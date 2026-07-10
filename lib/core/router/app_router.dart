@@ -8,6 +8,10 @@ import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
 import '../../feature/screens/kyc/presentation/screens/kyc_screen.dart';
 import '../../feature/screens/kyc/presentation/widgets/kyc_status_screen.dart';
 import '../../feature/screens/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../feature/screens/payments/presentation/screens/payment_screen.dart';
+import '../../feature/screens/payments/presentation/screens/payment_success_screen.dart';
+import '../../feature/screens/payments/presentation/screens/payments_screen.dart';
+import '../../feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
 import '../../feature/screens/splash/presentation/splash_screen.dart';
 
 /// Navigator keys
@@ -24,13 +28,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
     routes: [
       // Splash
-      GoRoute(path: RouteName.splash, pageBuilder: (ctx, state) => _fadeTransition(state, const SplashScreen())),
+      GoRoute(
+        path: RouteName.splash,
+        pageBuilder: (ctx, state) =>
+            _fadeTransition(state, const SplashScreen()),
+      ),
 
       // Onboarding
-      GoRoute(path: RouteName.onboarding, pageBuilder: (ctx, state) => _fadeTransition(state, const OnboardingScreen())),
+      GoRoute(
+        path: RouteName.onboarding,
+        pageBuilder: (ctx, state) =>
+            _fadeTransition(state, const OnboardingScreen()),
+      ),
 
       // Auth
-      GoRoute(path: RouteName.login, pageBuilder: (ctx, state) => _slideTransition(state, const LoginScreen())),
+      GoRoute(
+        path: RouteName.login,
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const LoginScreen()),
+      ),
       GoRoute(
         path: RouteName.otp,
         pageBuilder: (ctx, state) {
@@ -38,12 +54,43 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return _slideTransition(state, OtpScreen(phoneNumber: phone));
         },
       ),
-      GoRoute(path: RouteName.kycSubmit, pageBuilder: (ctx, state) => _slideTransition(state, const KycScreen())),
+      GoRoute(
+        path: RouteName.kycSubmit,
+        pageBuilder: (ctx, state) => _slideTransition(state, const KycScreen()),
+      ),
       GoRoute(
         path: RouteName.kycStatus,
         pageBuilder: (ctx, state) {
           final outcome = state.extra as KycOutcome? ?? KycOutcome.pending;
           return _slideTransition(state, KycStatusScreen(outcome: outcome));
+        },
+      ),
+      GoRoute(
+        path: RouteName.paymentSuccess,
+        pageBuilder: (ctx, state) {
+          final receipt =
+              state.extra as PaymentReceipt? ??
+              const PaymentReceipt(
+                enrollmentId: 'demo',
+                amount: 1000,
+                transactionId: 'BGS000000',
+                method: PaymentMethod.upi,
+              );
+          return _fadeTransition(state, PaymentSuccessScreen(receipt: receipt));
+        },
+      ),
+      GoRoute(
+        path: RouteName.paymentCheckout,
+        pageBuilder: (ctx, state) {
+          final id = state.pathParameters['enrollmentId']!;
+          return _slideTransition(state, CheckoutScreen(enrollmentId: id));
+        },
+      ),
+      GoRoute(
+        path: RouteName.payment,
+        pageBuilder: (ctx, state) {
+          final id = state.pathParameters['enrollmentId']!;
+          return _slideTransition(state, PaymentScreen(enrollmentId: id));
         },
       ),
     ],
@@ -206,25 +253,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 });
 
 // ── Page transition helpers ─────────────────────────────────────
-CustomTransitionPage<void> _slideTransition(GoRouterState state, Widget child) => CustomTransitionPage(
+CustomTransitionPage<void> _slideTransition(
+  GoRouterState state,
+  Widget child,
+) => CustomTransitionPage(
   key: state.pageKey,
   child: child,
   transitionDuration: const Duration(milliseconds: 280),
   reverseTransitionDuration: const Duration(milliseconds: 220),
   transitionsBuilder: (ctx, animation, secondary, child) => SlideTransition(
-    position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+    position: Tween<Offset>(
+      begin: const Offset(1, 0),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
     child: child,
   ),
 );
 
-CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) => CustomTransitionPage(
-  key: state.pageKey,
-  child: child,
-  transitionDuration: const Duration(milliseconds: 400),
-  transitionsBuilder: (ctx, animation, secondary, child) => FadeTransition(opacity: animation, child: child),
-);
+CustomTransitionPage<void> _fadeTransition(GoRouterState state, Widget child) =>
+    CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionDuration: const Duration(milliseconds: 400),
+      transitionsBuilder: (ctx, animation, secondary, child) =>
+          FadeTransition(opacity: animation, child: child),
+    );
 
-CustomTransitionPage<void> _noTransition(GoRouterState state, Widget child) => CustomTransitionPage(key: state.pageKey, child: child, transitionsBuilder: (ctx, animation, secondary, child) => child);
+CustomTransitionPage<void> _noTransition(GoRouterState state, Widget child) =>
+    CustomTransitionPage(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (ctx, animation, secondary, child) => child,
+    );
 
 // ── Error screens ────────────────────────────────────────────────
 class _ErrorScreen extends StatelessWidget {

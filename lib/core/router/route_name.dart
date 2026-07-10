@@ -23,6 +23,7 @@ abstract class RouteName {
 
   // ── Payments ──────────────────────────────────────────────────
   static const String payment = '/app/pay/:enrollmentId';
+  static const String paymentCheckout = '/app/pay/:enrollmentId/checkout';
   static const String paymentSuccess = '/app/pay/success';
 
   // ── Profile & KYC ────────────────────────────────────────────
@@ -51,10 +52,11 @@ abstract class RouteName {
   static String schemeDetailPath(String id) => '/app/schemes/$id';
   static String passbookPath(String id) => '/app/enrollments/$id/passbook';
   static String paymentPath(String enrollmentId) => '/app/pay/$enrollmentId';
+  static String paymentCheckoutPath(String enrollmentId) =>
+      '/app/pay/$enrollmentId/checkout';
   static String redemptionPath(String enrollmentId) =>
       '/app/redemption/$enrollmentId';
-  static String redemptionStatusPath(String id) =>
-      '/app/redemption/$id/status';
+  static String redemptionStatusPath(String id) => '/app/redemption/$id/status';
   static String agentCollectPath(String customerId) =>
       '/app/agent/collect/$customerId';
 }

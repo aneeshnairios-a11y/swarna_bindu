@@ -68,7 +68,12 @@ class KycStatusScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                0,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -76,11 +81,20 @@ class KycStatusScreen extends StatelessWidget {
                     customBorder: const CircleBorder(),
                     child: Padding(
                       padding: EdgeInsets.all(AppSpacing.xs),
-                      child: Icon(Icons.arrow_back, size: AppSpacing.iconLg, color: AppColors.textPrimaryLight),
+                      child: Icon(
+                        Icons.arrow_back,
+                        size: AppSpacing.iconLg,
+                        color: AppColors.textPrimaryLight,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.xs),
-                  Text(appBarTitle, style: AppTypography.headingSM(color: AppColors.textPrimaryLight)),
+                  Text(
+                    appBarTitle,
+                    style: AppTypography.headingSM(
+                      color: AppColors.textPrimaryLight,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -88,7 +102,10 @@ class KycStatusScreen extends StatelessWidget {
               padding: EdgeInsets.only(left: AppSpacing.xxxl + AppSpacing.lg),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text(k.statusStepCaption, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                child: Text(
+                  k.statusStepCaption,
+                  style: AppTypography.caption(color: AppColors.textMutedLight),
+                ),
               ),
             ),
             Expanded(
@@ -99,46 +116,85 @@ class KycStatusScreen extends StatelessWidget {
                   children: [
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.symmetric(vertical: AppSpacing.xxxl, horizontal: AppSpacing.lg),
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppSpacing.xxxl,
+                        horizontal: AppSpacing.lg,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceLight,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLg,
+                        ),
                         border: Border.all(color: AppColors.borderLight),
                       ),
                       child: Column(
                         children: [
                           Container(
                             padding: EdgeInsets.all(AppSpacing.lg),
-                            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
-                            child: Icon(icon, size: AppSpacing.iconXl, color: iconColor),
+                            decoration: BoxDecoration(
+                              color: iconBg,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              icon,
+                              size: AppSpacing.iconXl,
+                              color: iconColor,
+                            ),
                           ),
                           SizedBox(height: AppSpacing.lg),
                           Text(
                             title,
                             textAlign: TextAlign.center,
-                            style: AppTypography.headingSM(color: AppColors.textPrimaryLight),
+                            style: AppTypography.headingSM(
+                              color: AppColors.textPrimaryLight,
+                            ),
                           ),
                           SizedBox(height: AppSpacing.sm),
                           Text(
                             subtitle,
                             textAlign: TextAlign.center,
-                            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+                            style: AppTypography.bodySmall(
+                              color: AppColors.textMutedLight,
+                            ),
                           ),
-                          if (outcome == KycOutcome.success || outcome == KycOutcome.pending) ...[
+                          if (outcome == KycOutcome.success ||
+                              outcome == KycOutcome.pending) ...[
                             SizedBox(height: AppSpacing.lg),
                             Container(
                               width: double.infinity,
-                              padding: EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.md),
-                              decoration: BoxDecoration(color: AppColors.successGreenLight, borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+                              padding: EdgeInsets.symmetric(
+                                vertical: AppSpacing.sm,
+                                horizontal: AppSpacing.md,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppColors.successGreenLight,
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusMd,
+                                ),
+                              ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.schedule, size: AppSpacing.iconSm, color: AppColors.successGreen),
+                                  Icon(
+                                    Icons.schedule,
+                                    size: AppSpacing.iconSm,
+                                    color: AppColors.successGreen,
+                                  ),
                                   SizedBox(width: AppSpacing.xs),
                                   Column(
                                     children: [
-                                      Text(k.statusEtaLabel, style: AppTypography.caption(color: AppColors.textMutedLight)),
-                                      Text(k.statusEtaValue, style: AppTypography.labelMedium(color: AppColors.successGreen)),
+                                      Text(
+                                        k.statusEtaLabel,
+                                        style: AppTypography.caption(
+                                          color: AppColors.textMutedLight,
+                                        ),
+                                      ),
+                                      Text(
+                                        k.statusEtaValue,
+                                        style: AppTypography.labelMedium(
+                                          color: AppColors.successGreen,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -153,7 +209,12 @@ class KycStatusScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
               child: outcome == KycOutcome.rejected
                   ? OutlinedButton(
                       style: OutlinedButton.styleFrom(
@@ -163,7 +224,11 @@ class KycStatusScreen extends StatelessWidget {
                       onPressed: onRetry ?? () => context.pop(),
                       child: Text(k.statusReuploadCta),
                     )
-                  : AppButton(text: k.statusGoToDashboardCta, onPressed: () => context.go(RouteName.dashboard)),
+                  : AppButton(
+                      text: k.statusGoToDashboardCta,
+                      onPressed: () =>
+                          context.go(RouteName.paymentPath('demo')),
+                    ),
             ),
           ],
         ),
