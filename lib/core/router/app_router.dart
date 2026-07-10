@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gold_scheme/core/router/route_name.dart';
+import 'package:gold_scheme/feature/screens/dashboard/presentation/screens/dashboard_screen.dart';
 
 import '../../feature/screens/auth/presentation/screens/login_screen.dart';
 import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
@@ -38,13 +39,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return _slideTransition(state, OtpScreen(phoneNumber: phone));
         },
       ),
-      GoRoute(path: RouteName.kycSubmit, pageBuilder: (ctx, state) => _slideTransition(state, const KycScreen())),
+      GoRoute(
+        path: RouteName.kycSubmit,
+        pageBuilder: (ctx, state) => _slideTransition(
+          state,
+          const KycScreen(),
+        ),
+      ),
       GoRoute(
         path: RouteName.kycStatus,
         pageBuilder: (ctx, state) {
           final outcome = state.extra as KycOutcome? ?? KycOutcome.pending;
           return _slideTransition(state, KycStatusScreen(outcome: outcome));
         },
+      ),
+      GoRoute(
+        path: RouteName.dashboard,
+        pageBuilder: (ctx, state) => _slideTransition(
+          state,
+          const DashboardScreen(),
+        ),
       ),
     ],
 
