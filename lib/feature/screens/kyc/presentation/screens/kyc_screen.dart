@@ -13,8 +13,11 @@ import '../../../../global_widgets/common_button.dart';
 import '../viewmodels/kyc_viewmodels.dart';
 import '../widgets/key_step_identity.dart';
 import '../widgets/kyc_progress_header.dart';
+import '../widgets/kyc_status_screen.dart';
 import '../widgets/kyc_step_address.dart';
+import '../widgets/kyc_step_bank.dart';
 import '../widgets/kyc_step_personal.dart';
+import '../widgets/kyc_step_review.dart';
 
 /// KYC wizard. Figma shows 5 steps total; this build wires steps 1–3
 /// (Personal, Identity, Address). Steps 4 (Nominee) & 5 (Review & Submit)
@@ -32,6 +35,7 @@ class _KycScreenState extends ConsumerState<KycScreen> {
   final _personalFormKey = GlobalKey<FormState>();
   final _identityFormKey = GlobalKey<FormState>();
   final _addressFormKey = GlobalKey<FormState>();
+  final _bankFormKey = GlobalKey<FormState>();
 
   late final _nameController = TextEditingController();
   late final _emailController = TextEditingController();
@@ -43,11 +47,23 @@ class _KycScreenState extends ConsumerState<KycScreen> {
   late final _landmarkController = TextEditingController();
   late final _cityController = TextEditingController();
   late final _pinController = TextEditingController();
+  late final _accountHolderController = TextEditingController();
+  late final _accountNumberController = TextEditingController();
+  late final _confirmAccountNumberController = TextEditingController();
+  late final _ifscController = TextEditingController();
+  late final _branchController = TextEditingController();
+  late final _upiController = TextEditingController();
 
   /// Number of steps actually built in this screen (Personal, Identity, Address).
-  static const _builtSteps = 3;
+  // static const _builtSteps = 3;
 
-  late final _sectionLabels = [AppStrings.kyc.personalSectionLabel, AppStrings.kyc.identitySectionLabel, AppStrings.kyc.addressSectionLabel];
+  late final _sectionLabels = [
+    AppStrings.kyc.personalSectionLabel,
+    AppStrings.kyc.identitySectionLabel,
+    AppStrings.kyc.addressSectionLabel,
+    AppStrings.kyc.bankSectionLabel,
+    AppStrings.kyc.reviewSectionLabel,
+  ];
 
   @override
   void dispose() {
@@ -62,6 +78,12 @@ class _KycScreenState extends ConsumerState<KycScreen> {
     _landmarkController.dispose();
     _cityController.dispose();
     _pinController.dispose();
+    _accountHolderController.dispose();
+    _accountNumberController.dispose();
+    _confirmAccountNumberController.dispose();
+    _ifscController.dispose();
+    _branchController.dispose();
+    _upiController.dispose();
     super.dispose();
   }
 
@@ -73,9 +95,24 @@ class _KycScreenState extends ConsumerState<KycScreen> {
         return _identityFormKey;
       case 2:
         return _addressFormKey;
+      case 3:
+        return _bankFormKey;
       default:
         return null;
     }
+  }
+
+  void _goToPage(int step) {
+    _pageController.animateToPage(step, duration: const Duration(milliseconds: 280), curve: Curves.easeOutCubic);
+  }
+
+  Future<void> _onSubmit() async {
+    final notifier = ref.read(kycProvider.notifier);
+    await notifier.submit();
+    if (!mounted) return;
+    // TODO(Phase 2): branch on the real API result instead of always
+    // showing success — e.g. KycOutcome.rejected when verification fails.
+    context.push(RouteName.kycStatus, extra: KycOutcome.success);
   }
 
   void _onContinue() {
@@ -103,17 +140,23 @@ class _KycScreenState extends ConsumerState<KycScreen> {
           pinCode: _pinController.text.trim(),
         );
         break;
-    }
-
-    if (step >= _builtSteps - 1) {
-      // Steps 4 & 5 (Nominee, Review) land here once built.
-      // For now, Phase 1 ends the flow at the dashboard.
-      context.go(RouteName.dashboard);
-      return;
+      case 3:
+        notifier.updateBankInfo(
+          accountHolderName: _accountHolderController.text.trim(),
+          accountNumber: _accountNumberController.text.trim(),
+          confirmAccountNumber: _confirmAccountNumberController.text.trim(),
+          ifscCode: _ifscController.text.trim().toUpperCase(),
+          branchName: _branchController.text.trim(),
+          upiId: _upiController.text.trim(),
+        );
+        break;
+      case 4:
+        _onSubmit();
+        return;
     }
 
     notifier.nextStep();
-    _pageController.nextPage(duration: const Duration(milliseconds: 280), curve: Curves.easeOutCubic);
+    _goToPage(step + 1);
   }
 
   void _onBack() {
@@ -123,14 +166,39 @@ class _KycScreenState extends ConsumerState<KycScreen> {
       return;
     }
     ref.read(kycProvider.notifier).previousStep();
-    _pageController.previousPage(duration: const Duration(milliseconds: 280), curve: Curves.easeOutCubic);
+    _goToPage(step - 1);
   }
 
   void _onSkip() => context.go(RouteName.dashboard);
 
+  void _onEditStep(int step) {
+    ref.read(kycProvider.notifier).goToStep(step);
+    _goToPage(step);
+  }
+
+  void _syncControllersFromState(KycFormData data) {
+    _nameController.text = data.fullName;
+    _emailController.text = data.email;
+    _mobileController.text = data.mobile;
+    _aadhaarController.text = data.aadhaarNumber;
+    _panController.text = data.panNumber;
+    _houseController.text = data.houseName;
+    _streetController.text = data.streetArea;
+    _landmarkController.text = data.landmark;
+    _cityController.text = data.city;
+    _pinController.text = data.pinCode;
+    _accountHolderController.text = data.accountHolderName;
+    _accountNumberController.text = data.accountNumber;
+    _confirmAccountNumberController.text = data.confirmAccountNumber;
+    _ifscController.text = data.ifscCode;
+    _branchController.text = data.branchName;
+    _upiController.text = data.upiId;
+  }
+
   @override
   Widget build(BuildContext context) {
     final kycState = ref.watch(kycProvider);
+    final isReview = kycState.isReviewStep;
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -146,6 +214,13 @@ class _KycScreenState extends ConsumerState<KycScreen> {
               child: PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
+                onPageChanged: (page) {
+                  // Fired when Review's Edit links jump the PageView directly.
+                  if (page != ref.read(kycProvider).currentStep) {
+                    ref.read(kycProvider.notifier).goToStep(page);
+                  }
+                  _syncControllersFromState(ref.read(kycProvider).data);
+                },
                 children: [
                   SingleChildScrollView(
                     padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -205,6 +280,32 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       },
                     ),
                   ),
+                  SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    child: KycStepBank(
+                      formKey: _bankFormKey,
+                      accountHolderController: _accountHolderController,
+                      accountNumberController: _accountNumberController,
+                      confirmAccountNumberController: _confirmAccountNumberController,
+                      ifscController: _ifscController,
+                      branchController: _branchController,
+                      upiController: _upiController,
+                      bankName: kycState.data.bankName,
+                      onBankChanged: (b) => ref.read(kycProvider.notifier).updateBankInfo(bankName: b),
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                    child: KycStepReview(
+                      data: kycState.data,
+                      onEditStep: _onEditStep,
+                      onCaptureSelfie: () {
+                        // TODO(Phase 2): camera capture + liveness check.
+                        // Mocked here so Review has something to display:
+                        ref.read(kycProvider.notifier).updateSelfie(selfieImagePath: 'mock', selfieCapturedAt: DateTime.now());
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -212,7 +313,13 @@ class _KycScreenState extends ConsumerState<KycScreen> {
               padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
               child: Column(
                 children: [
-                  AppButton(text: AppStrings.kyc.continueCta, icon: Icons.arrow_forward, iconAfterText: true, onPressed: _onContinue),
+                  AppButton(
+                    text: isReview ? AppStrings.kyc.submitKycCta : AppStrings.kyc.continueCta,
+                    icon: isReview ? null : Icons.arrow_forward,
+                    iconAfterText: true,
+                    isLoading: kycState.isSubmitting,
+                    onPressed: _onContinue,
+                  ),
                   SizedBox(height: AppSpacing.sm),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,

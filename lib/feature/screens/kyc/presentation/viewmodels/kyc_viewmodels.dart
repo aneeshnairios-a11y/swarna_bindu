@@ -23,6 +23,15 @@ class KycFormData {
     this.district,
     this.state = 'Kerala',
     this.pinCode = '',
+    this.accountHolderName = '',
+    this.bankName,
+    this.accountNumber = '',
+    this.confirmAccountNumber = '',
+    this.ifscCode = '',
+    this.branchName = '',
+    this.upiId = '',
+    this.selfieImagePath,
+    this.selfieCapturedAt,
   });
 
   final String? profileImagePath;
@@ -46,6 +55,23 @@ class KycFormData {
   final String state;
   final String pinCode;
 
+  final String accountHolderName;
+  final String? bankName;
+  final String accountNumber;
+  final String confirmAccountNumber;
+  final String ifscCode;
+  final String branchName;
+  final String upiId;
+
+  final String? selfieImagePath;
+  final DateTime? selfieCapturedAt;
+
+  /// Combined single-line address used on the Review step.
+  String get formattedAddress {
+    final parts = [houseName, streetArea, if (landmark.trim().isNotEmpty) landmark, city, if (district != null) district, state].where((p) => p != null && p.toString().trim().isNotEmpty).join(', ');
+    return parts;
+  }
+
   KycFormData copyWith({
     String? profileImagePath,
     String? fullName,
@@ -65,6 +91,15 @@ class KycFormData {
     String? district,
     String? state,
     String? pinCode,
+    String? accountHolderName,
+    String? bankName,
+    String? accountNumber,
+    String? confirmAccountNumber,
+    String? ifscCode,
+    String? branchName,
+    String? upiId,
+    String? selfieImagePath,
+    DateTime? selfieCapturedAt,
   }) {
     return KycFormData(
       profileImagePath: profileImagePath ?? this.profileImagePath,
@@ -85,6 +120,15 @@ class KycFormData {
       district: district ?? this.district,
       state: state ?? this.state,
       pinCode: pinCode ?? this.pinCode,
+      accountHolderName: accountHolderName ?? this.accountHolderName,
+      bankName: bankName ?? this.bankName,
+      accountNumber: accountNumber ?? this.accountNumber,
+      confirmAccountNumber: confirmAccountNumber ?? this.confirmAccountNumber,
+      ifscCode: ifscCode ?? this.ifscCode,
+      branchName: branchName ?? this.branchName,
+      upiId: upiId ?? this.upiId,
+      selfieImagePath: selfieImagePath ?? this.selfieImagePath,
+      selfieCapturedAt: selfieCapturedAt ?? this.selfieCapturedAt,
     );
   }
 }
@@ -94,8 +138,7 @@ enum KycSubmitStatus { idle, submitting, success, error }
 class KycState {
   const KycState({this.currentStep = 0, this.data = const KycFormData(), this.status = KycSubmitStatus.idle, this.errorMessage});
 
-  /// Total steps in the full wizard (Figma shows 5 — this build covers
-  /// steps 1–3; steps 4 (Nominee) & 5 (Review) plug in the same way).
+  /// Personal, Identity, Address, Bank, Review — matches the Figma wizard.
   static const totalSteps = 5;
 
   final int currentStep; // 0-based, drives the PageView
@@ -104,6 +147,7 @@ class KycState {
   final String? errorMessage;
 
   bool get isSubmitting => status == KycSubmitStatus.submitting;
+  bool get isReviewStep => currentStep == totalSteps - 1;
 
   KycState copyWith({int? currentStep, KycFormData? data, KycSubmitStatus? status, String? errorMessage}) {
     return KycState(currentStep: currentStep ?? this.currentStep, data: data ?? this.data, status: status ?? this.status, errorMessage: errorMessage);
@@ -126,6 +170,13 @@ class KycNotifier extends Notifier<KycState> {
     }
   }
 
+  /// Jumps directly to a step — used by the "Edit" links on the Review step.
+  void goToStep(int step) {
+    if (step >= 0 && step < KycState.totalSteps) {
+      state = state.copyWith(currentStep: step);
+    }
+  }
+
   void updatePersonalInfo({String? profileImagePath, String? fullName, DateTime? dob, String? gender, String? email, String? mobile}) {
     state = state.copyWith(
       data: state.data.copyWith(profileImagePath: profileImagePath, fullName: fullName, dob: dob, gender: gender, email: email, mobile: mobile),
@@ -144,11 +195,37 @@ class KycNotifier extends Notifier<KycState> {
     );
   }
 
+  void updateBankInfo({String? accountHolderName, String? bankName, String? accountNumber, String? confirmAccountNumber, String? ifscCode, String? branchName, String? upiId}) {
+    state = state.copyWith(
+      data: state.data.copyWith(
+        accountHolderName: accountHolderName,
+        bankName: bankName,
+        accountNumber: accountNumber,
+        confirmAccountNumber: confirmAccountNumber,
+        ifscCode: ifscCode,
+        branchName: branchName,
+        upiId: upiId,
+      ),
+    );
+  }
+
+  void updateSelfie({String? selfieImagePath, DateTime? selfieCapturedAt}) {
+    state = state.copyWith(
+      data: state.data.copyWith(selfieImagePath: selfieImagePath, selfieCapturedAt: selfieCapturedAt),
+    );
+  }
+
   Future<void> submit() async {
     state = state.copyWith(status: KycSubmitStatus.submitting, errorMessage: null);
     // TODO(Phase 2): POST /users/:id/kyc with state.data (multipart for docs).
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 800));
     state = state.copyWith(status: KycSubmitStatus.success);
+  }
+
+  /// Resets submission status so the wizard can be retried after a
+  /// rejection, without losing the data already entered.
+  void resetSubmitStatus() {
+    state = state.copyWith(status: KycSubmitStatus.idle, errorMessage: null);
   }
 }
 

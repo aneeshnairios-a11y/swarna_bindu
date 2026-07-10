@@ -6,6 +6,7 @@ import 'package:gold_scheme/core/router/route_name.dart';
 import '../../feature/screens/auth/presentation/screens/login_screen.dart';
 import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
 import '../../feature/screens/kyc/presentation/screens/kyc_screen.dart';
+import '../../feature/screens/kyc/presentation/widgets/kyc_status_screen.dart';
 import '../../feature/screens/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../feature/screens/splash/presentation/splash_screen.dart';
 
@@ -38,6 +39,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: RouteName.kycSubmit, pageBuilder: (ctx, state) => _slideTransition(state, const KycScreen())),
+      GoRoute(
+        path: RouteName.kycStatus,
+        pageBuilder: (ctx, state) {
+          final outcome = state.extra as KycOutcome? ?? KycOutcome.pending;
+          return _slideTransition(state, KycStatusScreen(outcome: outcome));
+        },
+      ),
     ],
 
     // ── Routes (Phase 1 — remaining screens, to be added as built) ──

@@ -144,6 +144,50 @@ class _KycStrings {
   final String detectLocationTitle = 'Detect Current Location';
   final String detectLocationSubtitle = 'Use your current location to fill address';
   final String addressSecureNote = 'Your information is secure. Your address details are encrypted and used only for verification purposes.';
+
+  // ── Step 4 — Bank Account Details ───────────────────────────────
+  final String bankSectionLabel = 'Bank Details';
+  final String bankTitle = 'Bank Account Details';
+  final String bankSubtitle = 'Enter your bank account details for secure transactions.';
+  final String accountHolderLabel = 'Account Holder Name';
+  final String accountHolderHint = 'John Mathew';
+  final String bankNameLabel = 'Bank Name';
+  final String accountNumberLabel = 'Account Number';
+  final String accountNumberHint = '9198 7654 3210';
+  final String confirmAccountNumberLabel = 'Confirm Account Number';
+  final String ifscLabel = 'IFSC Code';
+  final String ifscHint = 'UTIB0001234';
+  final String branchNameLabel = 'Branch Name';
+  final String branchNameHint = 'MG Road, Kochi';
+  final String bankUsageNote = 'This account will be used to receive maturity amount, redemptions and refunds.';
+  final String upiLabel = 'UPI ID (Optional)';
+  final String upiSubtitle = 'Receive payment confirmations on your UPI ID';
+  final String upiHint = 'john@okaxis';
+  final String bankSecureNote = 'Your bank details are safe with us. We use bank-level security to protect your information.';
+
+  // ── Step 5 — Review & Submit ────────────────────────────────────
+  final String reviewSectionLabel = 'Review & Submit';
+  final String reviewTitle = 'Review Your Details';
+  final String reviewSubtitle = 'Please review all the information before submitting your KYC.';
+  final String reviewSecureNote = 'Your information is secure. All your details are encrypted and will be used only for verification purposes.';
+  final String selfieSectionLabel = 'Selfie Verification';
+  final String captureSelfieCta = 'Capture';
+  final String selfieNotCaptured = 'Not captured yet';
+  final String submitKycCta = 'Submit KYC';
+
+  // ── KYC Status (success / rejected / pending) ───────────────────
+  final String statusAppBarTitle = 'KYC Status';
+  final String statusStepCaption = 'Step 5 of 5 • Verification';
+  final String statusSuccessTitle = 'KYC Submitted Successfully!';
+  final String statusSuccessSubtitle = 'Thank you! Your KYC has been submitted. We will verify your details and notify you soon.';
+  final String statusRejectedTitle = 'KYC Submitted Rejected';
+  final String statusRejectedSubtitle = "Your document didn't pass verification. Re-upload a clear photo to try again.";
+  final String statusPendingTitle = 'KYC Under Review';
+  final String statusPendingSubtitle = 'Your KYC is being reviewed by our team. This usually takes 24–48 hours.';
+  final String statusEtaLabel = 'Estimated verification time';
+  final String statusEtaValue = '24 – 48 Hours';
+  final String statusReuploadCta = 'Re-upload Document';
+  final String statusGoToDashboardCta = 'Go to Dashboard';
 }
 
 class _CommonStrings {
