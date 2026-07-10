@@ -12,4 +12,6 @@ class AppAssetImage {
   static const String aadhaarCard = "$imagePath/aadhaarCard.webp";
   static const String panCard = "$imagePath/panCard.webp";
   static const String jewellery = "$imagePath/jewellery.webp";
+  static const String profile = "$imagePath/profile.webp";
+  static const String goldRate = "$imagePath/gold_rate.webp";
 }

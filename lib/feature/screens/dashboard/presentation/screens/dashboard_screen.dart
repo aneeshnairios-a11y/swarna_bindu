@@ -6,7 +6,7 @@ import 'package:gold_scheme/core/theme/app_spacing.dart';
 import 'package:gold_scheme/core/theme/app_typography.dart';
 
 import '../viewmodels/dashboard_viewmodel.dart';
-import '../widgets/dashboard_bottom_nav.dart';
+import '../../../../global_widgets/dashboard_bottom_nav.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/gold_rate_card.dart';
 import '../widgets/installment_due_card.dart';

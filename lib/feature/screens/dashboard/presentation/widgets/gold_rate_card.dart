@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:gold_scheme/core/theme/app_colors.dart';
 import 'package:gold_scheme/core/theme/app_spacing.dart';
 import 'package:gold_scheme/core/theme/app_typography.dart';
 
+import '../../../../../core/constants/image_string/image_strings.dart';
 import '../../../../../core/formatter/app_formatters.dart';
 
 class GoldRateCard extends StatelessWidget {
@@ -21,7 +23,9 @@ class GoldRateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
 
     return InkWell(
@@ -40,20 +44,33 @@ class GoldRateCard extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
-                  decoration: const BoxDecoration(gradient: AppColors.goldGradient, shape: BoxShape.circle),
-                  child: const Icon(Icons.workspace_premium_rounded, color: AppColors.textOnGold, size: 20),
+                  width: 40.w,
+                  height: 40.h,
+                  decoration: BoxDecoration(
+                    color: AppColors.maroonDark,
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                      image: AssetImage(AppAssetImage.goldRate),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
+
                 SizedBox(width: AppSpacing.md),
-                Text("Today's Gold Rate", style: AppTypography.sectionTitleSM(color: textPrimary)),
+                Text(
+                  "Today's Gold Rate",
+                  style: AppTypography.sectionTitleSM(color: textPrimary),
+                ),
               ],
             ),
             SizedBox(height: AppSpacing.md),
             Row(
               children: [
                 Expanded(
-                  child: _RateColumn(label: '22K Gold (1g)', value: AppFormatters.currencyDecimal(rate22k)),
+                  child: _RateColumn(
+                    label: '22K Gold (1g)',
+                    value: AppFormatters.currencyDecimal(rate22k),
+                  ),
                 ),
                 Container(width: 1, height: 32, color: border),
                 Expanded(
@@ -73,7 +90,11 @@ class GoldRateCard extends StatelessWidget {
 }
 
 class _RateColumn extends StatelessWidget {
-  const _RateColumn({required this.label, required this.value, this.alignEnd = false});
+  const _RateColumn({
+    required this.label,
+    required this.value,
+    this.alignEnd = false,
+  });
 
   final String label;
   final String value;
@@ -82,12 +103,16 @@ class _RateColumn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: Column(
-        crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: alignEnd
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
           Text(label, style: AppTypography.caption(color: AppColors.mutedGray)),
           const SizedBox(height: 4),

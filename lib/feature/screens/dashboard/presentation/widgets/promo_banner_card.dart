@@ -33,12 +33,12 @@ class PromoBannerCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Save Today,', style: AppTypography.bodySmall(color: Colors.white70)),
-                Text('Shine Tomorrow', style: AppTypography.headingSM(color: Colors.white)),
+                Text('Save Today,', style: AppTypography.statusBadge(color: Colors.white70)),
+                Text('Shine Tomorrow', style: AppTypography.bodyMedium(color: Colors.white)),
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   'Build your gold reserve with secure monthly savings.',
-                  style: AppTypography.caption(color: Colors.white60),
+                  style: AppTypography.statusBadge(color: Colors.white60),
                 ),
                 SizedBox(height: AppSpacing.md),
                 ElevatedButton(

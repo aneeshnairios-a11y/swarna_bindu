@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gold_scheme/core/constants/image_string/image_strings.dart';
 
 import 'package:gold_scheme/core/theme/app_colors.dart';
 import 'package:gold_scheme/core/theme/app_spacing.dart';
@@ -47,14 +49,15 @@ class SchemeSummaryCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  child: Container(
-                    width: 56,
-                    height: 56,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(gradient: AppColors.navyGoldGradient),
-                    child: const Icon(Icons.diamond_rounded, color: AppColors.primaryGoldLight),
+                Container(
+                  width:  72.w,
+                  height: 74.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    image: const DecorationImage(
+                      image: AssetImage(AppAssetImage.jewellery),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 SizedBox(width: AppSpacing.md),

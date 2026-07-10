@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:gold_scheme/core/theme/app_colors.dart';
 import 'package:gold_scheme/core/theme/app_spacing.dart';
 import 'package:gold_scheme/core/theme/app_typography.dart';
+
+import '../../../../../core/constants/image_string/image_strings.dart';
 
 class DashboardHeader extends StatelessWidget {
   const DashboardHeader({
@@ -34,10 +37,12 @@ class DashboardHeader extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onAvatarTap,
-          child: CircleAvatar(
-            radius: AppSpacing.avatarMd / 2,
-            backgroundColor: AppColors.goldSurfaceLight,
-            child: const Icon(Icons.person_rounded, color: AppColors.primaryGoldDark),
+          child: Container(
+            width: 44.w,
+            height: 44.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.avatarMd),
+              image: DecorationImage(image: AssetImage(AppAssetImage.profile), fit: BoxFit.cover),)
           ),
         ),
         SizedBox(width: AppSpacing.md),
