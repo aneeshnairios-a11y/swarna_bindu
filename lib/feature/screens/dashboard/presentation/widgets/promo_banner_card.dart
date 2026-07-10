@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gold_scheme/core/constants/image_string/image_strings.dart';
 
 import 'package:gold_scheme/core/theme/app_colors.dart';
 import 'package:gold_scheme/core/theme/app_spacing.dart';
@@ -9,11 +11,11 @@ class PromoBannerCard extends StatelessWidget {
 
   final VoidCallback? onExplore;
 
-  static const LinearGradient _promoGradient = LinearGradient(
-    colors: [Color(0xFF0F2818), Color(0xFF16321F), Color(0xFF1E3F27)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  // static const LinearGradient _promoGradient = LinearGradient(
+  //   colors: [Color(0xFF0F2818), Color(0xFF16321F), Color(0xFF1E3F27)],
+  //   begin: Alignment.topLeft,
+  //   end: Alignment.bottomRight,
+  // );
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +23,8 @@ class PromoBannerCard extends StatelessWidget {
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        gradient: _promoGradient,
+        color: AppColors.backgroundDark,
+        // gradient: _promoGradient,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       ),
       child: Row(
@@ -41,7 +44,7 @@ class PromoBannerCard extends StatelessWidget {
                 ElevatedButton(
                   onPressed: onExplore,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGold,
+                    backgroundColor: AppColors.primaryGoldDark,
                     foregroundColor: AppColors.textOnGold,
                     minimumSize: const Size(0, 40),
                     padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -53,7 +56,16 @@ class PromoBannerCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: AppSpacing.md),
-          Icon(Icons.diamond_outlined, color: AppColors.primaryGoldLight.withValues(alpha: 0.5), size: 64),
+          Container(
+            width: 156.w,
+            height: 105.h,
+            decoration: BoxDecoration(
+              image: DecorationImage(image: AssetImage(AppAssetImage.jewellery), fit: BoxFit.cover),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+            ),
+          ),
+
+          // Icon(Icons.diamond_outlined, color: AppColors.primaryGoldLight.withValues(alpha: 0.5), size: 64),
         ],
       ),
     );
