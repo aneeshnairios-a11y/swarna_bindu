@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
+import '../../../../../core/router/route_name.dart';
 import '../viewmodels/dashboard_viewmodel.dart';
 import '../../../../global_widgets/dashboard_bottom_nav.dart';
 import '../widgets/dashboard_header.dart';
@@ -46,7 +48,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 userName: state.userName,
                 unreadNotifications: state.unreadNotifications,
                 onNotificationTap: () {
-                  // TODO(Phase 2): context.push(RouteName.notifications);
+                 context.push(RouteName.notifications);
                 },
               ),
               SizedBox(height: AppSpacing.xl),
@@ -95,7 +97,9 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     label: 'Redeem Gold',
                     icon: Icons.card_giftcard_rounded,
                     color: AppColors.infoBlue,
-                    onTap: () {},
+                    onTap: () {
+                      context.push(RouteName.redeemGold);
+                    },
                   ),
                 ],
               ),

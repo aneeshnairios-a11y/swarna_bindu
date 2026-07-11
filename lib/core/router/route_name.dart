@@ -12,24 +12,36 @@ abstract class RouteName {
   static const String dashboard = '/app/dashboard';
   static const String schemes = '/app/schemes';
   static const String enrollments = '/app/enrollments';
-  static const String notifications = '/app/notifications';
   static const String profile = '/app/profile';
 
+
+
+
   // ── Scheme ────────────────────────────────────────────────────
+
   static const String schemeDetail = '/app/schemes/:id';
+  // ── Dashboard ────────────────────────────────────────────────────
+
+  static const String notifications = '/app/dashboard/notifications';
+  static const String redeemGold = '/app/dashboard/redeemGold';
+
 
   // ── Enrollment & passbook ─────────────────────────────────────
-  static const String passbook = '/app/enrollments/:id/passbook';
 
+  static const String passbook = '/app/enrollments/:id/passbook';
   // ── Payments ──────────────────────────────────────────────────
+
   static const String payment = '/app/pay/:enrollmentId';
   static const String paymentCheckout = '/app/pay/:enrollmentId/checkout';
   static const String paymentSuccess = '/app/pay/success';
-
+  static const String paymentHistory = '/app/paymentHistory';
+  static const String paymentReceipt = '/app/paymentReceipt';
   // ── Profile & KYC ────────────────────────────────────────────
+
   static const String kycSubmit = '/app/profile/kyc';
   static const String kycStatus = '/app/profile/kyc/status';
   static const String editProfile = '/app/profile/edit';
+  static const String myScheme = '/app/profile/mySchemes';
 
   // ── Redemption ────────────────────────────────────────────────
   static const String redemption = '/app/redemption/:enrollmentId';

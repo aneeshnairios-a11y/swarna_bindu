@@ -3,14 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:swarna_bindu/core/router/route_name.dart';
+import 'package:swarna_bindu/feature/screens/dashboard/presentation/screens/redeem_gold_screen.dart';
+import 'package:swarna_bindu/feature/screens/payments/presentation/screens/payment_receipt_screen.dart';
 
 import '../../feature/screens/auth/presentation/screens/login_screen.dart';
 import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
 import '../../feature/screens/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../feature/screens/dashboard/presentation/screens/notifications_screen.dart';
 import '../../feature/screens/gold_rate/presentation/gold_rate_screen.dart';
 import '../../feature/screens/kyc/presentation/screens/kyc_screen.dart';
 import '../../feature/screens/kyc/presentation/widgets/kyc_status_screen.dart';
 import '../../feature/screens/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../feature/screens/payments/presentation/screens/payment_history_screen.dart';
+import '../../feature/screens/profile/presentation/my_scheme_list_screen.dart';
 import '../../feature/screens/profile/presentation/profile_screen.dart';
 import '../../feature/screens/schemes/presentation/scheme_detail_screen.dart';
 import '../../feature/screens/schemes/presentation/schemes_screen.dart';
@@ -77,6 +82,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return _slideTransition(state, KycStatusScreen(outcome: outcome));
         },
       ),
+      // ── Dashboard ─────────────────────────────────────────────
+
       GoRoute(
         path: RouteName.dashboard,
         pageBuilder: (ctx, state) => _slideTransition(
@@ -84,6 +91,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           const DashboardScreen(),
         ),
       ),
+      GoRoute(
+              path: RouteName.notifications,
+              pageBuilder: (ctx, state) =>
+                  _noTransition(state, const NotificationsScreen()),
+            ),
+      GoRoute(
+              path: RouteName.redeemGold,
+              pageBuilder: (ctx, state) =>
+                  _noTransition(state, const RedeemGoldScreen()),
+            ),
+      // ── Payment ─────────────────────────────────────────────
+
       GoRoute(
         path: RouteName.paymentSuccess,
         pageBuilder: (ctx, state) {
@@ -112,6 +131,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return _slideTransition(state, PaymentScreen(enrollmentId: id));
         },
       ),
+      GoRoute(
+        path: RouteName.paymentHistory,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (ctx, state) => _slideTransition(state, const PaymentHistoryScreen()),
+      ),
+      GoRoute(
+        path: RouteName.paymentReceipt,
+        parentNavigatorKey: _rootNavigatorKey,
+        pageBuilder: (ctx, state) => _slideTransition(state, const PaymentReceiptScreen()),
+      ),
       // ── Schemes ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.schemes,
@@ -129,10 +158,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RouteName.goldRates,
         pageBuilder: (ctx, state) => _slideTransition(state, const GoldRateScreen()),
       ),
-      // ── Schemes ─────────────────────────────────────────────
+      // ── Profile ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.profile,
         pageBuilder: (ctx, state) => _slideTransition(state, const ProfileScreen()),
+
+      ),
+      GoRoute(
+        path: RouteName.myScheme,
+        pageBuilder: (ctx, state) => _slideTransition(state, const MySchemeListScreen()),
 
       ),
     ],

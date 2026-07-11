@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:swarna_bindu/core/constants/image_string/image_strings.dart';
 import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
@@ -534,12 +535,9 @@ class _GoldThumbnail extends StatelessWidget {
     decoration: BoxDecoration(
       color: AppColors.darkNavy,
       borderRadius: BorderRadius.circular(8),
+      image: DecorationImage(image: AssetImage(AppAssetImage.jewellery,),fit: BoxFit.cover),
     ),
-    child: const Icon(
-      Icons.workspace_premium_rounded,
-      color: AppColors.primaryGold,
-      size: 34,
-    ),
+   
   );
 }
 

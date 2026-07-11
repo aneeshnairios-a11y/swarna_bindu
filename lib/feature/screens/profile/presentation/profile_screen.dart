@@ -8,6 +8,7 @@ import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 import '../../../../core/router/route_name.dart';
 import '../../../global_widgets/dashboard_bottom_nav.dart';
+import 'my_scheme_list_screen.dart';
 
 /// Profile screen — maroon hero (avatar, name, mobile), an investment
 /// summary that overlaps the hero, and a "General" settings list.
@@ -56,13 +57,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('General', style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+                  Text(
+                    'General',
+                    style: AppTypography.sectionTitleSM(
+                      color: AppColors.textPrimaryLight,
+                    ),
+                  ),
                   SizedBox(height: AppSpacing.sm),
                   _SettingsRow(
                     icon: Icons.flag_rounded,
                     title: 'My Scheme',
                     subtitle: 'Learn About Our Schemes',
-                    onTap: () {},
+                    onTap: () => context.push(RouteName.myScheme),
                   ),
                   SizedBox(height: AppSpacing.sm),
                   _SettingsRow(
@@ -93,7 +99,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _ProfileHero extends StatelessWidget {
-  const _ProfileHero({required this.name, required this.mobile, required this.onBack});
+  const _ProfileHero({
+    required this.name,
+    required this.mobile,
+    required this.onBack,
+  });
 
   final String name;
   final String mobile;
@@ -110,7 +120,10 @@ class _ProfileHero extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -118,11 +131,18 @@ class _ProfileHero extends StatelessWidget {
                     onTap: onBack,
                     child: const Padding(
                       padding: EdgeInsets.all(4),
-                      child: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 22),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text('Profile', style: AppTypography.headingSM(color: Colors.white)),
+                  Text(
+                    'Profile',
+                    style: AppTypography.headingSM(color: Colors.white),
+                  ),
                 ],
               ),
             ),
@@ -133,8 +153,15 @@ class _ProfileHero extends StatelessWidget {
                 Container(
                   width: 88,
                   height: 88,
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  child: Icon(Icons.person_rounded, color: AppColors.maroonPrimary, size: 48),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person_rounded,
+                    color: AppColors.maroonPrimary,
+                    size: 48,
+                  ),
                 ),
                 Positioned(
                   right: 0,
@@ -147,7 +174,11 @@ class _ProfileHero extends StatelessWidget {
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.white, width: 2),
                     ),
-                    child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 13),
+                    child: const Icon(
+                      Icons.camera_alt_rounded,
+                      color: Colors.white,
+                      size: 13,
+                    ),
                   ),
                 ),
               ],
@@ -155,7 +186,12 @@ class _ProfileHero extends StatelessWidget {
             SizedBox(height: AppSpacing.sm),
             Text(name, style: AppTypography.sectionTitle(color: Colors.white)),
             SizedBox(height: 2),
-            Text('Mobile $mobile', style: AppTypography.bodyXSmall(color: Colors.white.withValues(alpha: 0.75))),
+            Text(
+              'Mobile $mobile',
+              style: AppTypography.bodyXSmall(
+                color: Colors.white.withValues(alpha: 0.75),
+              ),
+            ),
           ],
         ),
       ),
@@ -164,7 +200,10 @@ class _ProfileHero extends StatelessWidget {
 }
 
 class _InvestmentSummaryCard extends StatelessWidget {
-  const _InvestmentSummaryCard({required this.totalInvestment, required this.currentValue});
+  const _InvestmentSummaryCard({
+    required this.totalInvestment,
+    required this.currentValue,
+  });
 
   final double totalInvestment;
   final double currentValue;
@@ -172,12 +211,19 @@ class _InvestmentSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.lg),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 16, offset: const Offset(0, 6)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
         ],
       ),
       child: IntrinsicHeight(
@@ -190,7 +236,11 @@ class _InvestmentSummaryCard extends StatelessWidget {
                 value: AppFormatters.currency(totalInvestment),
               ),
             ),
-            Container(width: 1, color: AppColors.borderLight, margin: EdgeInsets.symmetric(horizontal: AppSpacing.sm)),
+            Container(
+              width: 1,
+              color: AppColors.borderLight,
+              margin: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+            ),
             Expanded(
               child: _SummaryItem(
                 icon: Icons.show_chart_rounded,
@@ -206,7 +256,11 @@ class _InvestmentSummaryCard extends StatelessWidget {
 }
 
 class _SummaryItem extends StatelessWidget {
-  const _SummaryItem({required this.icon, required this.label, required this.value});
+  const _SummaryItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   final IconData icon;
   final String label;
@@ -220,7 +274,10 @@ class _SummaryItem extends StatelessWidget {
         Container(
           width: 34,
           height: 34,
-          decoration: BoxDecoration(color: AppColors.infoBlueLight, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: AppColors.infoBlueLight,
+            shape: BoxShape.circle,
+          ),
           child: Icon(icon, color: AppColors.infoBlue, size: 17),
         ),
         SizedBox(width: AppSpacing.sm),
@@ -228,8 +285,16 @@ class _SummaryItem extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: AppTypography.caption(color: AppColors.textMutedLight)),
-              Text(value, style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+              Text(
+                label,
+                style: AppTypography.caption(color: AppColors.textMutedLight),
+              ),
+              Text(
+                value,
+                style: AppTypography.sectionTitleSM(
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
             ],
           ),
         ),
@@ -260,7 +325,10 @@ class _SettingsRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.md,
+          ),
           child: Row(
             children: [
               Container(
@@ -277,9 +345,19 @@ class _SettingsRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: AppTypography.labelLarge(color: AppColors.textPrimaryLight)),
+                    Text(
+                      title,
+                      style: AppTypography.labelLarge(
+                        color: AppColors.textPrimaryLight,
+                      ),
+                    ),
                     SizedBox(height: 2),
-                    Text(subtitle, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                    Text(
+                      subtitle,
+                      style: AppTypography.caption(
+                        color: AppColors.textMutedLight,
+                      ),
+                    ),
                   ],
                 ),
               ),

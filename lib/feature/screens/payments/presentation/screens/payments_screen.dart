@@ -65,8 +65,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         iconColor: const Color(0xFF2E9F4B),
                         title: 'View History',
                         subtitle: 'All Payments',
-                        onTap: () => _comingSoon(context, 'Payment history'),
-                      ),
+                        onTap: () {
+                          context.push(RouteName.paymentHistory);
+                        }),
                       SizedBox(width: AppSpacing.sm),
                       _QuickAction(
                         icon: Icons.file_download_outlined,
@@ -74,7 +75,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         iconColor: const Color(0xFF1680E8),
                         title: 'Receipts',
                         subtitle: 'Get Your Receipts',
-                        onTap: () => _comingSoon(context, 'Receipts'),
+                        onTap: () => context.push(RouteName.paymentReceipt),
                       ),
                       SizedBox(width: AppSpacing.sm),
                       _QuickAction(

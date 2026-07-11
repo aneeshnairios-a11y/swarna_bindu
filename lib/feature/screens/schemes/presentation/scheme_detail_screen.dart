@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:swarna_bindu/core/router/route_name.dart';
 import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
+import '../../../../core/constants/image_string/image_strings.dart';
 import '../../../global_widgets/common_button.dart';
 import '../schemes_viewmodel/scheme_model.dart';
+import 'my_schemes_screen.dart';
 
 /// Scheme detail + join flow — Phase 1, mock data only.
-/// "Confirm & Join Scheme" currently just simulates success; wire it up to
-/// `POST /enrollments` once the data layer is ready.
+///
+/// Flow: agree to both consent checkboxes → tap "Join This Scheme" →
+/// [_ConfirmSchemeDialog] asks the user to confirm → tapping "Add scheme"
+/// there simulates the enrollment call and lands on [MySchemesScreen].
+/// Wire the mock delay up to `POST /enrollments` once the data layer is
+/// ready.
 class SchemeDetailScreen extends StatefulWidget {
   const SchemeDetailScreen({super.key, required this.schemeId});
 
@@ -28,23 +33,25 @@ class _SchemeDetailScreenState extends State<SchemeDetailScreen> {
 
   bool get _canSubmit => _agreedTerms && _consentKyc && !_submitting;
 
-  Future<void> _confirmJoin(SchemeModel scheme) async {
+  Future<void> _onJoinPressed(SchemeModel scheme) async {
+    // Step 1 — ask the user to confirm the scheme they're about to add.
+    final confirmed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) => _ConfirmSchemeDialog(scheme: scheme),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    // Step 2 — "Add scheme" was tapped: simulate the enrollment call.
     setState(() => _submitting = true);
     await Future.delayed(const Duration(milliseconds: 600)); // mock latency
     if (!mounted) return;
     setState(() => _submitting = false);
 
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isDismissible: false,
-      builder: (ctx) => _SuccessSheet(
-        schemeName: scheme.name,
-        onDone: () {
-          Navigator.of(ctx).pop();
-          context.go(RouteName.dashboard);
-        },
-      ),
+    // Step 3 — land on My Schemes with the new enrollment.
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => MySchemesScreen(scheme: scheme)),
     );
   }
 
@@ -66,31 +73,19 @@ class _SchemeDetailScreenState extends State<SchemeDetailScreen> {
         children: [
           Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: AppSpacing.xxl, horizontal: AppSpacing.lg),
+            // padding: EdgeInsets.symmetric(vertical: AppSpacing.xxl, horizontal: AppSpacing.lg),
             decoration: BoxDecoration(
               gradient: AppColors.splashGradient,
               borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
             ),
             child: Column(
               children: [
-                Container(
-                  width: 56,
-                  height: 56,
-                  decoration: const BoxDecoration(gradient: AppColors.goldCardGradient, shape: BoxShape.circle),
-                  child: const Icon(Icons.wb_sunny_rounded, color: AppColors.textOnGold, size: 28),
-                ),
-                SizedBox(height: AppSpacing.md),
-                Text(
-                  scheme.name.toUpperCase(),
-                  style: AppTypography.headingLG(color: Colors.white).copyWith(letterSpacing: 2),
-                ),
-                SizedBox(height: AppSpacing.xs),
-                Text(scheme.tagline, style: AppTypography.bodySmall(color: Colors.white70)),
+                Image.asset(AppAssetImage.appLogo, height: 164.h,width: 164.w,),
               ],
             ),
           ),
           SizedBox(height: AppSpacing.xl),
-          Text('Terms & Conditions', style: AppTypography.sectionTitleSM(color: textColor)),
+          Text('Terms & Condition', style: AppTypography.sectionTitleSM(color: textColor)),
           SizedBox(height: AppSpacing.sm),
           Container(
             padding: EdgeInsets.all(AppSpacing.md),
@@ -157,12 +152,12 @@ class _SchemeDetailScreenState extends State<SchemeDetailScreen> {
           ),
           SizedBox(height: AppSpacing.xxl),
           AppButton(
-            text: 'Confirm & Join Scheme',
+            text: 'Join This Scheme',
             isLoading: _submitting,
-            onPressed: _canSubmit ? () => _confirmJoin(scheme) : null,
-            backgroundColor: AppColors.primaryGold,
+            onPressed: _canSubmit ? () => _onJoinPressed(scheme) : null,
+            backgroundColor: AppColors.maroonDark,
             disabledBackgroundColor: isDark ? AppColors.surfaceVariantDark : AppColors.borderStrongLight,
-            textColor: AppColors.textOnGold,
+            textColor: Colors.white,
           ),
           SizedBox(height: AppSpacing.lg),
         ],
@@ -194,8 +189,8 @@ class _ConsentTile extends StatelessWidget {
             Checkbox(
               value: value,
               onChanged: (v) => onChanged(v ?? false),
-              activeColor: AppColors.primaryGold,
-              checkColor: AppColors.textOnGold,
+              activeColor: AppColors.maroonDark,
+              checkColor: AppColors.surfaceLight,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
             ),
             Expanded(
@@ -211,53 +206,116 @@ class _ConsentTile extends StatelessWidget {
   }
 }
 
-class _SuccessSheet extends StatelessWidget {
-  const _SuccessSheet({required this.schemeName, required this.onDone});
+/// "Are you sure you want to add the following scheme?" confirmation
+/// dialog, shown right after the user taps "Join This Scheme".
+/// Returns `true` via [Navigator.pop] when "Add scheme" is tapped,
+/// `false`/`null` on Cancel or dismiss.
+class _ConfirmSchemeDialog extends StatelessWidget {
+  const _ConfirmSchemeDialog({required this.scheme});
 
-  final String schemeName;
-  final VoidCallback onDone;
+  final SchemeModel scheme;
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bg = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xl),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXxl)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.paidBgDark : AppColors.successGreenLight,
-              shape: BoxShape.circle,
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // ── Maroon header — logo + title ──────────────────
+            Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(AppSpacing.sm,),
+              decoration: const BoxDecoration(gradient: AppColors.splashGradient),
+              child: Column(
+                children: [
+                  Image.asset(AppAssetImage.appLogo, height: 150.h,width: 150.w,),
+                  // SizedBox(height: AppSpacing.sm),
+                  Text(
+                    'Confirm Scheme Selection',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.sectionTitle(color: Colors.white),
+                  ),
+                ],
+              ),
             ),
-            child: Icon(Icons.check_rounded, color: AppColors.successGreen, size: 32),
-          ),
-          SizedBox(height: AppSpacing.lg),
-          Text("You're in!", style: AppTypography.headingSM(color: textColor)),
-          SizedBox(height: AppSpacing.xs),
-          Text(
-            'Your request to join $schemeName has been recorded.',
-            textAlign: TextAlign.center,
-            style: AppTypography.bodySmall(color: mutedColor),
-          ),
-          SizedBox(height: AppSpacing.xl),
-          AppButton(
-            text: 'Go to Dashboard',
-            onPressed: onDone,
-            backgroundColor: AppColors.primaryGold,
-            textColor: AppColors.textOnGold,
-          ),
-        ],
+
+            // ── White body — confirmation + actions ───────────
+            Container(
+              width: double.infinity,
+              color: AppColors.surfaceLight,
+              padding: EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Are you sure you want to add the following scheme ?',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.bodySmall(color: AppColors.textPrimaryLight),
+                  ),
+                  SizedBox(height: AppSpacing.lg),
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: AppColors.goldSurfaceLight,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.savings_rounded, color: AppColors.maroonDark),
+                        SizedBox(width: AppSpacing.sm),
+                        Flexible(
+                          child: Text(
+                            '${scheme.name} Scheme',
+                            textAlign: TextAlign.center,
+                            style: AppTypography.labelLarge(color: AppColors.maroonDark)
+                                .copyWith(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: AppSpacing.md),
+                  Text(
+                    'you can cancel within 24 hours of joining with no penalty',
+                    textAlign: TextAlign.center,
+                    style: AppTypography.caption(color: AppColors.textMutedLight)
+                        .copyWith(fontStyle: FontStyle.italic),
+                  ),
+                  SizedBox(height: AppSpacing.xl),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: AppButton(
+                          text: 'Cancel',
+                          onPressed: () => Navigator.of(context).pop(false),
+                          height: 48,
+                          backgroundColor: AppColors.surfaceVariantLight,
+                          textColor: AppColors.textPrimaryLight,
+                        ),
+                      ),
+                      SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: AppButton(
+                          text: 'Add scheme',
+                          onPressed: () => Navigator.of(context).pop(true),
+                          height: 48,
+                          backgroundColor: AppColors.maroonDark,
+                          textColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
