@@ -14,4 +14,5 @@ class AppAssetImage {
   static const String jewellery = "$imagePath/jewellery.webp";
   static const String profile = "$imagePath/profile.webp";
   static const String goldRate = "$imagePath/gold_rate.webp";
+  static const String goldCoin = "$imagePath/gold_coin.webp";
 }

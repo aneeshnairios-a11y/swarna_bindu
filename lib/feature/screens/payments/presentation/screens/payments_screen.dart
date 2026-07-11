@@ -143,83 +143,90 @@ class _DueAmountCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-    height: 188,
     padding: EdgeInsets.all(AppSpacing.md),
     decoration: BoxDecoration(
       color: AppColors.maroonDark,
       borderRadius: BorderRadius.circular(16),
     ),
     child: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
+        Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Next Due Amount',
-              style: AppTypography.labelLarge(color: const Color(0xFFE9D7DD)),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              AppFormatters.currency(5000),
-              style: AppTypography.goldAmountSM(color: const Color(0xFFEFC744)),
-            ),
-            const SizedBox(height: 11),
-            const SizedBox(
-              width: 132,
-              child: Divider(color: Color(0xFF9A4564), height: 1),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 16,
-                  backgroundColor: Color(0xFFF7E9BF),
-                  child: Icon(
-                    Icons.calendar_today_outlined,
-                    size: 17,
-                    color: AppColors.maroonDark,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Next Due Amount',
+                    style: AppTypography.labelLarge(color: const Color(0xFFE9D7DD)),
                   ),
-                ),
-                SizedBox(width: AppSpacing.sm),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Due Date',
-                      style: AppTypography.labelSmall(
-                        color: const Color(0xFFE9D7DD),
-                      ),
-                    ),
-                    Text(
-                      '05 Jun 2025',
-                      style: AppTypography.labelMedium(color: Colors.white),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(
-              height: 40,
-              child: FilledButton(
-                onPressed: onPay,
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.maroonDark,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7),
+                  const SizedBox(height: 2),
+                  Text(
+                    AppFormatters.currency(5000),
+                    style: AppTypography.goldAmountSM(color: const Color(0xFFEFC744)),
                   ),
-                ),
-                child: Text(
-                  'Pay Now',
-                  style: AppTypography.sectionTitleSM(
-                    color: AppColors.maroonDark,
-                  ),
-                ),
+                ],
               ),
+            ),
+            const SizedBox(
+              width: 90,
+              height: 76,
+              child: _CoinStack(),
             ),
           ],
         ),
-
+        const SizedBox(height: 11),
+        const Divider(color: Color(0xFF9A4564), height: 1),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            const CircleAvatar(
+              radius: 16,
+              backgroundColor: Color(0xFFF7E9BF),
+              child: Icon(
+                Icons.calendar_today_outlined,
+                size: 17,
+                color: AppColors.maroonDark,
+              ),
+            ),
+            SizedBox(width: AppSpacing.sm),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Due Date',
+                  style: AppTypography.labelSmall(color: const Color(0xFFE9D7DD)),
+                ),
+                Text(
+                  '05 Jun 2025',
+                  style: AppTypography.labelMedium(color: Colors.white),
+                ),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: AppSpacing.md),
+        SizedBox(
+          width: double.infinity,
+          height: 44,
+          child: FilledButton(
+            onPressed: onPay,
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: AppColors.maroonDark,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(7),
+              ),
+            ),
+            child: Text(
+              'Pay Now',
+              style: AppTypography.sectionTitleSM(color: AppColors.maroonDark),
+            ),
+          ),
+        ),
       ],
     ),
   );
