@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
+import 'package:swarna_bindu/core/theme/app_colors.dart';
+import 'package:swarna_bindu/core/theme/app_spacing.dart';
+import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 import '../../../../../core/formatter/app_formatters.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 /// Hero card shown at the top of the Dashboard — total savings, gold
 /// accumulated, goal, and a circular progress ring toward the goal.

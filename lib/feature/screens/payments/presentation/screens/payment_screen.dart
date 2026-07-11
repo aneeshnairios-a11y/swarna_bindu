@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
-import 'package:gold_scheme/feature/global_widgets/common_button.dart';
-import 'package:gold_scheme/feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
+import 'package:swarna_bindu/core/theme/app_colors.dart';
+import 'package:swarna_bindu/core/theme/app_spacing.dart';
+import 'package:swarna_bindu/core/theme/app_typography.dart';
+import 'package:swarna_bindu/feature/global_widgets/common_button.dart';
+import 'package:swarna_bindu/feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
 
 /// Complete five-step payment flow opened by the Payments landing page.
 class CheckoutScreen extends ConsumerWidget {

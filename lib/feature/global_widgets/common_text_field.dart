@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
+import 'package:swarna_bindu/core/theme/app_colors.dart';
+import 'package:swarna_bindu/core/theme/app_spacing.dart';
+import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 /// Standard text input used across the app.
 /// Relies on the global `InputDecorationTheme` (see AppTheme) for

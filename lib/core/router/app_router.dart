@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gold_scheme/core/router/route_name.dart';
-import 'package:gold_scheme/feature/screens/dashboard/presentation/screens/dashboard_screen.dart';
-import 'package:gold_scheme/feature/screens/gold_rate/presentation/gold_rate_screen.dart';
-import 'package:gold_scheme/feature/screens/profile/presentation/profile_screen.dart';
+
+import 'package:swarna_bindu/core/router/route_name.dart';
 
 import '../../feature/screens/auth/presentation/screens/login_screen.dart';
 import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
+import '../../feature/screens/dashboard/presentation/screens/dashboard_screen.dart';
+import '../../feature/screens/gold_rate/presentation/gold_rate_screen.dart';
 import '../../feature/screens/kyc/presentation/screens/kyc_screen.dart';
 import '../../feature/screens/kyc/presentation/widgets/kyc_status_screen.dart';
 import '../../feature/screens/onboarding/presentation/screens/onboarding_screen.dart';
+import '../../feature/screens/profile/presentation/profile_screen.dart';
 import '../../feature/screens/schemes/presentation/scheme_detail_screen.dart';
 import '../../feature/screens/schemes/presentation/schemes_screen.dart';
 

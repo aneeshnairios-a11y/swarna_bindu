@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:gold_scheme/core/formatter/app_formatters.dart';
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
 
+import '../../../../core/formatter/app_formatters.dart';
 import '../../../../core/router/route_name.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/app_typography.dart';
 import '../../../global_widgets/common_button.dart';
 import '../../../global_widgets/dashboard_bottom_nav.dart';
 

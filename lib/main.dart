@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gold_scheme/core/constants/app_string/app_strings.dart';
-import 'package:gold_scheme/core/router/app_router.dart';
-import 'package:gold_scheme/core/theme/app_theme.dart';
-import 'package:gold_scheme/core/theme/theme_provider.dart';
+
+
+import 'core/constants/app_string/app_strings.dart';
+import 'core/router/app_router.dart';
+import 'core/theme/app_theme.dart';
+import 'core/theme/theme_provider.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));

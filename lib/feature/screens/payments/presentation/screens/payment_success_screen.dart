@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:gold_scheme/core/formatter/app_formatters.dart';
-import 'package:gold_scheme/core/router/route_name.dart';
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
-import 'package:gold_scheme/feature/global_widgets/common_button.dart';
-import 'package:gold_scheme/feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
+import 'package:swarna_bindu/core/formatter/app_formatters.dart';
+import 'package:swarna_bindu/core/router/route_name.dart';
+import 'package:swarna_bindu/core/theme/app_colors.dart';
+import 'package:swarna_bindu/core/theme/app_spacing.dart';
+import 'package:swarna_bindu/core/theme/app_typography.dart';
+import 'package:swarna_bindu/feature/global_widgets/common_button.dart';
+import 'package:swarna_bindu/feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
 
 class PaymentSuccessScreen extends StatelessWidget {
   const PaymentSuccessScreen({super.key, required this.receipt});

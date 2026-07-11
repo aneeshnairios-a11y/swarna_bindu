@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gold_scheme/core/constants/image_string/image_strings.dart';
 
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
 
+
+import '../../../../../core/constants/image_string/image_strings.dart';
 import '../../../../../core/formatter/app_formatters.dart';
+import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/app_spacing.dart';
+import '../../../../../core/theme/app_typography.dart';
 
 class SchemeSummaryCard extends StatelessWidget {
   const SchemeSummaryCard({

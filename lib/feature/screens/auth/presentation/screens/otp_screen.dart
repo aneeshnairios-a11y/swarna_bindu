@@ -7,11 +7,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:gold_scheme/core/constants/app_string/app_strings.dart';
-import 'package:gold_scheme/core/constants/image_string/image_strings.dart';
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_spacing.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
+import 'package:swarna_bindu/core/constants/app_string/app_strings.dart';
+import 'package:swarna_bindu/core/constants/image_string/image_strings.dart';
+import 'package:swarna_bindu/core/theme/app_colors.dart';
+import 'package:swarna_bindu/core/theme/app_spacing.dart';
+import 'package:swarna_bindu/core/theme/app_typography.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../../../../core/router/route_name.dart';

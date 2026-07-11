@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:gold_scheme/core/theme/app_colors.dart';
-import 'package:gold_scheme/core/theme/app_typography.dart';
+import 'package:swarna_bindu/core/theme/app_colors.dart';
 
 import '../../core/router/route_name.dart';
+import '../../core/theme/app_typography.dart';
 
 /// Bottom navigation bar with a raised center action button.
 ///
@@ -216,6 +216,10 @@ class _CenterAction extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final labelColor = selected
+        ? AppColors.maroonDark
+        : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -245,8 +249,9 @@ class _CenterAction extends StatelessWidget {
           Text(
             'Payments',
             style: AppTypography.labelSmall(
-              color: AppColors.mutedGray,
-            ).copyWith(fontSize: 11),
+              color: labelColor,
+            ).copyWith(fontSize: 11,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,),
           ),
         ],
       ),
