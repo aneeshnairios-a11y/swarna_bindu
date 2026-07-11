@@ -46,14 +46,12 @@ class GoldRateCard extends StatelessWidget {
                 Container(
                   width: 40.w,
                   height: 40.h,
+                  padding: EdgeInsets.all(AppSpacing.radiusSm),
                   decoration: BoxDecoration(
                     color: AppColors.maroonDark,
                     shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: AssetImage(AppAssetImage.goldRate),
-                      fit: BoxFit.cover,
-                    ),
                   ),
+                  child: Image.asset(AppAssetImage.goldRate,fit: BoxFit.cover,),
                 ),
 
                 SizedBox(width: AppSpacing.md),

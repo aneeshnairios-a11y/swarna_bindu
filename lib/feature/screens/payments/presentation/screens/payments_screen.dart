@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gold_scheme/core/formatter/app_formatters.dart';
 import 'package:gold_scheme/core/router/route_name.dart';
@@ -6,15 +7,25 @@ import 'package:gold_scheme/core/theme/app_colors.dart';
 import 'package:gold_scheme/core/theme/app_spacing.dart';
 import 'package:gold_scheme/core/theme/app_typography.dart';
 
+import '../../../../global_widgets/dashboard_bottom_nav.dart';
+
 /// Payment landing page matching the supplied reference design.
-class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key, required this.enrollmentId});
+class PaymentScreen extends StatefulWidget {
+   const PaymentScreen({super.key, required this.enrollmentId});
 
   final String enrollmentId;
 
   @override
+  State<PaymentScreen> createState() => _PaymentScreenState();
+}
+
+class _PaymentScreenState extends State<PaymentScreen> {
+  int navIndex = 1;
+
+  @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFFFFFCF6),
+    bottomNavigationBar: DashboardBottomNav(currentIndex: navIndex,  onTap: (i) => setState(() => navIndex = i),),
     body: SafeArea(
       child: Column(
         children: [
@@ -36,7 +47,7 @@ class PaymentScreen extends StatelessWidget {
                 children: [
                   _DueAmountCard(
                     onPay: () => context.push(
-                      RouteName.paymentCheckoutPath(enrollmentId),
+                      RouteName.paymentCheckoutPath(widget.enrollmentId),
                     ),
                   ),
                   SizedBox(height: AppSpacing.lg),
@@ -88,10 +99,11 @@ class PaymentScreen extends StatelessWidget {
               ),
             ),
           ),
-          const _PaymentNavigation(),
+
         ],
       ),
     ),
+
   );
 
   void _comingSoon(BuildContext context, String label) {
@@ -137,7 +149,7 @@ class _DueAmountCard extends StatelessWidget {
       color: AppColors.maroonDark,
       borderRadius: BorderRadius.circular(16),
     ),
-    child: Stack(
+    child: Column(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,37 +198,28 @@ class _DueAmountCard extends StatelessWidget {
                 ),
               ],
             ),
-          ],
-        ),
-        const Positioned(
-          top: 10,
-          right: -2,
-          child: SizedBox(width: 120, height: 100, child: _CoinStack()),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: SizedBox(
-            height: 40,
-            child: FilledButton(
-              onPressed: onPay,
-              style: FilledButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.maroonDark,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(7),
+            SizedBox(
+              height: 40,
+              child: FilledButton(
+                onPressed: onPay,
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.maroonDark,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7),
+                  ),
                 ),
-              ),
-              child: Text(
-                'Pay Now',
-                style: AppTypography.sectionTitleSM(
-                  color: AppColors.maroonDark,
+                child: Text(
+                  'Pay Now',
+                  style: AppTypography.sectionTitleSM(
+                    color: AppColors.maroonDark,
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
+
       ],
     ),
   );
@@ -300,7 +303,7 @@ class _SchemeCard extends StatelessWidget {
   const _SchemeCard();
   @override
   Widget build(BuildContext context) => Container(
-    height: 73,
+    height: 73.h,
     padding: const EdgeInsets.all(7),
     decoration: BoxDecoration(
       color: Colors.white,
@@ -443,81 +446,6 @@ class _SecurityCard extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _PaymentNavigation extends StatelessWidget {
-  const _PaymentNavigation();
-  @override
-  Widget build(BuildContext context) => Container(
-    height: 68,
-    decoration: const BoxDecoration(
-      color: Colors.white,
-      border: Border(top: BorderSide(color: Color(0xFFEEEAE3))),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: const [
-        _NavItem(icon: Icons.home_outlined, label: 'Home'),
-        _NavItem(icon: Icons.shopping_bag_outlined, label: 'Schemes'),
-        _NavItem(
-          icon: Icons.currency_rupee_rounded,
-          label: 'Payments',
-          selected: true,
-        ),
-        _NavItem(icon: Icons.bar_chart_outlined, label: 'Gold Rate'),
-        _NavItem(icon: Icons.person_outline_rounded, label: 'Profile'),
-      ],
-    ),
-  );
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    this.selected = false,
-  });
-  final IconData icon;
-  final String label;
-  final bool selected;
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    width: 55,
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (selected)
-          Transform.translate(
-            offset: const Offset(0, -20),
-            child: Container(
-              width: 42,
-              height: 42,
-              decoration: const BoxDecoration(
-                color: AppColors.maroonDark,
-                shape: BoxShape.circle,
-                border: Border.fromBorderSide(
-                  BorderSide(color: Color(0xFFFFFCF6), width: 7),
-                ),
-              ),
-              child: Icon(icon, color: AppColors.primaryGoldLight, size: 21),
-            ),
-          )
-        else
-          Icon(icon, color: AppColors.mutedGray, size: 21),
-        SizedBox(height: selected ? 0 : 4),
-        Text(
-          label,
-          style:
-              AppTypography.bodyXSmall(
-                color: selected ? AppColors.maroonDark : AppColors.mutedGray,
-              ).copyWith(
-                fontSize: 9,
-                fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
-              ),
         ),
       ],
     ),

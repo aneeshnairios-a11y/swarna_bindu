@@ -35,6 +35,8 @@ class DashboardBottomNav extends StatelessWidget {
         context.go(RouteName.dashboard);
       case 1:
         context.go(RouteName.schemes);
+      case 2:
+        context.go(RouteName.payment);
       case 3:
         context.go(RouteName.goldRates);
       case 4:
@@ -242,8 +244,9 @@ class _CenterAction extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             'Payments',
-            style: AppTypography.labelSmall(color: AppColors.mutedGray)
-                .copyWith(fontSize: 11),
+            style: AppTypography.labelSmall(
+              color: AppColors.mutedGray,
+            ).copyWith(fontSize: 11),
           ),
         ],
       ),
