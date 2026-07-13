@@ -4,11 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../../../core/constants/image_string/image_strings.dart';
 import '../../../../core/router/route_name.dart';
 import '../../../../core/theme/app_colors.dart';
-
 
 /// Animated gold logo splash — fades/scales in, then auto-navigates
 /// to onboarding after a short delay.
@@ -19,8 +17,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fade;
   late final Animation<double> _scale;
@@ -40,7 +37,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     _navigationTimer = Timer(const Duration(milliseconds: 2400), () {
-      if (mounted) context.go(RouteName.login);
+      if (mounted) context.go(RouteName.onboarding);
     });
   }
 
@@ -55,7 +52,13 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: DecoratedBox(
-        decoration: BoxDecoration(gradient: AppColors.splashGradient,image: DecorationImage(image: AssetImage(AppAssetImage.splashBg),fit: BoxFit.cover,)),
+        decoration: BoxDecoration(
+          gradient: AppColors.splashGradient,
+          image: DecorationImage(
+            image: AssetImage(AppAssetImage.splashBg),
+            fit: BoxFit.cover,
+          ),
+        ),
         child: Center(
           child: FadeTransition(
             opacity: _fade,
