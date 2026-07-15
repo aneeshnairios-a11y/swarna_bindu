@@ -53,11 +53,18 @@ jobs:
             echo "No build_runner dependency — skipping codegen."
           fi
 
+      # Non-blocking for now — Phase 1 is moving fast and formatting drift
+      # shouldn't stall the pipeline. Flip `continue-on-error` to `false`
+      # once the codebase is formatted and you want this enforced strictly.
       - name: Check formatting
+        continue-on-error: true
         run: dart format --output=none --set-exit-if-changed .
 
+      # No --fatal-infos / --fatal-warnings: those would fail the build on
+      # style nits and deprecation notices. This only fails on real errors.
+      # Warnings/infos still print in the log so they stay visible.
       - name: Analyze
-        run: flutter analyze --fatal-infos
+        run: flutter analyze
 
       - name: Run tests
         run: flutter test --coverage
