@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_typography.dart';
@@ -63,14 +61,13 @@ class AppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(borderRadius),
             color: gradient == null
                 ? (_enabled
-                ? backgroundColor ?? AppColors.maroonDark
-                : disabledBackgroundColor ?? AppColors.borderStrongLight)
+                      ? backgroundColor ?? AppColors.maroonDark
+                      : disabledBackgroundColor ?? AppColors.borderStrongLight)
                 : null,
             gradient: _enabled ? gradient : null,
           ),
           child: Padding(
-            padding: padding ??
-                 EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: padding ?? EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Center(child: _buildContent()),
           ),
         ),
@@ -102,8 +99,8 @@ class AppButton extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: iconAfterText
-          ? [textWidget,  SizedBox(width: AppSpacing.sm), iconWidget]
-          : [iconWidget,  SizedBox(width: AppSpacing.sm), textWidget],
+          ? [textWidget, SizedBox(width: AppSpacing.sm), iconWidget]
+          : [iconWidget, SizedBox(width: AppSpacing.sm), textWidget],
     );
   }
 }

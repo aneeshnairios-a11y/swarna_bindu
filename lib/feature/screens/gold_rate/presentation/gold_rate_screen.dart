@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../../../core/formatter/app_formatters.dart';
 import '../../../../core/router/route_name.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -28,7 +27,9 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Scaffold(
       backgroundColor: bg,
@@ -38,7 +39,10 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
           children: [
             // ── Header ───────────────────────────────────────
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -46,11 +50,18 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
                     onTap: () => context.go(RouteName.dashboard),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.arrow_back_rounded, color: textColor, size: AppSpacing.iconLg),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: textColor,
+                        size: AppSpacing.iconLg,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text('Gold Rate', style: AppTypography.headingSM(color: textColor)),
+                  Text(
+                    'Gold Rate',
+                    style: AppTypography.headingSM(color: textColor),
+                  ),
                 ],
               ),
             ),
@@ -58,7 +69,12 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
             // ── Body ─────────────────────────────────────────
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.xl),
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  AppSpacing.xl,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -92,30 +108,50 @@ class _RateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.lg),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.xl,
+        AppSpacing.lg,
+        AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
         gradient: AppColors.splashGradient,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         boxShadow: [
-          BoxShadow(color: AppColors.maroonDark.withValues(alpha: 0.25), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(
+            color: AppColors.maroonDark.withValues(alpha: 0.25),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
       child: Column(
         children: [
           Text(
             "Today's Gold Rate",
-            style: AppTypography.sectionTitleSM(color: Colors.white.withValues(alpha: 0.85)),
+            style: AppTypography.sectionTitleSM(
+              color: Colors.white.withValues(alpha: 0.85),
+            ),
           ),
           SizedBox(height: AppSpacing.lg),
           IntrinsicHeight(
             child: Row(
               children: [
                 Expanded(
-                  child: _RateColumn(label: '22k Gold (1g)', amount: AppFormatters.currencyDecimal(13250)),
+                  child: _RateColumn(
+                    label: '22k Gold (1g)',
+                    amount: AppFormatters.currencyDecimal(13250),
+                  ),
                 ),
-                Container(width: 1, color: Colors.white.withValues(alpha: 0.18)),
+                Container(
+                  width: 1,
+                  color: Colors.white.withValues(alpha: 0.18),
+                ),
                 Expanded(
-                  child: _RateColumn(label: '24k Gold (8g)', amount: AppFormatters.currencyDecimal(106000)),
+                  child: _RateColumn(
+                    label: '24k Gold (8g)',
+                    amount: AppFormatters.currencyDecimal(106000),
+                  ),
                 ),
               ],
             ),
@@ -146,13 +182,17 @@ class _RateColumn extends StatelessWidget {
         Text(
           label,
           textAlign: TextAlign.center,
-          style: AppTypography.bodyXSmall(color: Colors.white.withValues(alpha: 0.75)),
+          style: AppTypography.bodyXSmall(
+            color: Colors.white.withValues(alpha: 0.75),
+          ),
         ),
         SizedBox(height: AppSpacing.xs),
         Text(
           amount,
           textAlign: TextAlign.center,
-          style: AppTypography.currencyAmountSM(color: AppColors.primaryGoldLight),
+          style: AppTypography.currencyAmountSM(
+            color: AppColors.primaryGoldLight,
+          ),
         ),
       ],
     );
@@ -177,8 +217,15 @@ class _LiveRateNotice extends StatelessWidget {
           Container(
             width: 32,
             height: 32,
-            decoration: const BoxDecoration(color: AppColors.maroonDark, shape: BoxShape.circle),
-            child: const Icon(Icons.shield_rounded, color: Colors.white, size: 16),
+            decoration: const BoxDecoration(
+              color: AppColors.maroonDark,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.shield_rounded,
+              color: Colors.white,
+              size: 16,
+            ),
           ),
           SizedBox(width: AppSpacing.sm),
           Expanded(

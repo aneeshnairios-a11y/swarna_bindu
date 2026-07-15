@@ -17,7 +17,7 @@ class ThemeNotifier extends Notifier<ThemeMode> {
     final saved = prefs.getString(_kThemeKey);
     if (saved != null) {
       state = ThemeMode.values.firstWhere(
-            (e) => e.name == saved,
+        (e) => e.name == saved,
         orElse: () => ThemeMode.system,
       );
     }

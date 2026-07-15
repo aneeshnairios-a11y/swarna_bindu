@@ -69,11 +69,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: RouteName.kycSubmit,
-        pageBuilder: (ctx, state) => _slideTransition(
-          state,
-          const KycScreen(),
-        ),
-
+        pageBuilder: (ctx, state) => _slideTransition(state, const KycScreen()),
       ),
       GoRoute(
         path: RouteName.kycStatus,
@@ -82,38 +78,36 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return _slideTransition(state, KycStatusScreen(outcome: outcome));
         },
       ),
-      // ── Dashboard ─────────────────────────────────────────────
 
+      // ── Dashboard ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.dashboard,
-        pageBuilder: (ctx, state) => _slideTransition(
-          state,
-          const DashboardScreen(),
-        ),
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const DashboardScreen()),
       ),
       GoRoute(
-              path: RouteName.notifications,
-              pageBuilder: (ctx, state) =>
-                  _noTransition(state, const NotificationsScreen()),
-            ),
+        path: RouteName.notifications,
+        pageBuilder: (ctx, state) =>
+            _noTransition(state, const NotificationsScreen()),
+      ),
       GoRoute(
-              path: RouteName.redeemGold,
-              pageBuilder: (ctx, state) =>
-                  _noTransition(state, const RedeemGoldScreen()),
-            ),
-      // ── Payment ─────────────────────────────────────────────
+        path: RouteName.redeemGold,
+        pageBuilder: (ctx, state) =>
+            _noTransition(state, const RedeemGoldScreen()),
+      ),
 
+      // ── Payment ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.paymentSuccess,
         pageBuilder: (ctx, state) {
           final receipt =
               state.extra as PaymentReceipt? ??
-                  const PaymentReceipt(
-                    enrollmentId: 'demo',
-                    amount: 1000,
-                    transactionId: 'BGS000000',
-                    method: PaymentMethod.upi,
-                  );
+              const PaymentReceipt(
+                enrollmentId: 'demo',
+                amount: 1000,
+                transactionId: 'BGS000000',
+                method: PaymentMethod.upi,
+              );
           return _fadeTransition(state, PaymentSuccessScreen(receipt: receipt));
         },
       ),
@@ -134,17 +128,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteName.paymentHistory,
         parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (ctx, state) => _slideTransition(state, const PaymentHistoryScreen()),
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const PaymentHistoryScreen()),
       ),
       GoRoute(
         path: RouteName.paymentReceipt,
         parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (ctx, state) => _slideTransition(state, const PaymentReceiptScreen()),
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const PaymentReceiptScreen()),
       ),
       // ── Schemes ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.schemes,
-        pageBuilder: (ctx, state) => _slideTransition(state, const SchemesScreen()),
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const SchemesScreen()),
       ),
       GoRoute(
         path: RouteName.schemeDetail,
@@ -156,18 +153,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // ── Gold_Rate ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.goldRates,
-        pageBuilder: (ctx, state) => _slideTransition(state, const GoldRateScreen()),
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const GoldRateScreen()),
       ),
       // ── Profile ─────────────────────────────────────────────
       GoRoute(
         path: RouteName.profile,
-        pageBuilder: (ctx, state) => _slideTransition(state, const ProfileScreen()),
-
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const ProfileScreen()),
       ),
       GoRoute(
         path: RouteName.myScheme,
-        pageBuilder: (ctx, state) => _slideTransition(state, const MySchemeListScreen()),
-
+        pageBuilder: (ctx, state) =>
+            _slideTransition(state, const MySchemeListScreen()),
       ),
     ],
 

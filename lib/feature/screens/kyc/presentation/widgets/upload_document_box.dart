@@ -10,7 +10,13 @@ import 'package:swarna_bindu/core/theme/app_typography.dart';
 /// Phase 1: UI-only placeholder. Phase 2: wire to image_picker +
 /// flutter_image_compress, then upload via POST /users/:id/kyc.
 class UploadDocumentBox extends StatelessWidget {
-  const UploadDocumentBox({super.key, required this.label, this.hint, this.filePath, this.onTap});
+  const UploadDocumentBox({
+    super.key,
+    required this.label,
+    this.hint,
+    this.filePath,
+    this.onTap,
+  });
 
   final String label;
   final String? hint;
@@ -26,20 +32,37 @@ class UploadDocumentBox extends StatelessWidget {
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       child: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.lg, horizontal: AppSpacing.sm),
+        padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.lg,
+          horizontal: AppSpacing.sm,
+        ),
         decoration: BoxDecoration(
-          color: _hasFile ? AppColors.successGreenLight : AppColors.goldSurfaceLight.withValues(alpha: 0.5),
+          color: _hasFile
+              ? AppColors.successGreenLight
+              : AppColors.goldSurfaceLight.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(color: _hasFile ? AppColors.successGreen : AppColors.goldBorderLight),
+          border: Border.all(
+            color: _hasFile
+                ? AppColors.successGreen
+                : AppColors.goldBorderLight,
+          ),
         ),
         child: Column(
           children: [
-            Icon(_hasFile ? Icons.check_circle : Icons.file_upload_outlined, color: _hasFile ? AppColors.successGreen : AppColors.primaryGoldDark, size: AppSpacing.iconLg),
+            Icon(
+              _hasFile ? Icons.check_circle : Icons.file_upload_outlined,
+              color: _hasFile
+                  ? AppColors.successGreen
+                  : AppColors.primaryGoldDark,
+              size: AppSpacing.iconLg,
+            ),
             SizedBox(height: AppSpacing.xs),
             Text(
               _hasFile ? 'Uploaded' : label,
               textAlign: TextAlign.center,
-              style: AppTypography.labelSmall(color: AppColors.textPrimaryLight),
+              style: AppTypography.labelSmall(
+                color: AppColors.textPrimaryLight,
+              ),
             ),
             SizedBox(height: 2.h),
             Text(

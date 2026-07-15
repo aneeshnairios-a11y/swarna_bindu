@@ -31,7 +31,9 @@ class DashboardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Row(
       children: [
@@ -42,7 +44,11 @@ class DashboardHeader extends StatelessWidget {
             height: 44.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(AppSpacing.avatarMd),
-              image: DecorationImage(image: AssetImage(AppAssetImage.profile), fit: BoxFit.cover),)
+              image: DecorationImage(
+                image: AssetImage(AppAssetImage.profile),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
         SizedBox(width: AppSpacing.md),
@@ -50,7 +56,12 @@ class DashboardHeader extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_greeting, style: AppTypography.bodySmall(color: AppColors.primaryGoldDark)),
+              Text(
+                _greeting,
+                style: AppTypography.bodySmall(
+                  color: AppColors.primaryGoldDark,
+                ),
+              ),
               Text(
                 userName,
                 maxLines: 1,
@@ -89,11 +100,15 @@ class _NotificationBell extends StatelessWidget {
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
               shape: BoxShape.circle,
-              border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : AppColors.borderLight,
+              ),
             ),
             child: Icon(
               Icons.notifications_outlined,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              color: isDark
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimaryLight,
             ),
           ),
           if (count > 0)
@@ -103,11 +118,16 @@ class _NotificationBell extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-                decoration: const BoxDecoration(color: AppColors.errorRed, shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                  color: AppColors.errorRed,
+                  shape: BoxShape.circle,
+                ),
                 child: Text(
                   '$count',
                   textAlign: TextAlign.center,
-                  style: AppTypography.labelSmall(color: Colors.white).copyWith(fontSize: 10, height: 1),
+                  style: AppTypography.labelSmall(
+                    color: Colors.white,
+                  ).copyWith(fontSize: 10, height: 1),
                 ),
               ),
             ),

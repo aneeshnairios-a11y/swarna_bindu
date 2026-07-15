@@ -37,9 +37,9 @@ class PaymentReceiptScreen extends StatelessWidget {
   final num gstPercent;
 
   void _notReady(BuildContext context, String label) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$label will be available soon.')),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text('$label will be available soon.')));
   }
 
   @override
@@ -51,20 +51,37 @@ class PaymentReceiptScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.xs,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => context.canPop() ? context.pop() : context.go(RouteName.dashboard),
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(RouteName.dashboard),
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: 24,
+                    ),
                   ),
-                  Text('Payment Receipt', style: AppTypography.headingSM(color: Colors.black)),
+                  Text(
+                    'Payment Receipt',
+                    style: AppTypography.headingSM(color: Colors.black),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                padding: EdgeInsets.symmetric(
+                  horizontal: AppSpacing.lg,
+                  vertical: AppSpacing.md,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -74,7 +91,11 @@ class PaymentReceiptScreen extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(14),
                         boxShadow: const [
-                          BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 3)),
+                          BoxShadow(
+                            color: Color(0x12000000),
+                            blurRadius: 10,
+                            offset: Offset(0, 3),
+                          ),
                         ],
                       ),
                       child: Column(
@@ -88,24 +109,37 @@ class PaymentReceiptScreen extends StatelessWidget {
                                 decoration: BoxDecoration(
                                   color: AppColors.darkNavy,
                                   shape: BoxShape.circle,
-                                  image: DecorationImage(image: AssetImage(AppAssetImage.jewellery), fit: BoxFit.cover),
+                                  image: DecorationImage(
+                                    image: AssetImage(AppAssetImage.jewellery),
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                               SizedBox(width: AppSpacing.sm),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(schemeName, style: AppTypography.labelLarge(color: Colors.black)),
+                                  Text(
+                                    schemeName,
+                                    style: AppTypography.labelLarge(
+                                      color: Colors.black,
+                                    ),
+                                  ),
                                   SizedBox(height: 4),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFFDDF6E4),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
                                       'Active',
-                                      style: AppTypography.bodyXSmall(color: const Color(0xFF258B44)).copyWith(fontSize: 10),
+                                      style: AppTypography.bodyXSmall(
+                                        color: const Color(0xFF258B44),
+                                      ).copyWith(fontSize: 10),
                                     ),
                                   ),
                                 ],
@@ -116,34 +150,63 @@ class PaymentReceiptScreen extends StatelessWidget {
                           Row(
                             children: [
                               Expanded(
-                                child: _ColumnStat(label: 'Installment Type', value: installmentType),
+                                child: _ColumnStat(
+                                  label: 'Installment Type',
+                                  value: installmentType,
+                                ),
                               ),
-                              Container(width: 1, height: 30, color: AppColors.borderLight),
+                              Container(
+                                width: 1,
+                                height: 30,
+                                color: AppColors.borderLight,
+                              ),
                               SizedBox(width: AppSpacing.sm),
                               Expanded(
-                                child: _ColumnStat(label: 'Due Date', value: dueDate),
+                                child: _ColumnStat(
+                                  label: 'Due Date',
+                                  value: dueDate,
+                                ),
                               ),
-                              Container(width: 1, height: 30, color: AppColors.borderLight),
+                              Container(
+                                width: 1,
+                                height: 30,
+                                color: AppColors.borderLight,
+                              ),
                               SizedBox(width: AppSpacing.sm),
                               Expanded(
-                                child: _ColumnStat(label: 'Amount Paid', value: '₹${amountPaid.toStringAsFixed(0)}'),
+                                child: _ColumnStat(
+                                  label: 'Amount Paid',
+                                  value: '₹${amountPaid.toStringAsFixed(0)}',
+                                ),
                               ),
                             ],
                           ),
                           SizedBox(height: AppSpacing.md),
                           Container(height: 1, color: AppColors.borderLight),
                           SizedBox(height: AppSpacing.md),
-                          _DetailRow(label: 'Transaction ID', value: transactionId),
+                          _DetailRow(
+                            label: 'Transaction ID',
+                            value: transactionId,
+                          ),
                           SizedBox(height: 8),
                           _DetailRow(label: 'Invoice No', value: invoiceNo),
                           SizedBox(height: 8),
-                          _DetailRow(label: 'Razorpay order id', value: razorpayOrderId),
+                          _DetailRow(
+                            label: 'Razorpay order id',
+                            value: razorpayOrderId,
+                          ),
                           SizedBox(height: 8),
-                          _DetailRow(label: 'Payment Method', value: paymentMethod),
+                          _DetailRow(
+                            label: 'Payment Method',
+                            value: paymentMethod,
+                          ),
                           SizedBox(height: 8),
                           _DetailRow(label: 'Date & Time', value: dateTime),
                           SizedBox(height: 8),
-                          _DetailRow(label: 'GST(${gstPercent.toStringAsFixed(0)}%)', value: '₹0.00'),
+                          _DetailRow(
+                            label: 'GST(${gstPercent.toStringAsFixed(0)}%)',
+                            value: '₹0.00',
+                          ),
                         ],
                       ),
                     ),
@@ -174,17 +237,29 @@ class PaymentReceiptScreen extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
               child: SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: FilledButton(
-                  onPressed: () => context.canPop() ? context.pop() : context.go(RouteName.dashboard),
+                  onPressed: () => context.canPop()
+                      ? context.pop()
+                      : context.go(RouteName.dashboard),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.maroonDark,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                  child: Text('Back', style: AppTypography.buttonLarge(color: Colors.white)),
+                  child: Text(
+                    'Back',
+                    style: AppTypography.buttonLarge(color: Colors.white),
+                  ),
                 ),
               ),
             ),
@@ -206,9 +281,19 @@ class _ColumnStat extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10)),
+        Text(
+          label,
+          style: AppTypography.bodyXSmall(
+            color: AppColors.mutedGray,
+          ).copyWith(fontSize: 10),
+        ),
         SizedBox(height: 3),
-        Text(value, style: AppTypography.labelMedium(color: Colors.black).copyWith(fontWeight: FontWeight.w700)),
+        Text(
+          value,
+          style: AppTypography.labelMedium(
+            color: Colors.black,
+          ).copyWith(fontWeight: FontWeight.w700),
+        ),
       ],
     );
   }
@@ -230,7 +315,9 @@ class _DetailRow extends StatelessWidget {
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: AppTypography.labelMedium(color: Colors.black).copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.labelMedium(
+              color: Colors.black,
+            ).copyWith(fontWeight: FontWeight.w600),
           ),
         ),
       ],
@@ -260,7 +347,10 @@ class _ActionTile extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.sm),
+          padding: EdgeInsets.symmetric(
+            vertical: AppSpacing.md,
+            horizontal: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFFF0D9DE)),
@@ -273,11 +363,18 @@ class _ActionTile extends StatelessWidget {
                 child: Icon(icon, size: 16, color: AppColors.maroonDark),
               ),
               SizedBox(height: AppSpacing.xs),
-              Text(title, style: AppTypography.labelMedium(color: Colors.black).copyWith(fontWeight: FontWeight.w700)),
+              Text(
+                title,
+                style: AppTypography.labelMedium(
+                  color: Colors.black,
+                ).copyWith(fontWeight: FontWeight.w700),
+              ),
               SizedBox(height: 2),
               Text(
                 subtitle,
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+                style: AppTypography.bodyXSmall(
+                  color: AppColors.mutedGray,
+                ).copyWith(fontSize: 10),
               ),
             ],
           ),

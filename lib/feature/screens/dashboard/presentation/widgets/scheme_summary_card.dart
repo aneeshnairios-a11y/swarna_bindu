@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
-
 import '../../../../../core/constants/image_string/image_strings.dart';
 import '../../../../../core/formatter/app_formatters.dart';
 import '../../../../../core/theme/app_colors.dart';
@@ -32,7 +30,9 @@ class SchemeSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return InkWell(
       onTap: onTap,
@@ -42,7 +42,9 @@ class SchemeSummaryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          border: Border.all(color: isDark ? AppColors.borderDark : AppColors.borderLight),
+          border: Border.all(
+            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +53,7 @@ class SchemeSummaryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  width:  72.w,
+                  width: 72.w,
                   height: 74.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -66,15 +68,25 @@ class SchemeSummaryCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(name, style: AppTypography.sectionTitleSM(color: textPrimary)),
+                      Text(
+                        name,
+                        style: AppTypography.sectionTitleSM(color: textPrimary),
+                      ),
                       SizedBox(height: AppSpacing.sm),
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: _InfoBlock(label: 'Monthly Investment', value: AppFormatters.currency(monthlyInvestment)),
+                            child: _InfoBlock(
+                              label: 'Monthly Investment',
+                              value: AppFormatters.currency(monthlyInvestment),
+                            ),
                           ),
-                          _InfoBlock(label: 'Next Due date', value: AppFormatters.date(nextDueDate), alignEnd: true),
+                          _InfoBlock(
+                            label: 'Next Due date',
+                            value: AppFormatters.date(nextDueDate),
+                            alignEnd: true,
+                          ),
                         ],
                       ),
                     ],
@@ -85,9 +97,15 @@ class SchemeSummaryCard extends StatelessWidget {
             SizedBox(height: AppSpacing.md),
             Row(
               children: [
-                Text('${progressPercent.round()}% Completed', style: AppTypography.caption(color: AppColors.mutedGray)),
+                Text(
+                  '${progressPercent.round()}% Completed',
+                  style: AppTypography.caption(color: AppColors.mutedGray),
+                ),
                 const Spacer(),
-                Text('${AppFormatters.goldWeightShort(paidGrams)} / ${goalGrams.toStringAsFixed(0)}g', style: AppTypography.caption(color: AppColors.mutedGray)),
+                Text(
+                  '${AppFormatters.goldWeightShort(paidGrams)} / ${goalGrams.toStringAsFixed(0)}g',
+                  style: AppTypography.caption(color: AppColors.mutedGray),
+                ),
               ],
             ),
             SizedBox(height: AppSpacing.xs),
@@ -96,8 +114,12 @@ class SchemeSummaryCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: (progressPercent / 100).clamp(0.0, 1.0),
                 minHeight: 6,
-                backgroundColor: isDark ? AppColors.borderDark : AppColors.borderLight,
-                valueColor: const AlwaysStoppedAnimation(AppColors.successGreen),
+                backgroundColor: isDark
+                    ? AppColors.borderDark
+                    : AppColors.borderLight,
+                valueColor: const AlwaysStoppedAnimation(
+                  AppColors.successGreen,
+                ),
               ),
             ),
           ],
@@ -108,7 +130,11 @@ class SchemeSummaryCard extends StatelessWidget {
 }
 
 class _InfoBlock extends StatelessWidget {
-  const _InfoBlock({required this.label, required this.value, this.alignEnd = false});
+  const _InfoBlock({
+    required this.label,
+    required this.value,
+    this.alignEnd = false,
+  });
 
   final String label;
   final String value;
@@ -117,10 +143,14 @@ class _InfoBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Column(
-      crossAxisAlignment: alignEnd ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+      crossAxisAlignment: alignEnd
+          ? CrossAxisAlignment.end
+          : CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTypography.hint(color: AppColors.mutedGray)),
         Text(value, style: AppTypography.labelMedium(color: textPrimary)),

@@ -14,9 +14,6 @@ abstract class RouteName {
   static const String enrollments = '/app/enrollments';
   static const String profile = '/app/profile';
 
-
-
-
   // ── Scheme ────────────────────────────────────────────────────
 
   static const String schemeDetail = '/app/schemes/:id';
@@ -24,7 +21,6 @@ abstract class RouteName {
 
   static const String notifications = '/app/dashboard/notifications';
   static const String redeemGold = '/app/dashboard/redeemGold';
-
 
   // ── Enrollment & passbook ─────────────────────────────────────
 

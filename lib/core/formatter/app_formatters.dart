@@ -17,19 +17,16 @@ abstract class AppFormatters {
   );
 
   /// Format amount as ₹1,00,000
-  static String currency(num amount) =>
-      _currencyFormatter.format(amount);
+  static String currency(num amount) => _currencyFormatter.format(amount);
 
   /// Format amount as ₹1,00,000.00
   static String currencyDecimal(num amount) =>
       _currencyFormatterDecimal.format(amount);
 
   // ── Gold weight (3 decimal places) ───────────────────────────
-  static String goldWeight(double grams) =>
-      '${grams.toStringAsFixed(3)} g';
+  static String goldWeight(double grams) => '${grams.toStringAsFixed(3)} g';
 
-  static String goldWeightShort(double grams) =>
-      '${grams.toStringAsFixed(2)}g';
+  static String goldWeightShort(double grams) => '${grams.toStringAsFixed(2)}g';
 
   // ── Gold rate per gram ────────────────────────────────────────
   static String goldRate(num ratePerGram) =>

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-
 import 'core/constants/app_string/app_strings.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -25,7 +24,14 @@ class MyApp extends ConsumerWidget {
       minTextAdapt: true,
       splitScreenMode: false,
       builder: (_, child) {
-        return MaterialApp.router(title: AppStrings.app.appName, debugShowCheckedModeBanner: false, theme: AppTheme.light, darkTheme: AppTheme.dark, themeMode: themeMode, routerConfig: router);
+        return MaterialApp.router(
+          title: AppStrings.app.appName,
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeMode,
+          routerConfig: router,
+        );
       },
     );
   }

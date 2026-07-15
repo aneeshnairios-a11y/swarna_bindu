@@ -103,7 +103,11 @@ class _KycScreenState extends ConsumerState<KycScreen> {
   }
 
   void _goToPage(int step) {
-    _pageController.animateToPage(step, duration: const Duration(milliseconds: 280), curve: Curves.easeOutCubic);
+    _pageController.animateToPage(
+      step,
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   Future<void> _onSubmit() async {
@@ -126,10 +130,17 @@ class _KycScreenState extends ConsumerState<KycScreen> {
 
     switch (step) {
       case 0:
-        notifier.updatePersonalInfo(fullName: _nameController.text.trim(), email: _emailController.text.trim(), mobile: _mobileController.text.trim());
+        notifier.updatePersonalInfo(
+          fullName: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          mobile: _mobileController.text.trim(),
+        );
         break;
       case 1:
-        notifier.updateIdentityInfo(aadhaarNumber: _aadhaarController.text.trim(), panNumber: _panController.text.trim().toUpperCase());
+        notifier.updateIdentityInfo(
+          aadhaarNumber: _aadhaarController.text.trim(),
+          panNumber: _panController.text.trim().toUpperCase(),
+        );
         break;
       case 2:
         notifier.updateAddressInfo(
@@ -206,8 +217,19 @@ class _KycScreenState extends ConsumerState<KycScreen> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
-              child: KycProgressHeader(currentStep: kycState.currentStep + 1, totalSteps: KycState.totalSteps, sectionLabel: _sectionLabels[kycState.currentStep], onBack: _onBack, onSkip: _onSkip),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                0,
+              ),
+              child: KycProgressHeader(
+                currentStep: kycState.currentStep + 1,
+                totalSteps: KycState.totalSteps,
+                sectionLabel: _sectionLabels[kycState.currentStep],
+                onBack: _onBack,
+                onSkip: _onSkip,
+              ),
             ),
             SizedBox(height: AppSpacing.lg),
             Expanded(
@@ -232,8 +254,12 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       dob: kycState.data.dob,
                       gender: kycState.data.gender,
                       profileImagePath: kycState.data.profileImagePath,
-                      onDobChanged: (d) => ref.read(kycProvider.notifier).updatePersonalInfo(dob: d),
-                      onGenderChanged: (g) => ref.read(kycProvider.notifier).updatePersonalInfo(gender: g),
+                      onDobChanged: (d) => ref
+                          .read(kycProvider.notifier)
+                          .updatePersonalInfo(dob: d),
+                      onGenderChanged: (g) => ref
+                          .read(kycProvider.notifier)
+                          .updatePersonalInfo(gender: g),
                       onPickProfileImage: () {
                         // TODO(Phase 2): image_picker → flutter_image_compress → upload.
                       },
@@ -273,8 +299,12 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       pinController: _pinController,
                       district: kycState.data.district,
                       state: kycState.data.state,
-                      onDistrictChanged: (d) => ref.read(kycProvider.notifier).updateAddressInfo(district: d),
-                      onStateChanged: (s) => ref.read(kycProvider.notifier).updateAddressInfo(stateName: s),
+                      onDistrictChanged: (d) => ref
+                          .read(kycProvider.notifier)
+                          .updateAddressInfo(district: d),
+                      onStateChanged: (s) => ref
+                          .read(kycProvider.notifier)
+                          .updateAddressInfo(stateName: s),
                       onDetectLocation: () {
                         // TODO(Phase 2): geolocator + reverse geocoding.
                       },
@@ -286,12 +316,15 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       formKey: _bankFormKey,
                       accountHolderController: _accountHolderController,
                       accountNumberController: _accountNumberController,
-                      confirmAccountNumberController: _confirmAccountNumberController,
+                      confirmAccountNumberController:
+                          _confirmAccountNumberController,
                       ifscController: _ifscController,
                       branchController: _branchController,
                       upiController: _upiController,
                       bankName: kycState.data.bankName,
-                      onBankChanged: (b) => ref.read(kycProvider.notifier).updateBankInfo(bankName: b),
+                      onBankChanged: (b) => ref
+                          .read(kycProvider.notifier)
+                          .updateBankInfo(bankName: b),
                     ),
                   ),
                   SingleChildScrollView(
@@ -302,7 +335,12 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                       onCaptureSelfie: () {
                         // TODO(Phase 2): camera capture + liveness check.
                         // Mocked here so Review has something to display:
-                        ref.read(kycProvider.notifier).updateSelfie(selfieImagePath: 'mock', selfieCapturedAt: DateTime.now());
+                        ref
+                            .read(kycProvider.notifier)
+                            .updateSelfie(
+                              selfieImagePath: 'mock',
+                              selfieCapturedAt: DateTime.now(),
+                            );
                       },
                     ),
                   ),
@@ -310,11 +348,18 @@ class _KycScreenState extends ConsumerState<KycScreen> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
               child: Column(
                 children: [
                   AppButton(
-                    text: isReview ? AppStrings.kyc.submitKycCta : AppStrings.kyc.continueCta,
+                    text: isReview
+                        ? AppStrings.kyc.submitKycCta
+                        : AppStrings.kyc.continueCta,
                     icon: isReview ? null : Icons.arrow_forward,
                     iconAfterText: true,
                     isLoading: kycState.isSubmitting,
@@ -324,9 +369,18 @@ class _KycScreenState extends ConsumerState<KycScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.lock_outline, size: 12.sp, color: AppColors.textMutedLight),
+                      Icon(
+                        Icons.lock_outline,
+                        size: 12.sp,
+                        color: AppColors.textMutedLight,
+                      ),
                       SizedBox(width: 4.w),
-                      Text(AppStrings.kyc.securityNote, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                      Text(
+                        AppStrings.kyc.securityNote,
+                        style: AppTypography.caption(
+                          color: AppColors.textMutedLight,
+                        ),
+                      ),
                     ],
                   ),
                 ],

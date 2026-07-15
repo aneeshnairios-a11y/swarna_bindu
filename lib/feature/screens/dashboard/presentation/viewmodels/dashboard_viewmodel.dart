@@ -76,7 +76,8 @@ class DashboardState {
       totalGoldGrams: totalGoldGrams ?? this.totalGoldGrams,
       goalGoldGrams: goalGoldGrams ?? this.goalGoldGrams,
       goalProgress: goalProgress ?? this.goalProgress,
-      nextInstallmentAmount: nextInstallmentAmount ?? this.nextInstallmentAmount,
+      nextInstallmentAmount:
+          nextInstallmentAmount ?? this.nextInstallmentAmount,
       nextInstallmentDate: nextInstallmentDate ?? this.nextInstallmentDate,
       daysLeft: daysLeft ?? this.daysLeft,
       rate22k: rate22k ?? this.rate22k,

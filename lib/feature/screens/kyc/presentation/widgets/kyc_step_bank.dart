@@ -10,7 +10,16 @@ import '../../../../global_widgets/common_text_field.dart';
 
 /// Placeholder list — replace with the store's supported bank list
 /// (or a searchable IFSC-lookup field) in Phase 2.
-const List<String> kSupportedBanks = ['Axis Bank Ltd.', 'State Bank of India', 'HDFC Bank', 'ICICI Bank', 'Federal Bank', 'Canara Bank', 'Kerala Gramin Bank', 'Other'];
+const List<String> kSupportedBanks = [
+  'Axis Bank Ltd.',
+  'State Bank of India',
+  'HDFC Bank',
+  'ICICI Bank',
+  'Federal Bank',
+  'Canara Bank',
+  'Kerala Gramin Bank',
+  'Other',
+];
 
 class KycStepBank extends StatelessWidget {
   const KycStepBank({
@@ -45,9 +54,17 @@ class KycStepBank extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k.bankTitle, style: AppTypography.sectionTitle(color: AppColors.textPrimaryLight)),
+          Text(
+            k.bankTitle,
+            style: AppTypography.sectionTitle(
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
           SizedBox(height: 4.h),
-          Text(k.bankSubtitle, style: AppTypography.bodySmall(color: AppColors.textMutedLight)),
+          Text(
+            k.bankSubtitle,
+            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+          ),
           SizedBox(height: AppSpacing.xl),
 
           Container(
@@ -67,7 +84,9 @@ class KycStepBank extends StatelessWidget {
                   controller: accountHolderController,
                   prefixIcon: Icons.person_outline,
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Account holder name is required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Account holder name is required'
+                      : null,
                 ),
                 SizedBox(height: AppSpacing.lg),
                 AppDropdownField<String>(
@@ -92,7 +111,8 @@ class KycStepBank extends StatelessWidget {
                   validator: (v) {
                     final value = (v ?? '').trim();
                     if (value.isEmpty) return 'Account number is required';
-                    if (value.length < 9 || value.length > 18) return 'Enter a valid account number';
+                    if (value.length < 9 || value.length > 18)
+                      return 'Enter a valid account number';
                     return null;
                   },
                 ),
@@ -106,8 +126,10 @@ class KycStepBank extends StatelessWidget {
                   prefixIcon: Icons.credit_card_outlined,
                   validator: (v) {
                     final value = (v ?? '').trim();
-                    if (value.isEmpty) return 'Please confirm the account number';
-                    if (value != accountNumberController.text.trim()) return 'Account numbers do not match';
+                    if (value.isEmpty)
+                      return 'Please confirm the account number';
+                    if (value != accountNumberController.text.trim())
+                      return 'Account numbers do not match';
                     return null;
                   },
                 ),
@@ -125,7 +147,9 @@ class KycStepBank extends StatelessWidget {
                         validator: (v) {
                           final value = (v ?? '').trim().toUpperCase();
                           if (value.isEmpty) return 'Required';
-                          final ok = RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$').hasMatch(value);
+                          final ok = RegExp(
+                            r'^[A-Z]{4}0[A-Z0-9]{6}$',
+                          ).hasMatch(value);
                           return ok ? null : 'Enter a valid IFSC code';
                         },
                       ),
@@ -137,7 +161,8 @@ class KycStepBank extends StatelessWidget {
                         isRequired: true,
                         hintText: k.branchNameHint,
                         controller: branchController,
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        validator: (v) =>
+                            (v == null || v.trim().isEmpty) ? 'Required' : null,
                       ),
                     ),
                   ],
@@ -160,11 +185,23 @@ class KycStepBank extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(k.upiLabel, style: AppTypography.labelMedium(color: AppColors.textSecondaryLight)),
+                Text(
+                  k.upiLabel,
+                  style: AppTypography.labelMedium(
+                    color: AppColors.textSecondaryLight,
+                  ),
+                ),
                 SizedBox(height: 2.h),
-                Text(k.upiSubtitle, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                Text(
+                  k.upiSubtitle,
+                  style: AppTypography.caption(color: AppColors.textMutedLight),
+                ),
                 SizedBox(height: AppSpacing.sm),
-                AppTextField(hintText: k.upiHint, controller: upiController, prefixIcon: Icons.alternate_email),
+                AppTextField(
+                  hintText: k.upiHint,
+                  controller: upiController,
+                  prefixIcon: Icons.alternate_email,
+                ),
               ],
             ),
           ),
@@ -188,14 +225,20 @@ class _InfoStrip extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(color: AppColors.goldSurfaceLight, borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+      decoration: BoxDecoration(
+        color: AppColors.goldSurfaceLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, size: AppSpacing.iconMd, color: AppColors.primaryGoldDark),
           SizedBox(width: AppSpacing.sm),
           Expanded(
-            child: Text(text, style: AppTypography.caption(color: AppColors.textMutedLight)),
+            child: Text(
+              text,
+              style: AppTypography.caption(color: AppColors.textMutedLight),
+            ),
           ),
         ],
       ),

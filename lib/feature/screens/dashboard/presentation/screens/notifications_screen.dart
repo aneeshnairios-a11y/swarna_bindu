@@ -5,7 +5,11 @@ import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 class _NotificationItem {
-  const _NotificationItem({required this.title, required this.body, required this.timeLabel});
+  const _NotificationItem({
+    required this.title,
+    required this.body,
+    required this.timeLabel,
+  });
 
   final String title;
   final String body;
@@ -33,11 +37,21 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
-    final cardBg = isDark ? AppColors.goldSurfaceDark : AppColors.goldSurfaceLight;
-    final cardBorder = isDark ? AppColors.goldBorderDark : AppColors.goldBorderLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final mutedColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
+    final cardBg = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+    final cardBorder = isDark
+        ? AppColors.goldBorderDark
+        : AppColors.goldBorderLight;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -46,7 +60,10 @@ class NotificationsScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -54,52 +71,80 @@ class NotificationsScreen extends StatelessWidget {
                     onTap: () => Navigator.of(context).pop(),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.arrow_back_rounded, color: textColor, size: AppSpacing.iconLg),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: textColor,
+                        size: AppSpacing.iconLg,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text('Notification', style: AppTypography.headingSM(color: textColor)),
+                  Text(
+                    'Notification',
+                    style: AppTypography.headingSM(color: textColor),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: _mockNotifications.isEmpty
                   ? Center(
-                child: Text('No notifications yet', style: AppTypography.bodySmall(color: mutedColor)),
-              )
+                      child: Text(
+                        'No notifications yet',
+                        style: AppTypography.bodySmall(color: mutedColor),
+                      ),
+                    )
                   : ListView.separated(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                itemCount: _mockNotifications.length,
-                separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
-                itemBuilder: (context, i) {
-                  final n = _mockNotifications[i];
-                  return Container(
-                    padding: EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: cardBg.withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                      border: Border.all(color: cardBorder.withValues(alpha: 0.6)),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
+                      padding: EdgeInsets.all(AppSpacing.lg),
+                      itemCount: _mockNotifications.length,
+                      separatorBuilder: (_, __) =>
+                          SizedBox(height: AppSpacing.md),
+                      itemBuilder: (context, i) {
+                        final n = _mockNotifications[i];
+                        return Container(
+                          padding: EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: cardBg.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusLg,
+                            ),
+                            border: Border.all(
+                              color: cardBorder.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(n.title, style: AppTypography.labelLarge(color: textColor)),
-                              SizedBox(height: 4),
-                              Text(n.body, style: AppTypography.caption(color: mutedColor)),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      n.title,
+                                      style: AppTypography.labelLarge(
+                                        color: textColor,
+                                      ),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      n.body,
+                                      style: AppTypography.caption(
+                                        color: mutedColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(width: AppSpacing.sm),
+                              Text(
+                                n.timeLabel,
+                                style: AppTypography.caption(color: mutedColor),
+                              ),
                             ],
                           ),
-                        ),
-                        SizedBox(width: AppSpacing.sm),
-                        Text(n.timeLabel, style: AppTypography.caption(color: mutedColor)),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),

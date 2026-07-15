@@ -91,7 +91,8 @@ class _KycStrings {
   // ── Step 1 — Personal Information ──────────────────────────────
   final String personalSectionLabel = 'Personal Information';
   final String bannerTitle = 'Complete Your KYC';
-  final String bannerSubtitle = 'Complete your profile to securely access all Gold Scheme services.';
+  final String bannerSubtitle =
+      'Complete your profile to securely access all Gold Scheme services.';
   final String addProfilePicture = 'Add Profile Picture';
   final String personalDetailsTitle = 'Personal Details';
   final String fullNameLabel = 'Full Name';
@@ -108,7 +109,8 @@ class _KycStrings {
   // ── Step 2 — Identity Verification ──────────────────────────────
   final String identitySectionLabel = 'Identity Verification';
   final String identityTitle = 'Verify Your Identity';
-  final String identitySubtitle = 'Upload your government issued ID for verification.';
+  final String identitySubtitle =
+      'Upload your government issued ID for verification.';
   final String aadhaarCardTitle = 'Aadhaar Card';
   final String aadhaarNumberLabel = 'Aadhaar Number';
   final String aadhaarNumberHint = 'XXXX XXXX 4589';
@@ -117,13 +119,15 @@ class _KycStrings {
   final String uploadHint = 'JPG, PNG up to 5MB';
   final String orDivider = 'OR';
   final String digiLockerTitle = 'Verify Instantly using DigiLocker';
-  final String digiLockerSubtitle = 'Pull your documents securely from DigiLocker';
+  final String digiLockerSubtitle =
+      'Pull your documents securely from DigiLocker';
   final String digiLockerCta = 'Connect DigiLocker';
   final String panCardTitle = 'PAN Card';
   final String panNumberLabel = 'PAN Number';
   final String panNumberHint = 'ABCDE1234F';
   final String uploadPanCard = 'Upload PAN Card';
-  final String documentsSafeNote = 'Your documents are safe with us. All uploaded documents are encrypted and stored securely.';
+  final String documentsSafeNote =
+      'Your documents are safe with us. All uploaded documents are encrypted and stored securely.';
 
   // ── Step 3 — Address Information ────────────────────────────────
   final String addressSectionLabel = 'Address Information';
@@ -142,13 +146,16 @@ class _KycStrings {
   final String pinCodeLabel = 'PIN Code';
   final String pinCodeHint = '682001';
   final String detectLocationTitle = 'Detect Current Location';
-  final String detectLocationSubtitle = 'Use your current location to fill address';
-  final String addressSecureNote = 'Your information is secure. Your address details are encrypted and used only for verification purposes.';
+  final String detectLocationSubtitle =
+      'Use your current location to fill address';
+  final String addressSecureNote =
+      'Your information is secure. Your address details are encrypted and used only for verification purposes.';
 
   // ── Step 4 — Bank Account Details ───────────────────────────────
   final String bankSectionLabel = 'Bank Details';
   final String bankTitle = 'Bank Account Details';
-  final String bankSubtitle = 'Enter your bank account details for secure transactions.';
+  final String bankSubtitle =
+      'Enter your bank account details for secure transactions.';
   final String accountHolderLabel = 'Account Holder Name';
   final String accountHolderHint = 'John Mathew';
   final String bankNameLabel = 'Bank Name';
@@ -159,17 +166,21 @@ class _KycStrings {
   final String ifscHint = 'UTIB0001234';
   final String branchNameLabel = 'Branch Name';
   final String branchNameHint = 'MG Road, Kochi';
-  final String bankUsageNote = 'This account will be used to receive maturity amount, redemptions and refunds.';
+  final String bankUsageNote =
+      'This account will be used to receive maturity amount, redemptions and refunds.';
   final String upiLabel = 'UPI ID (Optional)';
   final String upiSubtitle = 'Receive payment confirmations on your UPI ID';
   final String upiHint = 'john@okaxis';
-  final String bankSecureNote = 'Your bank details are safe with us. We use bank-level security to protect your information.';
+  final String bankSecureNote =
+      'Your bank details are safe with us. We use bank-level security to protect your information.';
 
   // ── Step 5 — Review & Submit ────────────────────────────────────
   final String reviewSectionLabel = 'Review & Submit';
   final String reviewTitle = 'Review Your Details';
-  final String reviewSubtitle = 'Please review all the information before submitting your KYC.';
-  final String reviewSecureNote = 'Your information is secure. All your details are encrypted and will be used only for verification purposes.';
+  final String reviewSubtitle =
+      'Please review all the information before submitting your KYC.';
+  final String reviewSecureNote =
+      'Your information is secure. All your details are encrypted and will be used only for verification purposes.';
   final String selfieSectionLabel = 'Selfie Verification';
   final String captureSelfieCta = 'Capture';
   final String selfieNotCaptured = 'Not captured yet';
@@ -179,11 +190,14 @@ class _KycStrings {
   final String statusAppBarTitle = 'KYC Status';
   final String statusStepCaption = 'Step 5 of 5 • Verification';
   final String statusSuccessTitle = 'KYC Submitted Successfully!';
-  final String statusSuccessSubtitle = 'Thank you! Your KYC has been submitted. We will verify your details and notify you soon.';
+  final String statusSuccessSubtitle =
+      'Thank you! Your KYC has been submitted. We will verify your details and notify you soon.';
   final String statusRejectedTitle = 'KYC Submitted Rejected';
-  final String statusRejectedSubtitle = "Your document didn't pass verification. Re-upload a clear photo to try again.";
+  final String statusRejectedSubtitle =
+      "Your document didn't pass verification. Re-upload a clear photo to try again.";
   final String statusPendingTitle = 'KYC Under Review';
-  final String statusPendingSubtitle = 'Your KYC is being reviewed by our team. This usually takes 24–48 hours.';
+  final String statusPendingSubtitle =
+      'Your KYC is being reviewed by our team. This usually takes 24–48 hours.';
   final String statusEtaLabel = 'Estimated verification time';
   final String statusEtaValue = '24 – 48 Hours';
   final String statusReuploadCta = 'Re-upload Document';

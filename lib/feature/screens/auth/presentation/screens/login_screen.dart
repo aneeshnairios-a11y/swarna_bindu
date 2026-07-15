@@ -62,13 +62,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       AppStrings.login.welcomeTitle,
                       textAlign: TextAlign.center,
-                      style: AppTypography.headingLG(color: AppColors.textPrimaryLight),
+                      style: AppTypography.headingLG(
+                        color: AppColors.textPrimaryLight,
+                      ),
                     ),
                     SizedBox(height: AppSpacing.xs),
                     Text(
                       AppStrings.login.welcomeSubtitle,
                       textAlign: TextAlign.center,
-                      style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+                      style: AppTypography.bodySmall(
+                        color: AppColors.textMutedLight,
+                      ),
                     ),
                   ],
                 ),
@@ -81,27 +85,51 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    border: Border.all(width: 1.w, color: AppColors.borderLight),
-                    borderRadius: BorderRadius.all(Radius.circular(AppSpacing.radiusLg)),
+                    border: Border.all(
+                      width: 1.w,
+                      color: AppColors.borderLight,
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(AppSpacing.radiusLg),
+                    ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                      vertical: AppSpacing.md,
+                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _PhoneField(formKey: _formKey, controller: _phoneController),
+                        _PhoneField(
+                          formKey: _formKey,
+                          controller: _phoneController,
+                        ),
                         SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
-                            Icon(Icons.lock_outline, size: AppSpacing.iconSm, color: AppColors.textMutedLight),
+                            Icon(
+                              Icons.lock_outline,
+                              size: AppSpacing.iconSm,
+                              color: AppColors.textMutedLight,
+                            ),
                             SizedBox(width: AppSpacing.xs),
                             Expanded(
-                              child: Text(AppStrings.login.otpHint, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                              child: Text(
+                                AppStrings.login.otpHint,
+                                style: AppTypography.caption(
+                                  color: AppColors.textMutedLight,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                         SizedBox(height: AppSpacing.xxl),
-                        AppButton(text: AppStrings.login.sendOtp, isLoading: _isSubmitting, onPressed: _sendOtp),
+                        AppButton(
+                          text: AppStrings.login.sendOtp,
+                          isLoading: _isSubmitting,
+                          onPressed: _sendOtp,
+                        ),
                       ],
                     ),
                   ),
@@ -128,7 +156,12 @@ class _PhoneField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.login.mobileLabel, style: AppTypography.labelMedium(color: AppColors.textSecondaryLight)),
+          Text(
+            AppStrings.login.mobileLabel,
+            style: AppTypography.labelMedium(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
           SizedBox(height: AppSpacing.sm),
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -142,7 +175,12 @@ class _PhoneField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   border: Border.all(color: AppColors.borderLight),
                 ),
-                child: Text('+91', style: AppTypography.bodyMedium(color: AppColors.textPrimaryLight)),
+                child: Text(
+                  '+91',
+                  style: AppTypography.bodyMedium(
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
               ),
               SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -150,12 +188,19 @@ class _PhoneField extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.phone,
                   maxLength: 10,
-                  style: AppTypography.bodyMedium(color: AppColors.textPrimaryLight),
+                  style: AppTypography.bodyMedium(
+                    color: AppColors.textPrimaryLight,
+                  ),
                   decoration: InputDecoration(
                     counterText: '',
                     hintText: AppStrings.login.mobileHint,
-                    hintStyle: AppTypography.bodyMedium(color: AppColors.textMutedLight),
-                    contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.md),
+                    hintStyle: AppTypography.bodyMedium(
+                      color: AppColors.textMutedLight,
+                    ),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.md,
+                    ),
                     filled: true,
                     fillColor: AppColors.surfaceLight,
                     border: OutlineInputBorder(
@@ -168,7 +213,10 @@ class _PhoneField extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      borderSide: const BorderSide(color: AppColors.maroonPrimary, width: 1.5),
+                      borderSide: const BorderSide(
+                        color: AppColors.maroonPrimary,
+                        width: 1.5,
+                      ),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),

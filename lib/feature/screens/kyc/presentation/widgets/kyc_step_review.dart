@@ -10,7 +10,12 @@ import '../../../../../core/formatter/app_formatters.dart';
 import '../viewmodels/kyc_viewmodels.dart';
 
 class KycStepReview extends StatelessWidget {
-  const KycStepReview({super.key, required this.data, required this.onEditStep, this.onCaptureSelfie});
+  const KycStepReview({
+    super.key,
+    required this.data,
+    required this.onEditStep,
+    this.onCaptureSelfie,
+  });
 
   final KycFormData data;
 
@@ -25,9 +30,15 @@ class KycStepReview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(k.reviewTitle, style: AppTypography.sectionTitle(color: AppColors.textPrimaryLight)),
+        Text(
+          k.reviewTitle,
+          style: AppTypography.sectionTitle(color: AppColors.textPrimaryLight),
+        ),
         SizedBox(height: 4.h),
-        Text(k.reviewSubtitle, style: AppTypography.bodySmall(color: AppColors.textMutedLight)),
+        Text(
+          k.reviewSubtitle,
+          style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+        ),
         SizedBox(height: AppSpacing.xl),
 
         _ReviewCard(
@@ -41,8 +52,14 @@ class KycStepReview extends StatelessWidget {
             ),
             SizedBox(height: AppSpacing.md),
             _ReviewRow(
-              left: _ReviewField(label: k.dobLabel, value: data.dob == null ? '—' : AppFormatters.date(data.dob!)),
-              right: _ReviewField(label: k.mobileLabel, value: data.mobile.isEmpty ? '—' : data.mobile),
+              left: _ReviewField(
+                label: k.dobLabel,
+                value: data.dob == null ? '—' : AppFormatters.date(data.dob!),
+              ),
+              right: _ReviewField(
+                label: k.mobileLabel,
+                value: data.mobile.isEmpty ? '—' : data.mobile,
+              ),
             ),
             SizedBox(height: AppSpacing.md),
             _ReviewField(label: k.genderLabel, value: data.gender ?? '—'),
@@ -56,8 +73,14 @@ class KycStepReview extends StatelessWidget {
           onEdit: () => onEditStep(1),
           children: [
             _ReviewRow(
-              left: _ReviewField(label: k.aadhaarNumberLabel, value: _maskAadhaar(data.aadhaarNumber)),
-              right: _ReviewField(label: k.panNumberLabel, value: data.panNumber.isEmpty ? '—' : data.panNumber),
+              left: _ReviewField(
+                label: k.aadhaarNumberLabel,
+                value: _maskAadhaar(data.aadhaarNumber),
+              ),
+              right: _ReviewField(
+                label: k.panNumberLabel,
+                value: data.panNumber.isEmpty ? '—' : data.panNumber,
+              ),
             ),
           ],
         ),
@@ -68,9 +91,17 @@ class KycStepReview extends StatelessWidget {
           title: k.addressSectionLabel,
           onEdit: () => onEditStep(2),
           children: [
-            _ReviewField(label: 'Address', value: data.formattedAddress.isEmpty ? '—' : data.formattedAddress),
+            _ReviewField(
+              label: 'Address',
+              value: data.formattedAddress.isEmpty
+                  ? '—'
+                  : data.formattedAddress,
+            ),
             SizedBox(height: AppSpacing.md),
-            _ReviewField(label: k.pinCodeLabel, value: data.pinCode.isEmpty ? '—' : data.pinCode),
+            _ReviewField(
+              label: k.pinCodeLabel,
+              value: data.pinCode.isEmpty ? '—' : data.pinCode,
+            ),
           ],
         ),
 
@@ -81,32 +112,57 @@ class KycStepReview extends StatelessWidget {
           onEdit: () => onEditStep(3),
           children: [
             _ReviewRow(
-              left: _ReviewField(label: k.bankNameLabel, value: data.bankName ?? '—'),
-              right: _ReviewField(label: k.ifscLabel, value: data.ifscCode.isEmpty ? '—' : data.ifscCode),
+              left: _ReviewField(
+                label: k.bankNameLabel,
+                value: data.bankName ?? '—',
+              ),
+              right: _ReviewField(
+                label: k.ifscLabel,
+                value: data.ifscCode.isEmpty ? '—' : data.ifscCode,
+              ),
             ),
             SizedBox(height: AppSpacing.md),
             _ReviewRow(
-              left: _ReviewField(label: k.accountNumberLabel, value: _maskAccount(data.accountNumber)),
-              right: _ReviewField(label: 'UPI ID', value: data.upiId.isEmpty ? '—' : data.upiId),
+              left: _ReviewField(
+                label: k.accountNumberLabel,
+                value: _maskAccount(data.accountNumber),
+              ),
+              right: _ReviewField(
+                label: 'UPI ID',
+                value: data.upiId.isEmpty ? '—' : data.upiId,
+              ),
             ),
           ],
         ),
 
         SizedBox(height: AppSpacing.lg),
-        _SelfieCard(selfieCapturedAt: data.selfieCapturedAt, onCapture: onCaptureSelfie),
+        _SelfieCard(
+          selfieCapturedAt: data.selfieCapturedAt,
+          onCapture: onCaptureSelfie,
+        ),
 
         SizedBox(height: AppSpacing.lg),
         Container(
           width: double.infinity,
           padding: EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(color: AppColors.goldSurfaceLight, borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+          decoration: BoxDecoration(
+            color: AppColors.goldSurfaceLight,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.shield_outlined, size: AppSpacing.iconMd, color: AppColors.primaryGoldDark),
+              Icon(
+                Icons.shield_outlined,
+                size: AppSpacing.iconMd,
+                color: AppColors.primaryGoldDark,
+              ),
               SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(k.reviewSecureNote, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                child: Text(
+                  k.reviewSecureNote,
+                  style: AppTypography.caption(color: AppColors.textMutedLight),
+                ),
               ),
             ],
           ),
@@ -128,7 +184,12 @@ class KycStepReview extends StatelessWidget {
 }
 
 class _ReviewCard extends StatelessWidget {
-  const _ReviewCard({required this.icon, required this.title, required this.children, this.onEdit});
+  const _ReviewCard({
+    required this.icon,
+    required this.title,
+    required this.children,
+    this.onEdit,
+  });
 
   final IconData icon;
   final String title;
@@ -152,25 +213,49 @@ class _ReviewCard extends StatelessWidget {
             children: [
               Container(
                 padding: EdgeInsets.all(AppSpacing.xs),
-                decoration: BoxDecoration(color: AppColors.goldSurfaceLight, borderRadius: BorderRadius.circular(AppSpacing.radiusSm)),
-                child: Icon(icon, size: AppSpacing.iconMd, color: AppColors.primaryGoldDark),
+                decoration: BoxDecoration(
+                  color: AppColors.goldSurfaceLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Icon(
+                  icon,
+                  size: AppSpacing.iconMd,
+                  color: AppColors.primaryGoldDark,
+                ),
               ),
               SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(title, style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+                child: Text(
+                  title,
+                  style: AppTypography.sectionTitleSM(
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
               ),
               if (onEdit != null)
                 InkWell(
                   onTap: onEdit,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                      vertical: 2.h,
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.edit_outlined, size: 14.sp, color: AppColors.maroonPrimary),
+                        Icon(
+                          Icons.edit_outlined,
+                          size: 14.sp,
+                          color: AppColors.maroonPrimary,
+                        ),
                         SizedBox(width: 2.w),
-                        Text('Edit', style: AppTypography.labelSmall(color: AppColors.maroonPrimary)),
+                        Text(
+                          'Edit',
+                          style: AppTypography.labelSmall(
+                            color: AppColors.maroonPrimary,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -215,9 +300,15 @@ class _ReviewField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.caption(color: AppColors.textMutedLight)),
+        Text(
+          label,
+          style: AppTypography.caption(color: AppColors.textMutedLight),
+        ),
         SizedBox(height: 2.h),
-        Text(value, style: AppTypography.labelMedium(color: AppColors.textPrimaryLight)),
+        Text(
+          value,
+          style: AppTypography.labelMedium(color: AppColors.textPrimaryLight),
+        ),
       ],
     );
   }
@@ -252,26 +343,51 @@ class _SelfieCard extends StatelessWidget {
             children: [
               Container(
                 padding: EdgeInsets.all(AppSpacing.xs),
-                decoration: BoxDecoration(color: AppColors.goldSurfaceLight, borderRadius: BorderRadius.circular(AppSpacing.radiusSm)),
-                child: Icon(Icons.camera_alt_outlined, size: AppSpacing.iconMd, color: AppColors.primaryGoldDark),
+                decoration: BoxDecoration(
+                  color: AppColors.goldSurfaceLight,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                ),
+                child: Icon(
+                  Icons.camera_alt_outlined,
+                  size: AppSpacing.iconMd,
+                  color: AppColors.primaryGoldDark,
+                ),
               ),
               SizedBox(width: AppSpacing.sm),
               Expanded(
-                child: Text(k.selfieSectionLabel, style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+                child: Text(
+                  k.selfieSectionLabel,
+                  style: AppTypography.sectionTitleSM(
+                    color: AppColors.textPrimaryLight,
+                  ),
+                ),
               ),
               if (!captured)
                 InkWell(
                   onTap: onCapture,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2.h),
-                    child: Text(k.captureSelfieCta, style: AppTypography.labelSmall(color: AppColors.maroonPrimary)),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                      vertical: 2.h,
+                    ),
+                    child: Text(
+                      k.captureSelfieCta,
+                      style: AppTypography.labelSmall(
+                        color: AppColors.maroonPrimary,
+                      ),
+                    ),
                   ),
                 ),
             ],
           ),
           SizedBox(height: AppSpacing.md),
-          _ReviewField(label: k.selfieSectionLabel, value: captured ? 'Captured on ${AppFormatters.dateTime(selfieCapturedAt!)}' : k.selfieNotCaptured),
+          _ReviewField(
+            label: k.selfieSectionLabel,
+            value: captured
+                ? 'Captured on ${AppFormatters.dateTime(selfieCapturedAt!)}'
+                : k.selfieNotCaptured,
+          ),
         ],
       ),
     );

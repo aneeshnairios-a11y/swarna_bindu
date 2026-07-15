@@ -17,7 +17,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fade;
   late final Animation<double> _scale;
@@ -31,9 +32,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       duration: const Duration(seconds: 1),
     );
     _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _scale = Tween<double>(begin: 0.85, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
-    );
+    _scale = Tween<double>(
+      begin: 0.85,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
     _controller.forward();
 
     _navigationTimer = Timer(const Duration(milliseconds: 2400), () {
@@ -64,10 +66,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
             opacity: _fade,
             child: ScaleTransition(
               scale: _scale,
-              child: Image.asset(
-                AppAssetImage.appLogo,
-                width: 200.w,
-              ),
+              child: Image.asset(AppAssetImage.appLogo, width: 200.w),
             ),
           ),
         ),

@@ -46,9 +46,17 @@ class KycStepIdentity extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k.identityTitle, style: AppTypography.sectionTitle(color: AppColors.textPrimaryLight)),
+          Text(
+            k.identityTitle,
+            style: AppTypography.sectionTitle(
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
           SizedBox(height: 4.h),
-          Text(k.identitySubtitle, style: AppTypography.bodySmall(color: AppColors.textMutedLight)),
+          Text(
+            k.identitySubtitle,
+            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+          ),
           SizedBox(height: AppSpacing.xl),
 
           _DocCard(
@@ -63,11 +71,15 @@ class KycStepIdentity extends StatelessWidget {
                 hintText: k.aadhaarNumberHint,
                 controller: aadhaarController,
                 keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(12)],
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(12),
+                ],
                 validator: (v) {
                   final digits = (v ?? '').trim();
                   if (digits.isEmpty) return 'Aadhaar number is required';
-                  if (digits.length != 12) return 'Enter a valid 12-digit Aadhaar number';
+                  if (digits.length != 12)
+                    return 'Enter a valid 12-digit Aadhaar number';
                   return null;
                 },
               ),
@@ -75,11 +87,19 @@ class KycStepIdentity extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: UploadDocumentBox(label: k.uploadFront, filePath: aadhaarFrontPath, onTap: onUploadAadhaarFront),
+                    child: UploadDocumentBox(
+                      label: k.uploadFront,
+                      filePath: aadhaarFrontPath,
+                      onTap: onUploadAadhaarFront,
+                    ),
                   ),
                   SizedBox(width: AppSpacing.md),
                   Expanded(
-                    child: UploadDocumentBox(label: k.uploadBack, filePath: aadhaarBackPath, onTap: onUploadAadhaarBack),
+                    child: UploadDocumentBox(
+                      label: k.uploadBack,
+                      filePath: aadhaarBackPath,
+                      onTap: onUploadAadhaarBack,
+                    ),
                   ),
                 ],
               ),
@@ -92,7 +112,12 @@ class KycStepIdentity extends StatelessWidget {
               Expanded(child: Divider(color: AppColors.borderLight)),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: Text(k.orDivider, style: AppTypography.labelSmall(color: AppColors.textMutedLight)),
+                child: Text(
+                  k.orDivider,
+                  style: AppTypography.labelSmall(
+                    color: AppColors.textMutedLight,
+                  ),
+                ),
               ),
               Expanded(child: Divider(color: AppColors.borderLight)),
             ],
@@ -111,15 +136,29 @@ class KycStepIdentity extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.verified_user_outlined, color: AppColors.infoBlue, size: AppSpacing.iconLg),
+                    Icon(
+                      Icons.verified_user_outlined,
+                      color: AppColors.infoBlue,
+                      size: AppSpacing.iconLg,
+                    ),
                     SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(k.digiLockerTitle, style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+                          Text(
+                            k.digiLockerTitle,
+                            style: AppTypography.sectionTitleSM(
+                              color: AppColors.textPrimaryLight,
+                            ),
+                          ),
                           SizedBox(height: 2.h),
-                          Text(k.digiLockerSubtitle, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                          Text(
+                            k.digiLockerSubtitle,
+                            style: AppTypography.caption(
+                              color: AppColors.textMutedLight,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -131,10 +170,23 @@ class KycStepIdentity extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: onConnectDigiLocker,
                     style: ButtonStyle(
-                      side: WidgetStateProperty.all(BorderSide(color: AppColors.maroonPrimary, width: 1.w)),
-                      shape: WidgetStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd))),
+                      side: WidgetStateProperty.all(
+                        BorderSide(color: AppColors.maroonPrimary, width: 1.w),
+                      ),
+                      shape: WidgetStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
+                        ),
+                      ),
                     ),
-                    child: Text(k.digiLockerCta, style: AppTypography.buttonMedium(color: AppColors.maroonPrimary)),
+                    child: Text(
+                      k.digiLockerCta,
+                      style: AppTypography.buttonMedium(
+                        color: AppColors.maroonPrimary,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -164,12 +216,19 @@ class KycStepIdentity extends StatelessWidget {
                 },
               ),
               SizedBox(height: AppSpacing.md),
-              UploadDocumentBox(label: k.uploadPanCard, filePath: panCardPath, onTap: onUploadPanCard),
+              UploadDocumentBox(
+                label: k.uploadPanCard,
+                filePath: panCardPath,
+                onTap: onUploadPanCard,
+              ),
             ],
           ),
 
           SizedBox(height: AppSpacing.lg),
-          _InfoStrip(icon: Icons.verified_user_rounded, text: k.documentsSafeNote),
+          _InfoStrip(
+            icon: Icons.verified_user_rounded,
+            text: k.documentsSafeNote,
+          ),
         ],
       ),
     );
@@ -177,7 +236,13 @@ class KycStepIdentity extends StatelessWidget {
 }
 
 class _DocCard extends StatelessWidget {
-  const _DocCard({required this.image, required this.iconColor, required this.title, required this.required, required this.children});
+  const _DocCard({
+    required this.image,
+    required this.iconColor,
+    required this.title,
+    required this.required,
+    required this.children,
+  });
 
   final String image;
   final Color iconColor;
@@ -200,15 +265,35 @@ class _DocCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Image.asset(image, color: iconColor, fit: BoxFit.cover, width: AppSpacing.iconLg, height: AppSpacing.iconLg),
+              Image.asset(
+                image,
+                color: iconColor,
+                fit: BoxFit.cover,
+                width: AppSpacing.iconLg,
+                height: AppSpacing.iconLg,
+              ),
               SizedBox(width: AppSpacing.sm),
-              Text(title, style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+              Text(
+                title,
+                style: AppTypography.sectionTitleSM(
+                  color: AppColors.textPrimaryLight,
+                ),
+              ),
               if (required) ...[
                 SizedBox(width: AppSpacing.sm),
                 Container(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2.h),
-                  decoration: BoxDecoration(color: AppColors.paidBg, borderRadius: BorderRadius.circular(AppSpacing.radiusFull)),
-                  child: Text(AppStrings.kyc.requiredTag, style: AppTypography.statusBadge(color: AppColors.paidText)),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 2.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.paidBg,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                  ),
+                  child: Text(
+                    AppStrings.kyc.requiredTag,
+                    style: AppTypography.statusBadge(color: AppColors.paidText),
+                  ),
                 ),
               ],
             ],
@@ -243,14 +328,24 @@ class _InfoStrip extends StatelessWidget {
           Container(
             width: AppSpacing.iconLg,
             height: AppSpacing.iconLg,
-            decoration: BoxDecoration(color: AppColors.goldSurfaceLight, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: AppColors.goldSurfaceLight,
+              shape: BoxShape.circle,
+            ),
             child: Center(
-              child: Icon(icon, color: AppColors.primaryGoldDark, size: AppSpacing.iconMd),
+              child: Icon(
+                icon,
+                color: AppColors.primaryGoldDark,
+                size: AppSpacing.iconMd,
+              ),
             ),
           ),
           SizedBox(width: AppSpacing.sm),
           Expanded(
-            child: Text(text, style: AppTypography.caption(color: AppColors.textMutedLight)),
+            child: Text(
+              text,
+              style: AppTypography.caption(color: AppColors.textMutedLight),
+            ),
           ),
         ],
       ),

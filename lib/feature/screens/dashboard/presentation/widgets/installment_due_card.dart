@@ -23,7 +23,9 @@ class InstallmentDueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return InkWell(
       onTap: onTap,
@@ -40,8 +42,14 @@ class InstallmentDueCard extends StatelessWidget {
             Container(
               width: 44,
               height: 44,
-              decoration: BoxDecoration(color: AppColors.errorRed.withValues(alpha: 0.15), shape: BoxShape.circle),
-              child: const Icon(Icons.receipt_long_rounded, color: AppColors.errorRed),
+              decoration: BoxDecoration(
+                color: AppColors.errorRed.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.receipt_long_rounded,
+                color: AppColors.errorRed,
+              ),
             ),
             SizedBox(width: AppSpacing.md),
             Expanded(
@@ -51,11 +59,23 @@ class InstallmentDueCard extends StatelessWidget {
                   Row(
                     children: [
                       Expanded(
-                        child: Text('Next Installment Due', style: AppTypography.labelMedium(color: textPrimary)),
+                        child: Text(
+                          'Next Installment Due',
+                          style: AppTypography.labelMedium(color: textPrimary),
+                        ),
                       ),
-                      const Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.mutedGray),
+                      const Icon(
+                        Icons.calendar_today_rounded,
+                        size: 12,
+                        color: AppColors.mutedGray,
+                      ),
                       const SizedBox(width: 4),
-                      Text(AppFormatters.date(dueDate), style: AppTypography.caption(color: AppColors.mutedGray)),
+                      Text(
+                        AppFormatters.date(dueDate),
+                        style: AppTypography.caption(
+                          color: AppColors.mutedGray,
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: AppSpacing.xs),
@@ -64,15 +84,27 @@ class InstallmentDueCard extends StatelessWidget {
                     children: [
                       Text(
                         AppFormatters.currencyDecimal(amount),
-                        style: AppTypography.currencyAmountSM(color: AppColors.errorRed),
+                        style: AppTypography.currencyAmountSM(
+                          color: AppColors.errorRed,
+                        ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.errorRed.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusFull,
+                          ),
                         ),
-                        child: Text('$daysLeft days left', style: AppTypography.labelSmall(color: AppColors.errorRed)),
+                        child: Text(
+                          '$daysLeft days left',
+                          style: AppTypography.labelSmall(
+                            color: AppColors.errorRed,
+                          ),
+                        ),
                       ),
                     ],
                   ),

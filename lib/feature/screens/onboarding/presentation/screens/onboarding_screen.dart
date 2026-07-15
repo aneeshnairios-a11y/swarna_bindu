@@ -12,7 +12,12 @@ import 'package:swarna_bindu/core/theme/app_typography.dart';
 import '../viewmodels/onboarding_viewmodel.dart';
 
 class _OnboardingPageData {
-  const _OnboardingPageData({required this.image, required this.titleLine1, required this.titleLine2, required this.description});
+  const _OnboardingPageData({
+    required this.image,
+    required this.titleLine1,
+    required this.titleLine2,
+    required this.description,
+  });
 
   final String image;
   final String titleLine1;
@@ -68,7 +73,10 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       context.go(RouteName.login);
       return;
     }
-    _pageController.nextPage(duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic);
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 320),
+      curve: Curves.easeOutCubic,
+    );
   }
 
   void _skip() => context.go(RouteName.login);
@@ -105,8 +113,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   child: PageView.builder(
                     controller: _pageController,
                     itemCount: _pages.length,
-                    onPageChanged: (index) => ref.read(onboardingViewModelProvider.notifier).setPage(index),
-                    itemBuilder: (context, index) => _OnboardingPage(data: _pages[index]),
+                    onPageChanged: (index) => ref
+                        .read(onboardingViewModelProvider.notifier)
+                        .setPage(index),
+                    itemBuilder: (context, index) =>
+                        _OnboardingPage(data: _pages[index]),
                   ),
                 ),
               ],
@@ -115,7 +126,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               left: 0,
               right: 0,
               bottom: 0,
-              child: _BottomBar(currentPage: currentPage, pageCount: _pages.length, onNext: () => _onNext(currentPage)),
+              child: _BottomBar(
+                currentPage: currentPage,
+                pageCount: _pages.length,
+                onNext: () => _onNext(currentPage),
+              ),
             ),
           ],
         ),
@@ -137,7 +152,12 @@ class _OnboardingPage extends StatelessWidget {
         // mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(height: 100.h),
-          Image.asset(data.image, fit: BoxFit.contain, width: 300.w, height: 300.h),
+          Image.asset(
+            data.image,
+            fit: BoxFit.contain,
+            width: 300.w,
+            height: 300.h,
+          ),
           SizedBox(height: AppSpacing.huge),
           Text(
             data.titleLine1,
@@ -195,7 +215,11 @@ class _SectionDivider extends StatelessWidget {
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.currentPage, required this.pageCount, required this.onNext});
+  const _BottomBar({
+    required this.currentPage,
+    required this.pageCount,
+    required this.onNext,
+  });
 
   final int currentPage;
   final int pageCount;
@@ -211,7 +235,10 @@ class _BottomBar extends StatelessWidget {
         children: [
           ClipPath(
             clipper: _WaveClipper(),
-            child: Container(height: 90, color: AppColors.goldSurfaceLight.withValues(alpha: 0.8)),
+            child: Container(
+              height: 90,
+              color: AppColors.goldSurfaceLight.withValues(alpha: 0.8),
+            ),
           ),
           Positioned(
             // left: AppSpacing.xxl,
@@ -225,7 +252,12 @@ class _BottomBar extends StatelessWidget {
                   margin: EdgeInsets.only(right: AppSpacing.sm),
                   width: 8,
                   height: 8,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: isActive ? AppColors.maroonPrimary : AppColors.borderStrongLight),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isActive
+                        ? AppColors.maroonPrimary
+                        : AppColors.borderStrongLight,
+                  ),
                 );
               }),
             ),
@@ -242,7 +274,11 @@ class _BottomBar extends StatelessWidget {
                 onTap: onNext,
                 child: Padding(
                   padding: EdgeInsets.all(AppSpacing.md),
-                  child: Icon(Icons.arrow_forward, color: Colors.white, size: AppSpacing.iconLg),
+                  child: Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: AppSpacing.iconLg,
+                  ),
                 ),
               ),
             ),
@@ -257,8 +293,18 @@ class _WaveClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path()..lineTo(0, size.height * 0.45);
-    path.quadraticBezierTo(size.width * 0.25, size.height * 0.1, size.width * 0.5, size.height * 0.35);
-    path.quadraticBezierTo(size.width * 0.75, size.height * 0.6, size.width, size.height * 0.3);
+    path.quadraticBezierTo(
+      size.width * 0.25,
+      size.height * 0.1,
+      size.width * 0.5,
+      size.height * 0.35,
+    );
+    path.quadraticBezierTo(
+      size.width * 0.75,
+      size.height * 0.6,
+      size.width,
+      size.height * 0.3,
+    );
     path.lineTo(size.width, size.height);
     path.lineTo(0, size.height);
     path.close();

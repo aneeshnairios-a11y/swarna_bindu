@@ -65,7 +65,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   void _verify() {
-    ref.read(otpProvider.notifier).verify(_pinController.text, expectedLength: _kOtpLength);
+    ref
+        .read(otpProvider.notifier)
+        .verify(_pinController.text, expectedLength: _kOtpLength);
   }
 
   void _resendOtp() {
@@ -101,20 +103,27 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               Container(
                 padding: EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage(AppAssetImage.otpBg), fit: BoxFit.cover),
+                  image: DecorationImage(
+                    image: AssetImage(AppAssetImage.otpBg),
+                    fit: BoxFit.cover,
+                  ),
                 ),
                 child: Column(
                   children: [
                     Text(
                       AppStrings.otp.title,
                       textAlign: TextAlign.center,
-                      style: AppTypography.headingLG(color: AppColors.textPrimaryLight),
+                      style: AppTypography.headingLG(
+                        color: AppColors.textPrimaryLight,
+                      ),
                     ),
                     SizedBox(height: AppSpacing.sm),
                     Text(
                       AppStrings.otp.subtitle,
                       textAlign: TextAlign.center,
-                      style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+                      style: AppTypography.bodySmall(
+                        color: AppColors.textMutedLight,
+                      ),
                     ),
                   ],
                 ),
@@ -127,7 +136,12 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
                 child: Column(
                   children: [
-                    Text(AppStrings.otp.fieldLabel, style: AppTypography.labelMedium(color: AppColors.textSecondaryLight)),
+                    Text(
+                      AppStrings.otp.fieldLabel,
+                      style: AppTypography.labelMedium(
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
                     SizedBox(height: AppSpacing.md),
                     Pinput(
                       length: _kOtpLength,
@@ -136,46 +150,74 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       autofocus: true,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onChanged: (_) => ref.read(otpProvider.notifier).clearError(),
+                      onChanged: (_) =>
+                          ref.read(otpProvider.notifier).clearError(),
                       onCompleted: (_) => _verify(),
                       defaultPinTheme: PinTheme(
                         width: 44,
                         height: 52,
-                        textStyle: AppTypography.headingSM(color: AppColors.textPrimaryLight),
+                        textStyle: AppTypography.headingSM(
+                          color: AppColors.textPrimaryLight,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(color: error != null ? AppColors.errorRed : AppColors.borderLight),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
+                          border: Border.all(
+                            color: error != null
+                                ? AppColors.errorRed
+                                : AppColors.borderLight,
+                          ),
                         ),
                       ),
                       focusedPinTheme: PinTheme(
                         width: 44,
                         height: 52,
-                        textStyle: AppTypography.headingSM(color: AppColors.textPrimaryLight),
+                        textStyle: AppTypography.headingSM(
+                          color: AppColors.textPrimaryLight,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(color: AppColors.maroonPrimary, width: 1.5),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
+                          border: Border.all(
+                            color: AppColors.maroonPrimary,
+                            width: 1.5,
+                          ),
                         ),
                       ),
                       errorPinTheme: PinTheme(
                         width: 44,
                         height: 52,
-                        textStyle: AppTypography.headingSM(color: AppColors.textPrimaryLight),
+                        textStyle: AppTypography.headingSM(
+                          color: AppColors.textPrimaryLight,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
                           border: Border.all(color: AppColors.errorRed),
                         ),
                       ),
                     ),
-                    if (error != null) ...[SizedBox(height: AppSpacing.sm), Text(error, style: AppTypography.caption(color: AppColors.errorRed))],
+                    if (error != null) ...[
+                      SizedBox(height: AppSpacing.sm),
+                      Text(
+                        error,
+                        style: AppTypography.caption(color: AppColors.errorRed),
+                      ),
+                    ],
                     SizedBox(height: AppSpacing.md),
                     Center(
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
-                          style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+                          style: AppTypography.bodySmall(
+                            color: AppColors.textMutedLight,
+                          ),
                           children: [
                             TextSpan(text: AppStrings.otp.resendPrefix),
                             if (_secondsLeft > 0)
@@ -183,20 +225,29 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 text:
                                     '${AppStrings.otp.resendCountingLabel}'
                                     '${_formatSeconds(_secondsLeft)}',
-                                style: AppTypography.labelMedium(color: AppColors.textPrimaryLight),
+                                style: AppTypography.labelMedium(
+                                  color: AppColors.textPrimaryLight,
+                                ),
                               )
                             else
                               TextSpan(
                                 text: AppStrings.otp.resendCta,
-                                style: AppTypography.labelMedium(color: AppColors.maroonPrimary),
-                                recognizer: TapGestureRecognizer()..onTap = _resendOtp,
+                                style: AppTypography.labelMedium(
+                                  color: AppColors.maroonPrimary,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = _resendOtp,
                               ),
                           ],
                         ),
                       ),
                     ),
                     SizedBox(height: AppSpacing.xl),
-                    AppButton(text: AppStrings.otp.verifyAndLogin, isLoading: isVerifying, onPressed: _verify),
+                    AppButton(
+                      text: AppStrings.otp.verifyAndLogin,
+                      isLoading: isVerifying,
+                      onPressed: _verify,
+                    ),
                     SizedBox(height: AppSpacing.xl),
                   ],
                 ),

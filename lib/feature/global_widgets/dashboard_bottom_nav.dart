@@ -76,9 +76,7 @@ class DashboardBottomNav extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: const BorderRadius.vertical(
-              top: Radius.circular(24),
-            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.08),
@@ -248,10 +246,10 @@ class _CenterAction extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             'Payments',
-            style: AppTypography.labelSmall(
-              color: labelColor,
-            ).copyWith(fontSize: 11,
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,),
+            style: AppTypography.labelSmall(color: labelColor).copyWith(
+              fontSize: 11,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            ),
           ),
         ],
       ),

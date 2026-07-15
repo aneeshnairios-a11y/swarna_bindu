@@ -76,16 +76,20 @@ class _MySchemeListScreenState extends State<MySchemeListScreen> {
     _selectedId = _mockEnrollments
         .firstWhere(
           (e) => e.status == _EnrollmentStatus.active,
-      orElse: () => _mockEnrollments.first,
-    )
+          orElse: () => _mockEnrollments.first,
+        )
         .id;
   }
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -94,7 +98,10 @@ class _MySchemeListScreenState extends State<MySchemeListScreen> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -102,11 +109,18 @@ class _MySchemeListScreenState extends State<MySchemeListScreen> {
                     onTap: () => Navigator.of(context).pop(),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.arrow_back_rounded, color: textColor, size: AppSpacing.iconLg),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: textColor,
+                        size: AppSpacing.iconLg,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text('Schemes', style: AppTypography.headingSM(color: textColor)),
+                  Text(
+                    'Schemes',
+                    style: AppTypography.headingSM(color: textColor),
+                  ),
                 ],
               ),
             ),
@@ -135,7 +149,11 @@ class _MySchemeListScreenState extends State<MySchemeListScreen> {
 }
 
 class _EnrollmentCard extends StatelessWidget {
-  const _EnrollmentCard({required this.enrollment, required this.selected, this.onTap});
+  const _EnrollmentCard({
+    required this.enrollment,
+    required this.selected,
+    this.onTap,
+  });
 
   final _EnrollmentSummary enrollment;
   final bool selected;
@@ -146,8 +164,12 @@ class _EnrollmentCard extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final mutedColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
     final isActive = enrollment.status == _EnrollmentStatus.active;
 
     final badgeBg = isActive
@@ -167,7 +189,10 @@ class _EnrollmentCard extends StatelessWidget {
           padding: EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-            border: Border.all(color: selected ? AppColors.primaryGold : border, width: selected ? 1.5 : 1),
+            border: Border.all(
+              color: selected ? AppColors.primaryGold : border,
+              width: selected ? 1.5 : 1,
+            ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,7 +201,9 @@ class _EnrollmentCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Icon(
-                    selected ? Icons.radio_button_checked_rounded : Icons.radio_button_off_rounded,
+                    selected
+                        ? Icons.radio_button_checked_rounded
+                        : Icons.radio_button_off_rounded,
                     color: selected ? AppColors.primaryGoldDark : mutedColor,
                     size: 20,
                   ),
@@ -191,7 +218,9 @@ class _EnrollmentCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
                           child: Image.asset(
                             AppAssetImage.jewellery,
                             width: 56,
@@ -204,21 +233,36 @@ class _EnrollmentCard extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(enrollment.name, style: AppTypography.sectionTitleSM(color: textColor)),
-                              SizedBox(height: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: badgeBg,
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                                ),
-                                child: Text(
-                                  isActive ? 'Active' : 'Redeemed',
-                                  style: AppTypography.labelSmall(color: badgeText),
+                              Text(
+                                enrollment.name,
+                                style: AppTypography.sectionTitleSM(
+                                  color: textColor,
                                 ),
                               ),
                               SizedBox(height: 4),
-                              Text(enrollment.tagline, style: AppTypography.caption(color: mutedColor)),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: badgeBg,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radiusFull,
+                                  ),
+                                ),
+                                child: Text(
+                                  isActive ? 'Active' : 'Redeemed',
+                                  style: AppTypography.labelSmall(
+                                    color: badgeText,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                enrollment.tagline,
+                                style: AppTypography.caption(color: mutedColor),
+                              ),
                             ],
                           ),
                         ),
@@ -232,7 +276,9 @@ class _EnrollmentCard extends StatelessWidget {
                         Expanded(
                           child: _StatCell(
                             label: 'Monthly Investment',
-                            value: AppFormatters.currencyDecimal(enrollment.monthlyInvestment),
+                            value: AppFormatters.currencyDecimal(
+                              enrollment.monthlyInvestment,
+                            ),
                             textColor: textColor,
                             mutedColor: mutedColor,
                           ),
@@ -250,7 +296,9 @@ class _EnrollmentCard extends StatelessWidget {
                         Expanded(
                           child: _StatCell(
                             label: isActive ? 'Gold saved' : 'Redeemed Gold',
-                            value: AppFormatters.goldWeight(enrollment.goldGrams),
+                            value: AppFormatters.goldWeight(
+                              enrollment.goldGrams,
+                            ),
                             textColor: textColor,
                             mutedColor: mutedColor,
                           ),
@@ -274,12 +322,22 @@ class _StatDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(width: 1, height: 34, color: color, margin: EdgeInsets.symmetric(horizontal: AppSpacing.sm));
+    return Container(
+      width: 1,
+      height: 34,
+      color: color,
+      margin: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+    );
   }
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.label, required this.value, required this.textColor, required this.mutedColor});
+  const _StatCell({
+    required this.label,
+    required this.value,
+    required this.textColor,
+    required this.mutedColor,
+  });
 
   final String label;
   final String value;

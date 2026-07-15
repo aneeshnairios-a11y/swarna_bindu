@@ -29,7 +29,10 @@ class OtpNotifier extends Notifier<OtpState> {
 
   Future<void> verify(String otp, {required int expectedLength}) async {
     if (otp.length != expectedLength) {
-      state = state.copyWith(status: OtpStatus.error, errorMessage: AppStrings.otp.invalidOtp);
+      state = state.copyWith(
+        status: OtpStatus.error,
+        errorMessage: AppStrings.otp.invalidOtp,
+      );
       return;
     }
 
@@ -46,4 +49,6 @@ class OtpNotifier extends Notifier<OtpState> {
   }
 }
 
-final otpProvider = NotifierProvider.autoDispose<OtpNotifier, OtpState>(OtpNotifier.new);
+final otpProvider = NotifierProvider.autoDispose<OtpNotifier, OtpState>(
+  OtpNotifier.new,
+);

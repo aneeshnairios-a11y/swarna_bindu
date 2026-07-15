@@ -12,7 +12,7 @@ import '../../../../global_widgets/dashboard_bottom_nav.dart';
 
 /// Payment landing page matching the supplied reference design.
 class PaymentScreen extends StatefulWidget {
-   const PaymentScreen({super.key, required this.enrollmentId});
+  const PaymentScreen({super.key, required this.enrollmentId});
 
   final String enrollmentId;
 
@@ -26,7 +26,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
     backgroundColor: const Color(0xFFFFFCF6),
-    bottomNavigationBar: DashboardBottomNav(currentIndex: navIndex,  onTap: (i) => setState(() => navIndex = i),),
+    bottomNavigationBar: DashboardBottomNav(
+      currentIndex: navIndex,
+      onTap: (i) => setState(() => navIndex = i),
+    ),
     body: SafeArea(
       child: Column(
         children: [
@@ -67,7 +70,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                         subtitle: 'All Payments',
                         onTap: () {
                           context.push(RouteName.paymentHistory);
-                        }),
+                        },
+                      ),
                       SizedBox(width: AppSpacing.sm),
                       _QuickAction(
                         icon: Icons.file_download_outlined,
@@ -101,11 +105,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ),
           ),
-
         ],
       ),
     ),
-
   );
 
   void _comingSoon(BuildContext context, String label) {
@@ -163,7 +165,9 @@ class _DueAmountCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 AppFormatters.currency(5000),
-                style: AppTypography.goldAmountSM(color: const Color(0xFFEFC744)),
+                style: AppTypography.goldAmountSM(
+                  color: const Color(0xFFEFC744),
+                ),
               ),
               const SizedBox(height: 11),
               const Divider(color: Color(0xFF9A4564), height: 1),
@@ -173,14 +177,26 @@ class _DueAmountCard extends StatelessWidget {
                   const CircleAvatar(
                     radius: 16,
                     backgroundColor: Color(0xFFF7E9BF),
-                    child: Icon(Icons.calendar_today_outlined, size: 17, color: AppColors.maroonDark),
+                    child: Icon(
+                      Icons.calendar_today_outlined,
+                      size: 17,
+                      color: AppColors.maroonDark,
+                    ),
                   ),
                   SizedBox(width: AppSpacing.sm),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Due Date', style: AppTypography.labelSmall(color: const Color(0xFFE9D7DD))),
-                      Text('05 Jun 2025', style: AppTypography.labelMedium(color: Colors.white)),
+                      Text(
+                        'Due Date',
+                        style: AppTypography.labelSmall(
+                          color: const Color(0xFFE9D7DD),
+                        ),
+                      ),
+                      Text(
+                        '05 Jun 2025',
+                        style: AppTypography.labelMedium(color: Colors.white),
+                      ),
                     ],
                   ),
                 ],
@@ -194,9 +210,16 @@ class _DueAmountCard extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: AppColors.maroonDark,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
                   ),
-                  child: Text('Pay Now', style: AppTypography.sectionTitleSM(color: AppColors.maroonDark)),
+                  child: Text(
+                    'Pay Now',
+                    style: AppTypography.sectionTitleSM(
+                      color: AppColors.maroonDark,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -216,6 +239,7 @@ class _DueAmountCard extends StatelessWidget {
     ),
   );
 }
+
 class _QuickAction extends StatelessWidget {
   const _QuickAction({
     required this.icon,
@@ -315,7 +339,10 @@ class _SchemeCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: AppColors.darkNavy,
             borderRadius: BorderRadius.circular(8),
-            image: DecorationImage(image: AssetImage(AppAssetImage.jewellery,),fit: BoxFit.cover),
+            image: DecorationImage(
+              image: AssetImage(AppAssetImage.jewellery),
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         SizedBox(width: AppSpacing.sm),

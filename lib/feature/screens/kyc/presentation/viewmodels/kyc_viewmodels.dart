@@ -68,7 +68,14 @@ class KycFormData {
 
   /// Combined single-line address used on the Review step.
   String get formattedAddress {
-    final parts = [houseName, streetArea, if (landmark.trim().isNotEmpty) landmark, city, if (district != null) district, state].where((p) => p != null && p.toString().trim().isNotEmpty).join(', ');
+    final parts = [
+      houseName,
+      streetArea,
+      if (landmark.trim().isNotEmpty) landmark,
+      city,
+      if (district != null) district,
+      state,
+    ].where((p) => p != null && p.toString().trim().isNotEmpty).join(', ');
     return parts;
   }
 
@@ -136,7 +143,12 @@ class KycFormData {
 enum KycSubmitStatus { idle, submitting, success, error }
 
 class KycState {
-  const KycState({this.currentStep = 0, this.data = const KycFormData(), this.status = KycSubmitStatus.idle, this.errorMessage});
+  const KycState({
+    this.currentStep = 0,
+    this.data = const KycFormData(),
+    this.status = KycSubmitStatus.idle,
+    this.errorMessage,
+  });
 
   /// Personal, Identity, Address, Bank, Review — matches the Figma wizard.
   static const totalSteps = 5;
@@ -149,8 +161,18 @@ class KycState {
   bool get isSubmitting => status == KycSubmitStatus.submitting;
   bool get isReviewStep => currentStep == totalSteps - 1;
 
-  KycState copyWith({int? currentStep, KycFormData? data, KycSubmitStatus? status, String? errorMessage}) {
-    return KycState(currentStep: currentStep ?? this.currentStep, data: data ?? this.data, status: status ?? this.status, errorMessage: errorMessage);
+  KycState copyWith({
+    int? currentStep,
+    KycFormData? data,
+    KycSubmitStatus? status,
+    String? errorMessage,
+  }) {
+    return KycState(
+      currentStep: currentStep ?? this.currentStep,
+      data: data ?? this.data,
+      status: status ?? this.status,
+      errorMessage: errorMessage,
+    );
   }
 }
 
@@ -177,25 +199,75 @@ class KycNotifier extends Notifier<KycState> {
     }
   }
 
-  void updatePersonalInfo({String? profileImagePath, String? fullName, DateTime? dob, String? gender, String? email, String? mobile}) {
+  void updatePersonalInfo({
+    String? profileImagePath,
+    String? fullName,
+    DateTime? dob,
+    String? gender,
+    String? email,
+    String? mobile,
+  }) {
     state = state.copyWith(
-      data: state.data.copyWith(profileImagePath: profileImagePath, fullName: fullName, dob: dob, gender: gender, email: email, mobile: mobile),
+      data: state.data.copyWith(
+        profileImagePath: profileImagePath,
+        fullName: fullName,
+        dob: dob,
+        gender: gender,
+        email: email,
+        mobile: mobile,
+      ),
     );
   }
 
-  void updateIdentityInfo({String? aadhaarNumber, String? aadhaarFrontPath, String? aadhaarBackPath, String? panNumber, String? panCardPath}) {
+  void updateIdentityInfo({
+    String? aadhaarNumber,
+    String? aadhaarFrontPath,
+    String? aadhaarBackPath,
+    String? panNumber,
+    String? panCardPath,
+  }) {
     state = state.copyWith(
-      data: state.data.copyWith(aadhaarNumber: aadhaarNumber, aadhaarFrontPath: aadhaarFrontPath, aadhaarBackPath: aadhaarBackPath, panNumber: panNumber, panCardPath: panCardPath),
+      data: state.data.copyWith(
+        aadhaarNumber: aadhaarNumber,
+        aadhaarFrontPath: aadhaarFrontPath,
+        aadhaarBackPath: aadhaarBackPath,
+        panNumber: panNumber,
+        panCardPath: panCardPath,
+      ),
     );
   }
 
-  void updateAddressInfo({String? houseName, String? streetArea, String? landmark, String? city, String? district, String? stateName, String? pinCode}) {
+  void updateAddressInfo({
+    String? houseName,
+    String? streetArea,
+    String? landmark,
+    String? city,
+    String? district,
+    String? stateName,
+    String? pinCode,
+  }) {
     state = state.copyWith(
-      data: state.data.copyWith(houseName: houseName, streetArea: streetArea, landmark: landmark, city: city, district: district, state: stateName, pinCode: pinCode),
+      data: state.data.copyWith(
+        houseName: houseName,
+        streetArea: streetArea,
+        landmark: landmark,
+        city: city,
+        district: district,
+        state: stateName,
+        pinCode: pinCode,
+      ),
     );
   }
 
-  void updateBankInfo({String? accountHolderName, String? bankName, String? accountNumber, String? confirmAccountNumber, String? ifscCode, String? branchName, String? upiId}) {
+  void updateBankInfo({
+    String? accountHolderName,
+    String? bankName,
+    String? accountNumber,
+    String? confirmAccountNumber,
+    String? ifscCode,
+    String? branchName,
+    String? upiId,
+  }) {
     state = state.copyWith(
       data: state.data.copyWith(
         accountHolderName: accountHolderName,
@@ -211,12 +283,18 @@ class KycNotifier extends Notifier<KycState> {
 
   void updateSelfie({String? selfieImagePath, DateTime? selfieCapturedAt}) {
     state = state.copyWith(
-      data: state.data.copyWith(selfieImagePath: selfieImagePath, selfieCapturedAt: selfieCapturedAt),
+      data: state.data.copyWith(
+        selfieImagePath: selfieImagePath,
+        selfieCapturedAt: selfieCapturedAt,
+      ),
     );
   }
 
   Future<void> submit() async {
-    state = state.copyWith(status: KycSubmitStatus.submitting, errorMessage: null);
+    state = state.copyWith(
+      status: KycSubmitStatus.submitting,
+      errorMessage: null,
+    );
     // TODO(Phase 2): POST /users/:id/kyc with state.data (multipart for docs).
     await Future.delayed(const Duration(milliseconds: 800));
     state = state.copyWith(status: KycSubmitStatus.success);
@@ -229,4 +307,6 @@ class KycNotifier extends Notifier<KycState> {
   }
 }
 
-final kycProvider = NotifierProvider.autoDispose<KycNotifier, KycState>(KycNotifier.new);
+final kycProvider = NotifierProvider.autoDispose<KycNotifier, KycState>(
+  KycNotifier.new,
+);

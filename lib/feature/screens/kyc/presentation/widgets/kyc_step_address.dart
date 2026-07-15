@@ -27,7 +27,12 @@ const List<String> kKeralaDistricts = [
   'Kasaragod',
 ];
 
-const List<String> kIndianStates = ['Kerala', 'Tamil Nadu', 'Karnataka', 'Other'];
+const List<String> kIndianStates = [
+  'Kerala',
+  'Tamil Nadu',
+  'Karnataka',
+  'Other',
+];
 
 class KycStepAddress extends StatelessWidget {
   const KycStepAddress({
@@ -66,9 +71,17 @@ class KycStepAddress extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(k.addressTitle, style: AppTypography.sectionTitle(color: AppColors.textPrimaryLight)),
+          Text(
+            k.addressTitle,
+            style: AppTypography.sectionTitle(
+              color: AppColors.textPrimaryLight,
+            ),
+          ),
           SizedBox(height: 4.h),
-          Text(k.addressSubtitle, style: AppTypography.bodySmall(color: AppColors.textMutedLight)),
+          Text(
+            k.addressSubtitle,
+            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+          ),
           SizedBox(height: AppSpacing.xl),
 
           Container(
@@ -87,7 +100,9 @@ class KycStepAddress extends StatelessWidget {
                   hintText: k.houseHint,
                   controller: houseController,
                   prefixIcon: Icons.home_outlined,
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'This field is required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'This field is required'
+                      : null,
                 ),
                 SizedBox(height: AppSpacing.lg),
                 AppTextField(
@@ -96,10 +111,17 @@ class KycStepAddress extends StatelessWidget {
                   hintText: k.streetHint,
                   controller: streetController,
                   prefixIcon: Icons.location_on_outlined,
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'This field is required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'This field is required'
+                      : null,
                 ),
                 SizedBox(height: AppSpacing.lg),
-                AppTextField(label: k.landmarkLabel, hintText: k.landmarkHint, controller: landmarkController, prefixIcon: Icons.flag_outlined),
+                AppTextField(
+                  label: k.landmarkLabel,
+                  hintText: k.landmarkHint,
+                  controller: landmarkController,
+                  prefixIcon: Icons.flag_outlined,
+                ),
                 SizedBox(height: AppSpacing.lg),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,7 +133,8 @@ class KycStepAddress extends StatelessWidget {
                         hintText: k.cityHint,
                         controller: cityController,
                         prefixIcon: Icons.location_city_outlined,
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                        validator: (v) =>
+                            (v == null || v.trim().isEmpty) ? 'Required' : null,
                       ),
                     ),
                     SizedBox(width: AppSpacing.md),
@@ -134,7 +157,14 @@ class KycStepAddress extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: AppDropdownField<String>(label: k.stateLabel, isRequired: true, value: state, items: kIndianStates, itemLabel: (s) => s, onChanged: onStateChanged),
+                      child: AppDropdownField<String>(
+                        label: k.stateLabel,
+                        isRequired: true,
+                        value: state,
+                        items: kIndianStates,
+                        itemLabel: (s) => s,
+                        onChanged: onStateChanged,
+                      ),
                     ),
                     SizedBox(width: AppSpacing.md),
                     Expanded(
@@ -173,15 +203,29 @@ class KycStepAddress extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.my_location, color: AppColors.primaryGoldDark, size: AppSpacing.iconLg),
+                  Icon(
+                    Icons.my_location,
+                    color: AppColors.primaryGoldDark,
+                    size: AppSpacing.iconLg,
+                  ),
                   SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(k.detectLocationTitle, style: AppTypography.sectionTitleSM(color: AppColors.textPrimaryLight)),
+                        Text(
+                          k.detectLocationTitle,
+                          style: AppTypography.sectionTitleSM(
+                            color: AppColors.textPrimaryLight,
+                          ),
+                        ),
                         SizedBox(height: 2.h),
-                        Text(k.detectLocationSubtitle, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                        Text(
+                          k.detectLocationSubtitle,
+                          style: AppTypography.caption(
+                            color: AppColors.textMutedLight,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -195,14 +239,26 @@ class KycStepAddress extends StatelessWidget {
           Container(
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(color: AppColors.goldSurfaceLight, borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+            decoration: BoxDecoration(
+              color: AppColors.goldSurfaceLight,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(Icons.shield_outlined, size: AppSpacing.iconMd, color: AppColors.primaryGoldDark),
+                Icon(
+                  Icons.shield_outlined,
+                  size: AppSpacing.iconMd,
+                  color: AppColors.primaryGoldDark,
+                ),
                 SizedBox(width: AppSpacing.sm),
                 Expanded(
-                  child: Text(k.addressSecureNote, style: AppTypography.caption(color: AppColors.textMutedLight)),
+                  child: Text(
+                    k.addressSecureNote,
+                    style: AppTypography.caption(
+                      color: AppColors.textMutedLight,
+                    ),
+                  ),
                 ),
               ],
             ),

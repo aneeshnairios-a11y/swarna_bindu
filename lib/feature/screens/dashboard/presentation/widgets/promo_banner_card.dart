@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:swarna_bindu/core/theme/app_colors.dart';
 
-
 import '../../../../../core/constants/image_string/image_strings.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_typography.dart';
@@ -35,8 +34,14 @@ class PromoBannerCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Save Today,', style: AppTypography.statusBadge(color: Colors.white70)),
-                Text('Shine Tomorrow', style: AppTypography.bodyMedium(color: Colors.white)),
+                Text(
+                  'Save Today,',
+                  style: AppTypography.statusBadge(color: Colors.white70),
+                ),
+                Text(
+                  'Shine Tomorrow',
+                  style: AppTypography.bodyMedium(color: Colors.white),
+                ),
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   'Build your gold reserve with secure monthly savings.',
@@ -50,9 +55,16 @@ class PromoBannerCard extends StatelessWidget {
                     foregroundColor: AppColors.textOnGold,
                     minimumSize: const Size(0, 40),
                     padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
                   ),
-                  child: Text('Explore Schemes', style: AppTypography.buttonSmall(color: AppColors.textOnGold)),
+                  child: Text(
+                    'Explore Schemes',
+                    style: AppTypography.buttonSmall(
+                      color: AppColors.textOnGold,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -62,7 +74,10 @@ class PromoBannerCard extends StatelessWidget {
             width: 156.w,
             height: 105.h,
             decoration: BoxDecoration(
-              image: DecorationImage(image: AssetImage(AppAssetImage.jewellery), fit: BoxFit.cover),
+              image: DecorationImage(
+                image: AssetImage(AppAssetImage.jewellery),
+                fit: BoxFit.cover,
+              ),
               borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
             ),
           ),

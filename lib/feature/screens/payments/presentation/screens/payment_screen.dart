@@ -535,9 +535,11 @@ class _GoldThumbnail extends StatelessWidget {
     decoration: BoxDecoration(
       color: AppColors.darkNavy,
       borderRadius: BorderRadius.circular(8),
-      image: DecorationImage(image: AssetImage(AppAssetImage.jewellery,),fit: BoxFit.cover),
+      image: DecorationImage(
+        image: AssetImage(AppAssetImage.jewellery),
+        fit: BoxFit.cover,
+      ),
     ),
-   
   );
 }
 

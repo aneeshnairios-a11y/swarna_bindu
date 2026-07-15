@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 abstract class AppColors {
   // ── Brand ─────────────────────────────────────────────────────
   static const Color primaryGold = Color(0xFFD4AF37);

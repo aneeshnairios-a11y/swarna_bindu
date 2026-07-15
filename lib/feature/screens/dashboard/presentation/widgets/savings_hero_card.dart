@@ -30,7 +30,10 @@ class SavingsHeroCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.xl,
+        vertical: AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
         gradient: AppColors.splashGradient,
         borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
@@ -58,14 +61,18 @@ class SavingsHeroCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   AppFormatters.goldWeight(totalGoldGrams),
-                  style: AppTypography.sectionTitleSM(color: AppColors.primaryGoldLight),
+                  style: AppTypography.sectionTitleSM(
+                    color: AppColors.primaryGoldLight,
+                  ),
                 ),
                 SizedBox(height: AppSpacing.md),
                 const _Label('Your Goal'),
                 const SizedBox(height: 4),
                 Text(
                   AppFormatters.goldWeight(goalGoldGrams),
-                  style: AppTypography.sectionTitleSM(color: AppColors.primaryGoldLight),
+                  style: AppTypography.sectionTitleSM(
+                    color: AppColors.primaryGoldLight,
+                  ),
                 ),
               ],
             ),
@@ -92,7 +99,9 @@ class SavingsHeroCard extends StatelessWidget {
                 Text(
                   'of your goal',
                   textAlign: TextAlign.center,
-                  style: AppTypography.hint(color: Colors.white.withValues(alpha: 0.65)),
+                  style: AppTypography.hint(
+                    color: Colors.white.withValues(alpha: 0.65),
+                  ),
                 ),
               ],
             ),
@@ -124,7 +133,9 @@ class _AmountText extends StatelessWidget {
           if (decimals.isNotEmpty)
             TextSpan(
               text: decimals,
-              style: AppTypography.sectionTitleSM(color: AppColors.primaryGoldLight),
+              style: AppTypography.sectionTitleSM(
+                color: AppColors.primaryGoldLight,
+              ),
             ),
         ],
       ),
@@ -140,7 +151,9 @@ class _Label extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: AppTypography.bodyXSmall(color: Colors.white.withValues(alpha: 0.7)),
+      style: AppTypography.bodyXSmall(
+        color: Colors.white.withValues(alpha: 0.7),
+      ),
     );
   }
 }

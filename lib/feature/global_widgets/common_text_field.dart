@@ -55,8 +55,12 @@ class AppTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +74,9 @@ class AppTextField extends StatelessWidget {
                   ? [
                       TextSpan(
                         text: ' *',
-                        style: AppTypography.labelMedium(color: AppColors.errorRed),
+                        style: AppTypography.labelMedium(
+                          color: AppColors.errorRed,
+                        ),
                       ),
                     ]
                   : null,
@@ -96,7 +102,13 @@ class AppTextField extends StatelessWidget {
           decoration: InputDecoration(
             hintText: hintText,
             counterText: '',
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: AppSpacing.iconMd, color: AppColors.mutedGray) : null,
+            prefixIcon: prefixIcon != null
+                ? Icon(
+                    prefixIcon,
+                    size: AppSpacing.iconMd,
+                    color: AppColors.mutedGray,
+                  )
+                : null,
             suffixIcon: suffixIcon,
           ),
         ),
@@ -134,8 +146,12 @@ class AppDropdownField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,7 +165,9 @@ class AppDropdownField<T> extends StatelessWidget {
                   ? [
                       TextSpan(
                         text: ' *',
-                        style: AppTypography.labelMedium(color: AppColors.errorRed),
+                        style: AppTypography.labelMedium(
+                          color: AppColors.errorRed,
+                        ),
                       ),
                     ]
                   : null,
@@ -160,11 +178,20 @@ class AppDropdownField<T> extends StatelessWidget {
         DropdownButtonFormField<T>(
           value: value,
           isExpanded: true,
-          icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.mutedGray),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: AppColors.mutedGray,
+          ),
           style: AppTypography.bodySmall(color: textColor),
           decoration: InputDecoration(
             hintText: hintText,
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: AppSpacing.iconMd, color: AppColors.mutedGray) : null,
+            prefixIcon: prefixIcon != null
+                ? Icon(
+                    prefixIcon,
+                    size: AppSpacing.iconMd,
+                    color: AppColors.mutedGray,
+                  )
+                : null,
           ),
           items: items
               .map(

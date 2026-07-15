@@ -31,10 +31,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(dashboardProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textPrimary = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
@@ -42,13 +46,16 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           onRefresh: () => ref.read(dashboardProvider.notifier).refresh(),
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenH, vertical: AppSpacing.screenV),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.screenH,
+              vertical: AppSpacing.screenV,
+            ),
             children: [
               DashboardHeader(
                 userName: state.userName,
                 unreadNotifications: state.unreadNotifications,
                 onNotificationTap: () {
-                 context.push(RouteName.notifications);
+                  context.push(RouteName.notifications);
                 },
               ),
               SizedBox(height: AppSpacing.xl),
@@ -71,7 +78,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               SizedBox(height: AppSpacing.xl),
 
-              Text('Quick Actions', style: AppTypography.sectionTitle(color: textPrimary)),
+              Text(
+                'Quick Actions',
+                style: AppTypography.sectionTitle(color: textPrimary),
+              ),
               SizedBox(height: AppSpacing.md),
               QuickActionsGrid(
                 actions: [
@@ -114,7 +124,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               ),
               SizedBox(height: AppSpacing.xl),
 
-              Text('My Schemes', style: AppTypography.sectionTitle(color: textPrimary)),
+              Text(
+                'My Schemes',
+                style: AppTypography.sectionTitle(color: textPrimary),
+              ),
               SizedBox(height: AppSpacing.md),
               ...state.mySchemes.map(
                 (s) => Padding(

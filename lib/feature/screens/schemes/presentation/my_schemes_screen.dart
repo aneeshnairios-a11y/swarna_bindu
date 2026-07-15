@@ -33,12 +33,20 @@ class MySchemesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
-    final footerBg = isDark ? AppColors.goldSurfaceDark : AppColors.goldSurfaceLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final mutedColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
+    final footerBg = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -48,7 +56,10 @@ class MySchemesScreen extends StatelessWidget {
           children: [
             // ── Header ───────────────────────────────────────
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -56,11 +67,18 @@ class MySchemesScreen extends StatelessWidget {
                     onTap: () => context.go(RouteName.dashboard),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.arrow_back_rounded, color: textColor, size: AppSpacing.iconLg),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: textColor,
+                        size: AppSpacing.iconLg,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text('My Schemes', style: AppTypography.headingSM(color: textColor)),
+                  Text(
+                    'My Schemes',
+                    style: AppTypography.headingSM(color: textColor),
+                  ),
                 ],
               ),
             ),
@@ -76,14 +94,23 @@ class MySchemesScreen extends StatelessWidget {
                     border: Border.all(color: border),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 18, offset: const Offset(0, 8)),
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 18,
+                        offset: const Offset(0, 8),
+                      ),
                     ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md),
+                        padding: EdgeInsets.fromLTRB(
+                          AppSpacing.lg,
+                          AppSpacing.lg,
+                          AppSpacing.lg,
+                          AppSpacing.md,
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -99,34 +126,54 @@ class MySchemesScreen extends StatelessWidget {
                                   ),
                                   child: Padding(
                                     padding: const EdgeInsets.all(8),
-                                    child: Image.asset(AppAssetImage.goldRate, fit: BoxFit.cover),
+                                    child: Image.asset(
+                                      AppAssetImage.goldRate,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                 ),
                                 SizedBox(width: AppSpacing.md),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Text(scheme.name, style: AppTypography.sectionTitleSM(color: textColor)),
+                                      Text(
+                                        scheme.name,
+                                        style: AppTypography.sectionTitleSM(
+                                          color: textColor,
+                                        ),
+                                      ),
                                       SizedBox(height: 2),
                                       Text(
                                         'Build Your Wealth With Disciplined Monthly Savings And Get Maturity Benefits.',
-                                        style: AppTypography.caption(color: mutedColor),
+                                        style: AppTypography.caption(
+                                          color: mutedColor,
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 SizedBox(width: AppSpacing.sm),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
-                                    color: isDark ? AppColors.paidBgDark : AppColors.successGreenLight,
-                                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                                    color: isDark
+                                        ? AppColors.paidBgDark
+                                        : AppColors.successGreenLight,
+                                    borderRadius: BorderRadius.circular(
+                                      AppSpacing.radiusFull,
+                                    ),
                                   ),
                                   child: Text(
                                     'Active',
                                     style: AppTypography.labelSmall(
-                                      color: isDark ? AppColors.paidTextDark : AppColors.successGreen,
+                                      color: isDark
+                                          ? AppColors.paidTextDark
+                                          : AppColors.successGreen,
                                     ),
                                   ),
                                 ),
@@ -148,7 +195,9 @@ class MySchemesScreen extends StatelessWidget {
                                 Expanded(
                                   child: _StatCell(
                                     label: 'Total Gold',
-                                    value: AppFormatters.goldWeightShort(totalGoldGrams),
+                                    value: AppFormatters.goldWeightShort(
+                                      totalGoldGrams,
+                                    ),
                                     textColor: textColor,
                                     mutedColor: mutedColor,
                                   ),
@@ -169,11 +218,15 @@ class MySchemesScreen extends StatelessWidget {
                       SizedBox(height: AppSpacing.sm),
                       Container(
                         width: double.infinity,
-                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.sm,
+                        ),
                         color: footerBg.withValues(alpha: 0.5),
                         child: AppButton(
                           text: 'pay',
-                          onPressed: () => context.push(RouteName.paymentPath(scheme.id)),
+                          onPressed: () =>
+                              context.push(RouteName.paymentPath(scheme.id)),
                           height: 46,
                           backgroundColor: AppColors.maroonDark,
                           textColor: Colors.white,
@@ -192,7 +245,12 @@ class MySchemesScreen extends StatelessWidget {
 }
 
 class _StatCell extends StatelessWidget {
-  const _StatCell({required this.label, required this.value, required this.textColor, required this.mutedColor});
+  const _StatCell({
+    required this.label,
+    required this.value,
+    required this.textColor,
+    required this.mutedColor,
+  });
 
   final String label;
   final String value;

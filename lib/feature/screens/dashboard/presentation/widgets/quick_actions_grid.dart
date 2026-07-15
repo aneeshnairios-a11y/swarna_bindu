@@ -26,7 +26,9 @@ class QuickActionsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: actions.map((a) => Expanded(child: _QuickActionItem(action: a))).toList(),
+      children: actions
+          .map((a) => Expanded(child: _QuickActionItem(action: a)))
+          .toList(),
     );
   }
 }
@@ -38,7 +40,9 @@ class _QuickActionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final labelColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
 
     return InkWell(
       onTap: action.onTap,

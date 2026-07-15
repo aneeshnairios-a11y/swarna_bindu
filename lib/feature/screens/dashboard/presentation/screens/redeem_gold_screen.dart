@@ -29,7 +29,8 @@ class RedeemGoldScreen extends StatefulWidget {
 class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
   bool _submitting = false;
 
-  double get _currentValue => widget.availableGoldGrams * widget.goldRatePerGram;
+  double get _currentValue =>
+      widget.availableGoldGrams * widget.goldRatePerGram;
 
   Future<void> _confirmRedeem() async {
     setState(() => _submitting = true);
@@ -38,7 +39,11 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
     setState(() => _submitting = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Redemption request for ${AppFormatters.goldWeight(widget.availableGoldGrams)} submitted.')),
+      SnackBar(
+        content: Text(
+          'Redemption request for ${AppFormatters.goldWeight(widget.availableGoldGrams)} submitted.',
+        ),
+      ),
     );
     Navigator.of(context).pop();
   }
@@ -46,11 +51,17 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final mutedColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -59,7 +70,10 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              padding: EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
               child: Row(
                 children: [
                   InkWell(
@@ -67,11 +81,18 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                     onTap: () => Navigator.of(context).pop(),
                     child: Padding(
                       padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.arrow_back_rounded, color: textColor, size: AppSpacing.iconLg),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: textColor,
+                        size: AppSpacing.iconLg,
+                      ),
                     ),
                   ),
                   SizedBox(width: AppSpacing.sm),
-                  Text('Redeem Gold', style: AppTypography.headingSM(color: textColor)),
+                  Text(
+                    'Redeem Gold',
+                    style: AppTypography.headingSM(color: textColor),
+                  ),
                 ],
               ),
             ),
@@ -93,16 +114,27 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Available gold', style: AppTypography.bodySmall(color: Colors.white70)),
+                              Text(
+                                'Available gold',
+                                style: AppTypography.bodySmall(
+                                  color: Colors.white70,
+                                ),
+                              ),
                               SizedBox(height: 4),
                               Text(
                                 '${widget.availableGoldGrams.toStringAsFixed(3)}g',
-                                style: AppTypography.goldAmount(color: AppColors.primaryGold),
+                                style: AppTypography.goldAmount(
+                                  color: AppColors.primaryGold,
+                                ),
                               ),
                               SizedBox(height: 2),
                               Text(
-                                AppFormatters.currencyDecimal(widget.investedAmount),
-                                style: AppTypography.bodySmall(color: Colors.white70),
+                                AppFormatters.currencyDecimal(
+                                  widget.investedAmount,
+                                ),
+                                style: AppTypography.bodySmall(
+                                  color: Colors.white70,
+                                ),
                               ),
                             ],
                           ),
@@ -110,8 +142,15 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                         Container(
                           width: 64,
                           height: 64,
-                          decoration: const BoxDecoration(gradient: AppColors.goldCardGradient, shape: BoxShape.circle),
-                          child: const Icon(Icons.diamond_rounded, color: AppColors.textOnGold, size: 30),
+                          decoration: const BoxDecoration(
+                            gradient: AppColors.goldCardGradient,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.diamond_rounded,
+                            color: AppColors.textOnGold,
+                            size: 30,
+                          ),
                         ),
                       ],
                     ),
@@ -128,25 +167,32 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('You will receive', style: AppTypography.sectionTitleSM(color: textColor)),
+                        Text(
+                          'You will receive',
+                          style: AppTypography.sectionTitleSM(color: textColor),
+                        ),
                         SizedBox(height: AppSpacing.md),
                         _InfoRow(
                           label: 'Invested Amount',
-                          value: AppFormatters.currencyDecimal(widget.investedAmount),
+                          value: AppFormatters.currencyDecimal(
+                            widget.investedAmount,
+                          ),
                           textColor: textColor,
                           mutedColor: mutedColor,
                         ),
                         SizedBox(height: AppSpacing.sm),
                         _InfoRow(
                           label: 'Gold Quantity',
-                          value: '${widget.availableGoldGrams.toStringAsFixed(3)}g',
+                          value:
+                              '${widget.availableGoldGrams.toStringAsFixed(3)}g',
                           textColor: textColor,
                           mutedColor: mutedColor,
                         ),
                         SizedBox(height: AppSpacing.sm),
                         _InfoRow(
                           label: 'gold rate',
-                          value: '${AppFormatters.currencyDecimal(widget.goldRatePerGram)}/gm',
+                          value:
+                              '${AppFormatters.currencyDecimal(widget.goldRatePerGram)}/gm',
                           textColor: textColor,
                           mutedColor: mutedColor,
                         ),
@@ -162,7 +208,9 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                         SizedBox(height: AppSpacing.md),
                         _InfoRow(
                           label: 'Redeem gold',
-                          value: AppFormatters.goldWeight(widget.availableGoldGrams),
+                          value: AppFormatters.goldWeight(
+                            widget.availableGoldGrams,
+                          ),
                           textColor: AppColors.maroonPrimary,
                           mutedColor: textColor,
                           emphasize: true,
@@ -178,7 +226,12 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
         ),
       ),
       bottomNavigationBar: SafeArea(
-        minimum: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+        minimum: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          0,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
         child: AppButton(
           text: 'Redeem Gold',
           isLoading: _submitting,
@@ -209,10 +262,14 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final labelStyle = emphasize
-        ? AppTypography.labelLarge(color: mutedColor).copyWith(fontWeight: FontWeight.w700)
+        ? AppTypography.labelLarge(
+            color: mutedColor,
+          ).copyWith(fontWeight: FontWeight.w700)
         : AppTypography.bodySmall(color: mutedColor);
     final valueStyle = emphasize
-        ? AppTypography.sectionTitleSM(color: textColor).copyWith(fontWeight: FontWeight.w700)
+        ? AppTypography.sectionTitleSM(
+            color: textColor,
+          ).copyWith(fontWeight: FontWeight.w700)
         : AppTypography.labelMedium(color: textColor);
 
     return Row(

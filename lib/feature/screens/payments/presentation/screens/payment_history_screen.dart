@@ -55,31 +55,52 @@ class PaymentHistoryScreen extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.xs,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => context.canPop() ? context.pop() : context.go(RouteName.dashboard),
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(RouteName.dashboard),
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.black,
+                      size: 24,
+                    ),
                   ),
-                  Text('Payment History', style: AppTypography.headingSM(color: Colors.black)),
+                  Text(
+                    'Payment History',
+                    style: AppTypography.headingSM(color: Colors.black),
+                  ),
                 ],
               ),
             ),
             Expanded(
               child: _mockTransactions.isEmpty
                   ? Center(
-                child: Text(
-                  'No payments yet',
-                  style: AppTypography.bodySmall(color: AppColors.mutedGray),
-                ),
-              )
+                      child: Text(
+                        'No payments yet',
+                        style: AppTypography.bodySmall(
+                          color: AppColors.mutedGray,
+                        ),
+                      ),
+                    )
                   : ListView.separated(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-                itemCount: _mockTransactions.length,
-                separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
-                itemBuilder: (context, i) => _TransactionCard(transaction: _mockTransactions[i]),
-              ),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: AppSpacing.lg,
+                        vertical: AppSpacing.md,
+                      ),
+                      itemCount: _mockTransactions.length,
+                      separatorBuilder: (_, __) =>
+                          SizedBox(height: AppSpacing.md),
+                      itemBuilder: (context, i) =>
+                          _TransactionCard(transaction: _mockTransactions[i]),
+                    ),
             ),
           ],
         ),
@@ -101,7 +122,11 @@ class _TransactionCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
@@ -115,11 +140,17 @@ class _TransactionCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.darkNavy,
                   shape: BoxShape.circle,
-                  image: DecorationImage(image: AssetImage(AppAssetImage.jewellery), fit: BoxFit.cover),
+                  image: DecorationImage(
+                    image: AssetImage(AppAssetImage.jewellery),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
               SizedBox(width: AppSpacing.sm),
-              Text(transaction.schemeName, style: AppTypography.labelLarge(color: Colors.black)),
+              Text(
+                transaction.schemeName,
+                style: AppTypography.labelLarge(color: Colors.black),
+              ),
             ],
           ),
           SizedBox(height: AppSpacing.sm),
@@ -131,7 +162,11 @@ class _TransactionCard extends StatelessWidget {
           SizedBox(height: 6),
           _DetailRow(label: 'Date & Time', value: transaction.dateTime),
           SizedBox(height: 6),
-          _DetailRow(label: 'Amount paid', value: '₹${transaction.amountPaid.toStringAsFixed(0)}', emphasize: true),
+          _DetailRow(
+            label: 'Amount paid',
+            value: '₹${transaction.amountPaid.toStringAsFixed(0)}',
+            emphasize: true,
+          ),
         ],
       ),
     );
@@ -139,7 +174,11 @@ class _TransactionCard extends StatelessWidget {
 }
 
 class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value, this.emphasize = false});
+  const _DetailRow({
+    required this.label,
+    required this.value,
+    this.emphasize = false,
+  });
 
   final String label;
   final String value;
@@ -150,12 +189,17 @@ class _DetailRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppTypography.bodyXSmall(color: AppColors.mutedGray)),
+        Text(
+          label,
+          style: AppTypography.bodyXSmall(color: AppColors.mutedGray),
+        ),
         Text(
           value,
           style: emphasize
               ? AppTypography.labelMedium(color: Colors.black)
-              : AppTypography.labelMedium(color: Colors.black).copyWith(fontWeight: FontWeight.w600),
+              : AppTypography.labelMedium(
+                  color: Colors.black,
+                ).copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );
