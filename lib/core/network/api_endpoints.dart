@@ -28,6 +28,15 @@ abstract class ApiEndpoints {
   static const String refreshToken = '/auth/refresh';
   static const String logout = '/auth/logout';
 
+  // ── KYC ─────────────────────────────────────────────────────
+  static const String kycPersonal = '/user/kyc/personal';
+  static const String kycIdentity = '/user/kyc/identity';
+  static const String kycAddress = '/user/kyc/address';
+  static const String kycBank = '/user/kyc/bank';
+  static const String kycStatus = '/user/kyc/status';
+  // TODO(kyc-submit): wire once the endpoint is finalized.
+  static const String kycSubmit = '/user/kyc/submit';
+
   // ── Users ───────────────────────────────────────────────────
   static String userProfile(String id) => '/users/$id';
   static String submitKyc(String id) => '/users/$id/kyc';

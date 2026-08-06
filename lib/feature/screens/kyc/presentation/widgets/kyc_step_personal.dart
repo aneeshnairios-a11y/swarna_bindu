@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -61,8 +63,7 @@ class KycStepPersonal extends StatelessWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary:
-                  AppColors.maroonPrimary, // Header background & selected date
+              primary: AppColors.maroonPrimary, // Header background & selected date
               onPrimary: Colors.white, // Header text
               surface: Colors.white, // Dialog background
               onSurface: Colors.black87, // Calendar text
@@ -84,9 +85,7 @@ class KycStepPersonal extends StatelessWidget {
     if (picked != null) onDobChanged(picked);
   }
 
-  String get _dobText => dob == null
-      ? ''
-      : '${dob!.day.toString().padLeft(2, '0')} ${_months[dob!.month - 1]} ${dob!.year}';
+  String get _dobText => dob == null ? '' : '${dob!.day.toString().padLeft(2, '0')} ${_months[dob!.month - 1]} ${dob!.year}';
 
   @override
   Widget build(BuildContext context) {
@@ -118,15 +117,26 @@ class KycStepPersonal extends StatelessWidget {
                             width: 2,
                           ),
                         ),
-                        child: profileImagePath == null
-                            ? Icon(
-                                Icons.person,
-                                size: AppSpacing.iconXl,
-                                color: AppColors.maroonPrimary,
-                              )
-                            : null,
-                      ),
-                      // CircleAvatar(
+                        child: ClipOval(
+                          child: profileImagePath == null
+                              ? Icon(
+                                  Icons.person,
+                                  size: AppSpacing.iconXl,
+                                  color: AppColors.maroonPrimary,
+                                )
+                              : Image.file(
+                                  File(profileImagePath!),
+                                  width: AppSpacing.avatarXl,
+                                  height: AppSpacing.avatarXl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => Icon(
+                                    Icons.person,
+                                    size: AppSpacing.iconXl,
+                                    color: AppColors.maroonPrimary,
+                                  ),
+                                ),
+                        ),
+                      ), // CircleAvatar(
                       //   radius: AppSpacing.avatarXl / 2,
                       //   backgroundColor: AppColors.surfaceVariantLight,
                       //   backgroundImage: profileImagePath != null ? AssetImage(profileImagePath!) : null,
@@ -188,9 +198,7 @@ class KycStepPersonal extends StatelessWidget {
                   controller: nameController,
                   prefixIcon: Icons.person_outline,
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) => (v == null || v.trim().isEmpty)
-                      ? 'Full name is required'
-                      : null,
+                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Full name is required' : null,
                 ),
                 SizedBox(height: AppSpacing.lg),
                 Row(

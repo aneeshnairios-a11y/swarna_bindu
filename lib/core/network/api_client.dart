@@ -93,6 +93,16 @@ class ApiClient {
       return ApiFailure(UnknownApiException(e.toString()));
     }
   }
+
+  Future<ApiResult<T>> uploadPut<T>(
+    String path, {
+    required FormData formData,
+    required T Function(dynamic json) parser,
+    void Function(int sent, int total)? onSendProgress,
+  }) => _request(
+    () => _dio.put(path, data: formData, onSendProgress: onSendProgress),
+    parser,
+  );
 }
 
 final apiClientProvider = Provider<ApiClient>((ref) {

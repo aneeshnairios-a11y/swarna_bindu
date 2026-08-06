@@ -66,6 +66,11 @@ class AuthInterceptor extends Interceptor {
       return;
     }
 
+    if (err.requestOptions.data is FormData) {
+      handler.next(err);
+      return;
+    }
+
     try {
       final token = await _secureStorage.accessToken;
       final retryOptions = err.requestOptions

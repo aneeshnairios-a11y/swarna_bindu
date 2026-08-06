@@ -25,6 +25,10 @@ dependencies:
   dio: ^5.10.0
   flutter_secure_storage: ^10.3.1
   connectivity_plus: ^7.3.0
+  path_provider: ^2.1.6
+  image_picker: ^1.2.3
+  geolocator: ^14.0.3
+  flutter_image_compress: ^2.5.1
 
 dev_dependencies:
   flutter_test:
