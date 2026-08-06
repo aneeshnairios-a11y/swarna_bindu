@@ -7,9 +7,9 @@ abstract class EnvConfig {
   static const AppEnvironment current = AppEnvironment.dev;
 
   static const Map<AppEnvironment, String> _baseUrls = {
-    AppEnvironment.dev: 'http://localhost:5000/api/v1',
-    AppEnvironment.staging: 'https://staging-api.bictree.com/api/v1',
-    AppEnvironment.prod: 'https://api.bictree.com/api/v1',
+    AppEnvironment.dev: 'https://scheme.bindujewellery.com/api/v1',
+    AppEnvironment.staging: 'https://scheme.bindujewellery.com/api/v1',
+    AppEnvironment.prod: 'https://scheme.bindujewellery.com/api/v1',
   };
 
   static String get baseUrl => _baseUrls[current]!;

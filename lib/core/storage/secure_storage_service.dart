@@ -14,6 +14,7 @@ class SecureStorageService {
   static const _kRefreshToken = 'refresh_token';
   static const _kUserId = 'user_id';
   static const _kUserRole = 'user_role';
+  static const _kKycStatus = 'kyc_status';
 
   Future<void> saveTokens({
     required String accessToken,
@@ -40,6 +41,9 @@ class SecureStorageService {
   Future<void> saveUserRole(String role) => _storage.write(key: _kUserRole, value: role);
 
   Future<String?> get userRole => _storage.read(key: _kUserRole);
+
+  Future<void> saveKycStatus(String status) => _storage.write(key: _kKycStatus, value: status);
+  Future<String?> get kycStatus => _storage.read(key: _kKycStatus);
 
   /// True once a refresh token exists — Splash uses this (not the access
   /// token, which expires in 15 min) to decide the first route.

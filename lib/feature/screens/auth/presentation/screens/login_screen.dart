@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -10,18 +11,18 @@ import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 import '../../../../../core/constants/image_string/image_strings.dart';
 import '../../../../global_widgets/common_button.dart';
+import '../viewmodels/login_viewmodels.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _phoneController = TextEditingController();
-  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -31,19 +32,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _sendOtp() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
-    setState(() => _isSubmitting = true);
-
-    // TODO(T2): replace with real "request OTP" API call.
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (!mounted) return;
-      setState(() => _isSubmitting = false);
-      context.push(RouteName.otp, extra: _phoneController.text.trim());
-    });
+    FocusScope.of(context).unfocus();
+    ref.read(loginProvider.notifier).sendOtp(_phoneController.text.trim());
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<LoginState>(loginProvider, (previous, next) {
+      if (next.status == LoginStatus.sent && previous?.status != LoginStatus.sent) {
+        context.push(RouteName.otp, extra: _phoneController.text.trim());
+      } else if (next.status == LoginStatus.error && next.errorMessage != null) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(
+            SnackBar(content: Text(next.errorMessage!), backgroundColor: AppColors.errorRed),
+          );
+        ref.read(loginProvider.notifier).clearError();
+      }
+    });
+
+    final isSending = ref.watch(loginProvider.select((s) => s.isSending));
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
@@ -62,17 +71,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       AppStrings.login.welcomeTitle,
                       textAlign: TextAlign.center,
-                      style: AppTypography.headingLG(
-                        color: AppColors.textPrimaryLight,
-                      ),
+                      style: AppTypography.headingLG(color: AppColors.textPrimaryLight),
                     ),
                     SizedBox(height: AppSpacing.xs),
                     Text(
                       AppStrings.login.welcomeSubtitle,
                       textAlign: TextAlign.center,
-                      style: AppTypography.bodySmall(
-                        color: AppColors.textMutedLight,
-                      ),
+                      style: AppTypography.bodySmall(color: AppColors.textMutedLight),
                     ),
                   ],
                 ),
@@ -85,13 +90,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.surfaceLight,
-                    border: Border.all(
-                      width: 1.w,
-                      color: AppColors.borderLight,
-                    ),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(AppSpacing.radiusLg),
-                    ),
+                    border: Border.all(width: 1.w, color: AppColors.borderLight),
+                    borderRadius: BorderRadius.all(Radius.circular(AppSpacing.radiusLg)),
                   ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
@@ -101,10 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _PhoneField(
-                          formKey: _formKey,
-                          controller: _phoneController,
-                        ),
+                        _PhoneField(formKey: _formKey, controller: _phoneController),
                         SizedBox(height: AppSpacing.sm),
                         Row(
                           children: [
@@ -117,9 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Expanded(
                               child: Text(
                                 AppStrings.login.otpHint,
-                                style: AppTypography.caption(
-                                  color: AppColors.textMutedLight,
-                                ),
+                                style: AppTypography.caption(color: AppColors.textMutedLight),
                               ),
                             ),
                           ],
@@ -127,8 +122,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(height: AppSpacing.xxl),
                         AppButton(
                           text: AppStrings.login.sendOtp,
-                          isLoading: _isSubmitting,
-                          onPressed: _sendOtp,
+                          isLoading: isSending,
+                          onPressed: isSending ? null : _sendOtp,
                         ),
                       ],
                     ),
@@ -158,9 +153,7 @@ class _PhoneField extends StatelessWidget {
         children: [
           Text(
             AppStrings.login.mobileLabel,
-            style: AppTypography.labelMedium(
-              color: AppColors.textSecondaryLight,
-            ),
+            style: AppTypography.labelMedium(color: AppColors.textSecondaryLight),
           ),
           SizedBox(height: AppSpacing.sm),
           Row(
@@ -177,9 +170,7 @@ class _PhoneField extends StatelessWidget {
                 ),
                 child: Text(
                   '+91',
-                  style: AppTypography.bodyMedium(
-                    color: AppColors.textPrimaryLight,
-                  ),
+                  style: AppTypography.bodyMedium(color: AppColors.textPrimaryLight),
                 ),
               ),
               SizedBox(width: AppSpacing.sm),
@@ -188,15 +179,11 @@ class _PhoneField extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.phone,
                   maxLength: 10,
-                  style: AppTypography.bodyMedium(
-                    color: AppColors.textPrimaryLight,
-                  ),
+                  style: AppTypography.bodyMedium(color: AppColors.textPrimaryLight),
                   decoration: InputDecoration(
                     counterText: '',
                     hintText: AppStrings.login.mobileHint,
-                    hintStyle: AppTypography.bodyMedium(
-                      color: AppColors.textMutedLight,
-                    ),
+                    hintStyle: AppTypography.bodyMedium(color: AppColors.textMutedLight),
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: AppSpacing.md,
                       vertical: AppSpacing.md,
@@ -213,10 +200,7 @@ class _PhoneField extends StatelessWidget {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      borderSide: const BorderSide(
-                        color: AppColors.maroonPrimary,
-                        width: 1.5,
-                      ),
+                      borderSide: const BorderSide(color: AppColors.maroonPrimary, width: 1.5),
                     ),
                     errorBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
