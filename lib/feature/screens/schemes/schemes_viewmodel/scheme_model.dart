@@ -1,78 +1,64 @@
-/// Mock scheme model for Phase 1 (UI-only). Shape mirrors the eventual
-/// `GET /schemes` / `GET /schemes/:id` response so swapping in real data
-/// via a repository in Phase 2 only touches the data source, not the UI.
+/// Real scheme catalog model — mirrors `GET /schemes` and `GET /schemes/:id`.
+///
+/// Phase 2 replacement for the Phase 1 mock model. Field names follow the
+/// server response exactly (`maturityBenefitPercent`, `minGoldGram`,
+/// `termsAndConditions` as a single `\n`-joined string) so `fromJson` needs
+/// no renaming/guessing.
 class SchemeModel {
   const SchemeModel({
     required this.id,
     required this.name,
-    required this.tagline,
+    required this.description,
     required this.monthlyInvestment,
     required this.durationMonths,
-    required this.maturityBonusPercent,
-    required this.minGoldGrams,
-    required this.bestFor,
-    this.badge,
+    required this.maturityBenefitPercent,
+    required this.minGoldGram,
+    required this.termsAndConditions,
+    required this.isActive,
   });
 
   final String id;
   final String name;
-  final String tagline;
+  final String description;
   final double monthlyInvestment;
   final int durationMonths;
-  final double maturityBonusPercent;
-  final double minGoldGrams;
-  final String bestFor;
+  final double maturityBenefitPercent;
+  final double minGoldGram;
 
-  /// e.g. "Popular", "New" — null when the scheme has no badge.
-  final String? badge;
+  /// Raw server string, e.g. "1. ...\n2. ...\n3. ...". Use [termsList] for
+  /// bullet-point UI rendering.
+  final String termsAndConditions;
+  final bool isActive;
 
-  /// Generic terms shown on the scheme detail screen, generated from the
-  /// scheme's own numbers so every scheme reads correctly without needing
-  /// per-scheme copy yet.
-  List<String> get termsAndConditions => [
-    'Minimum monthly installment for this scheme is ₹${monthlyInvestment.toStringAsFixed(0)}, payable on or before the due date each month.',
-    'The scheme runs for $durationMonths months from the date of enrollment. Gold is credited at the day\'s rate on each successful payment.',
-    'On maturity, a bonus of up to $maturityBonusPercent% of the accumulated gold value is added, subject to completing all installments on time.',
-    'A minimum of ${minGoldGrams.toStringAsFixed(0)} grams must accumulate before redemption as jewellery can be requested.',
-    'Missed installments may attract a late fee and can affect eligibility for the maturity bonus — see your store for details.',
-    'KYC verification (Aadhaar & PAN) is mandatory before the first redemption request can be processed.',
-  ];
+  factory SchemeModel.fromJson(Map<String, dynamic> json) => SchemeModel(
+    id: json['_id'] as String? ?? json['id'] as String? ?? '',
+    name: json['name'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    monthlyInvestment: (json['monthlyInvestment'] as num?)?.toDouble() ?? 0,
+    durationMonths: (json['durationMonths'] as num?)?.toInt() ?? 0,
+    maturityBenefitPercent: (json['maturityBenefitPercent'] as num?)?.toDouble() ?? 0,
+    minGoldGram: (json['minGoldGram'] as num?)?.toDouble() ?? 0,
+    termsAndConditions: json['termsAndConditions'] as String? ?? '',
+    isActive: json['isActive'] as bool? ?? true,
+  );
+
+  /// Splits the server's newline-separated terms string into a clean bullet
+  /// list for [SchemeDetailScreen]. Strips the leading "1. " / "2. " index
+  /// prefixes the server includes, since the UI renders its own bullet dot.
+  List<String> get termsList => termsAndConditions
+      .split('\n')
+      .map((line) => line.trim().replaceFirst(RegExp(r'^\d+\.\s*'), ''))
+      .where((line) => line.isNotEmpty)
+      .toList();
+
+  /// Cosmetic "best for" tag shown on the scheme card footer. The API has
+  /// no equivalent field — this is a local UI heuristic derived from the
+  /// investment tier, not server data. Adjust thresholds as product
+  /// guidance dictates, or remove if this messaging should come from the
+  /// backend later.
+  String get bestFor {
+    if (monthlyInvestment <= 2500) return 'Best for Beginners';
+    if (monthlyInvestment >= 8000) return 'Best for High Returns';
+    return 'Best for Long Term';
+  }
 }
-
-const mockSchemes = <SchemeModel>[
-  SchemeModel(
-    id: 'swarna-bindu',
-    name: 'Swarna Bindu',
-    tagline: 'Ideal for long-term gold savings',
-    monthlyInvestment: 5000,
-    durationMonths: 11,
-    maturityBonusPercent: 8,
-    minGoldGrams: 10,
-    bestFor: 'Best for Long Term',
-    badge: 'Popular',
-  ),
-  SchemeModel(
-    id: 'swarna-lite',
-    name: 'Swarna Lite',
-    tagline: 'Light, flexible monthly savings',
-    monthlyInvestment: 2000,
-    durationMonths: 6,
-    maturityBonusPercent: 4,
-    minGoldGrams: 3,
-    bestFor: 'Best for Beginners',
-  ),
-  SchemeModel(
-    id: 'swarna-plus',
-    name: 'Swarna Plus',
-    tagline: 'Higher returns for committed savers',
-    monthlyInvestment: 10000,
-    durationMonths: 18,
-    maturityBonusPercent: 12,
-    minGoldGrams: 25,
-    bestFor: 'Best for High Returns',
-    badge: 'New',
-  ),
-];
-
-SchemeModel findScheme(String id) =>
-    mockSchemes.firstWhere((s) => s.id == id, orElse: () => mockSchemes.first);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,27 +13,26 @@ import '../../../../core/formatter/app_formatters.dart';
 import '../../../global_widgets/common_button.dart';
 import '../../../global_widgets/dashboard_bottom_nav.dart';
 import '../schemes_viewmodel/scheme_model.dart';
+import '../schemes_viewmodel/schemes_notifier.dart';
 
-/// Scheme browser — Phase 1, mock data only.
-class SchemesScreen extends StatefulWidget {
+/// Scheme browser — Phase 2, wired to `GET /schemes` via [schemesListProvider].
+class SchemesScreen extends ConsumerStatefulWidget {
   const SchemesScreen({super.key});
 
   @override
-  State<SchemesScreen> createState() => _SchemesScreenState();
+  ConsumerState<SchemesScreen> createState() => _SchemesScreenState();
 }
 
-class _SchemesScreenState extends State<SchemesScreen> {
+class _SchemesScreenState extends ConsumerState<SchemesScreen> {
   int navIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimaryLight;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final state = ref.watch(schemesListProvider);
+
     return Scaffold(
       backgroundColor: bgColor,
       bottomNavigationBar: DashboardBottomNav(
@@ -71,17 +71,108 @@ class _SchemesScreenState extends State<SchemesScreen> {
                 ],
               ),
             ),
-            Expanded(
-              child: ListView.separated(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                itemCount: mockSchemes.length,
-                separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
-                itemBuilder: (context, i) =>
-                    _SchemeCard(scheme: mockSchemes[i]),
-              ),
-            ),
+            Expanded(child: _buildBody(context, state)),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context, SchemesListState state) {
+    if (state.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.errorMessage != null && state.schemes.isEmpty) {
+      return _ErrorState(
+        message: state.errorMessage!,
+        onRetry: () => ref.read(schemesListProvider.notifier).loadFirstPage(),
+      );
+    }
+
+    if (state.isEmpty) {
+      return const _EmptyState();
+    }
+
+    return RefreshIndicator(
+      onRefresh: () => ref.read(schemesListProvider.notifier).refresh(),
+      child: ListView.separated(
+        padding: EdgeInsets.all(AppSpacing.lg),
+        itemCount: state.schemes.length + (state.hasMore ? 1 : 0),
+        separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
+        itemBuilder: (context, i) {
+          if (i >= state.schemes.length) {
+            return _LoadMoreButton(
+              isLoading: state.isLoadingMore,
+              onTap: () => ref.read(schemesListProvider.notifier).loadMore(),
+            );
+          }
+          return _SchemeCard(scheme: state.schemes[i]);
+        },
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    return Center(
+      child: Text('No schemes available right now.', style: AppTypography.bodySmall(color: mutedColor)),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline_rounded, size: 40, color: AppColors.errorRed),
+            SizedBox(height: AppSpacing.sm),
+            Text(message, textAlign: TextAlign.center, style: AppTypography.bodySmall(color: textColor)),
+            SizedBox(height: AppSpacing.md),
+            OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadMoreButton extends StatelessWidget {
+  const _LoadMoreButton({required this.isLoading, required this.onTap});
+
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+      child: Center(
+        child: isLoading
+            ? const SizedBox(
+          width: 22,
+          height: 22,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        )
+            : TextButton(onPressed: onTap, child: const Text('Load more')),
       ),
     );
   }
@@ -92,30 +183,22 @@ class _SchemeCard extends StatelessWidget {
 
   final SchemeModel scheme;
 
-  void _openDetail(BuildContext context) =>
-      context.push(RouteName.schemeDetailPath(scheme.id));
+  void _openDetail(BuildContext context) => context.push(RouteName.schemeDetailPath(scheme.id));
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimaryLight;
-    final mutedColor = isDark
-        ? AppColors.textMutedDark
-        : AppColors.textMutedLight;
-    final footerBg = isDark
-        ? AppColors.goldSurfaceDark
-        : AppColors.goldSurfaceLight;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final footerBg = isDark ? AppColors.goldSurfaceDark : AppColors.goldSurfaceLight;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       child: InkWell(
         onTap: () => _openDetail(context),
         child: Container(
-          // padding: EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             color: cardColor,
             boxShadow: [
@@ -164,41 +247,18 @@ class _SchemeCard extends StatelessWidget {
                             children: [
                               Text(
                                 scheme.name,
-                                style: AppTypography.sectionTitleSM(
-                                  color: textColor,
-                                ),
+                                style: AppTypography.sectionTitleSM(color: textColor),
                               ),
                               SizedBox(height: 2),
                               Text(
-                                scheme.tagline,
+                                scheme.description,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: AppTypography.caption(color: mutedColor),
                               ),
                             ],
                           ),
                         ),
-                        if (scheme.badge != null)
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isDark
-                                  ? AppColors.paidBgDark
-                                  : AppColors.successGreenLight,
-                              borderRadius: BorderRadius.circular(
-                                AppSpacing.radiusFull,
-                              ),
-                            ),
-                            child: Text(
-                              scheme.badge!,
-                              style: AppTypography.labelSmall(
-                                color: isDark
-                                    ? AppColors.paidTextDark
-                                    : AppColors.successGreen,
-                              ),
-                            ),
-                          ),
                       ],
                     ),
                     SizedBox(height: AppSpacing.md),
@@ -210,9 +270,7 @@ class _SchemeCard extends StatelessWidget {
                         Expanded(
                           child: _StatCell(
                             label: 'Monthly Investment',
-                            value: AppFormatters.currency(
-                              scheme.monthlyInvestment,
-                            ),
+                            value: AppFormatters.currency(scheme.monthlyInvestment),
                             textColor: textColor,
                             mutedColor: mutedColor,
                           ),
@@ -230,8 +288,7 @@ class _SchemeCard extends StatelessWidget {
                         Expanded(
                           child: _StatCell(
                             label: 'Maturity Bene',
-                            value:
-                                'Up to ${scheme.maturityBonusPercent.toStringAsFixed(0)}%',
+                            value: 'Up to ${scheme.maturityBenefitPercent.toStringAsFixed(0)}%',
                             textColor: AppColors.successGreen,
                             mutedColor: mutedColor,
                           ),
@@ -240,8 +297,7 @@ class _SchemeCard extends StatelessWidget {
                         Expanded(
                           child: _StatCell(
                             label: 'Min. Gold',
-                            value:
-                                '${scheme.minGoldGrams.toStringAsFixed(0)} Gram',
+                            value: '${scheme.minGoldGram.toStringAsFixed(0)} Gram',
                             textColor: textColor,
                             mutedColor: mutedColor,
                           ),
@@ -251,7 +307,6 @@ class _SchemeCard extends StatelessWidget {
                   ],
                 ),
               ),
-
               SizedBox(height: AppSpacing.md),
               Container(
                 width: double.infinity,

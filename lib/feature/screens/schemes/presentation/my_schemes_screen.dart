@@ -9,23 +9,25 @@ import 'package:swarna_bindu/core/theme/app_typography.dart';
 import '../../../../core/constants/image_string/image_strings.dart';
 import '../../../../core/formatter/app_formatters.dart';
 import '../../../global_widgets/common_button.dart';
-import '../schemes_viewmodel/scheme_model.dart';
+import '../data/models/scheme_response_model.dart';
 
-/// Shown right after a customer confirms "Add scheme" on the confirm
-/// dialog in [SchemeDetailScreen]. Phase 1 — mock data only, so every
-/// freshly-joined scheme starts at ₹0 paid / 0g gold / 0 pending.
-/// Wire `totalPaid` / `totalGold` / `pendingCount` up to
-/// `GET /users/:id/enrollments` once the data layer is ready.
+/// Shown right after `POST /schemes/:id/join` succeeds on
+/// [SchemeDetailScreen]. A brand-new enrollment always starts at ₹0 paid /
+/// 0g gold / 0 pending installments, so [totalPaid]/[totalGoldGrams]/
+/// [pendingCount] default to 0 — the join response itself doesn't carry
+/// running totals (see [UserSchemeModel]). Once the user makes a payment,
+/// those figures live in `GET /schemes/my-schemes` (`MySchemeModel`)
+/// instead, surfaced on the schemes-list screen, not here.
 class MySchemesScreen extends StatelessWidget {
   const MySchemesScreen({
     super.key,
-    required this.scheme,
+    required this.userScheme,
     this.totalPaid = 0,
     this.totalGoldGrams = 0.0,
     this.pendingCount = 0,
   });
 
-  final SchemeModel scheme;
+  final UserSchemeModel userScheme;
   final num totalPaid;
   final double totalGoldGrams;
   final int pendingCount;
@@ -33,20 +35,12 @@ class MySchemesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark
-        ? AppColors.backgroundDark
-        : AppColors.backgroundLight;
+    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textColor = isDark
-        ? AppColors.textPrimaryDark
-        : AppColors.textPrimaryLight;
-    final mutedColor = isDark
-        ? AppColors.textMutedDark
-        : AppColors.textMutedLight;
-    final footerBg = isDark
-        ? AppColors.goldSurfaceDark
-        : AppColors.goldSurfaceLight;
+    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final footerBg = isDark ? AppColors.goldSurfaceDark : AppColors.goldSurfaceLight;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -135,21 +129,17 @@ class MySchemesScreen extends StatelessWidget {
                                 SizedBox(width: AppSpacing.md),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        scheme.name,
-                                        style: AppTypography.sectionTitleSM(
-                                          color: textColor,
-                                        ),
+                                        userScheme.schemeName,
+                                        style: AppTypography.sectionTitleSM(color: textColor),
                                       ),
                                       SizedBox(height: 2),
                                       Text(
-                                        'Build Your Wealth With Disciplined Monthly Savings And Get Maturity Benefits.',
-                                        style: AppTypography.caption(
-                                          color: mutedColor,
-                                        ),
+                                        'Goal: ${AppFormatters.goldWeight(userScheme.goalGoldGram)} · '
+                                            '${AppFormatters.date(userScheme.startDate)} – ${AppFormatters.date(userScheme.endDate)}',
+                                        style: AppTypography.caption(color: mutedColor),
                                       ),
                                     ],
                                   ),
@@ -164,16 +154,12 @@ class MySchemesScreen extends StatelessWidget {
                                     color: isDark
                                         ? AppColors.paidBgDark
                                         : AppColors.successGreenLight,
-                                    borderRadius: BorderRadius.circular(
-                                      AppSpacing.radiusFull,
-                                    ),
+                                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                                   ),
                                   child: Text(
-                                    'Active',
+                                    userScheme.status,
                                     style: AppTypography.labelSmall(
-                                      color: isDark
-                                          ? AppColors.paidTextDark
-                                          : AppColors.successGreen,
+                                      color: isDark ? AppColors.paidTextDark : AppColors.successGreen,
                                     ),
                                   ),
                                 ),
@@ -195,9 +181,7 @@ class MySchemesScreen extends StatelessWidget {
                                 Expanded(
                                   child: _StatCell(
                                     label: 'Total Gold',
-                                    value: AppFormatters.goldWeightShort(
-                                      totalGoldGrams,
-                                    ),
+                                    value: AppFormatters.goldWeightShort(totalGoldGrams),
                                     textColor: textColor,
                                     mutedColor: mutedColor,
                                   ),
@@ -225,8 +209,7 @@ class MySchemesScreen extends StatelessWidget {
                         color: footerBg.withValues(alpha: 0.5),
                         child: AppButton(
                           text: 'pay',
-                          onPressed: () =>
-                              context.push(RouteName.paymentPath(scheme.id)),
+                          onPressed: () => context.push(RouteName.paymentPath(userScheme.id)),
                           height: 46,
                           backgroundColor: AppColors.maroonDark,
                           textColor: Colors.white,

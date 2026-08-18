@@ -47,6 +47,8 @@ abstract class ApiEndpoints {
   // ── Schemes ─────────────────────────────────────────────────
   static const String schemes = '/schemes';
   static String schemeDetail(String id) => '/schemes/$id';
+  static String schemeJoin(String id) => '/schemes/$id/join';
+  static const String mySchemes = '/schemes/my-schemes';
 
   // ── Enrollments ─────────────────────────────────────────────
   static const String enrollments = '/enrollments';
