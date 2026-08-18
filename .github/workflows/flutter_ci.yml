@@ -3,9 +3,9 @@ name: Flutter CI
 # Runs on every push/PR to main & develop, plus any PR targeting them.
 on:
   push:
-    branches: [main, feature_ui/dashboard]
+    branches: [main, develop]
   pull_request:
-    branches: [main, feature_ui/dashboard]
+    branches: [main, develop]
   workflow_dispatch: {} # allows manual "Run workflow" trigger from the Actions tab
 
 # Cancel older in-progress runs on the same branch/PR when a new commit lands
