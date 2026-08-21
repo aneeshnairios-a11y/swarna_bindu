@@ -9,7 +9,7 @@ import 'package:swarna_bindu/feature/screens/payments/presentation/screens/payme
 import '../../feature/screens/auth/presentation/screens/login_screen.dart';
 import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
 import '../../feature/screens/dashboard/presentation/screens/dashboard_screen.dart';
-import '../../feature/screens/dashboard/presentation/screens/notifications_screen.dart';
+import '../../feature/screens/notifications/presentation/screens/notifications_screen.dart';
 import '../../feature/screens/gold_rate/presentation/gold_rate_screen.dart';
 import '../../feature/screens/kyc/presentation/screens/kyc_screen.dart';
 import '../../feature/screens/kyc/presentation/widgets/kyc_status_screen.dart';

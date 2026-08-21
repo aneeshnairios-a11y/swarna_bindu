@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/formatter/app_formatters.dart';
@@ -8,23 +9,31 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../global_widgets/common_button.dart';
 import '../../../global_widgets/dashboard_bottom_nav.dart';
+import 'viewmodels/gold_rate_viewmodel.dart';
 
-/// Gold Rate screen — today's 22k/24k rate card + a note about live pricing.
-///
-/// Phase 1: values are static placeholders. In Phase 2 this reads from
-/// `GET /gold-rates/today` via a Riverpod AsyncNotifier.
-class GoldRateScreen extends StatefulWidget {
+/// Gold Rate screen — today's 22k/24k rate card, live from
+/// `GET /gold-rate/today`.
+class GoldRateScreen extends ConsumerStatefulWidget {
   const GoldRateScreen({super.key});
 
   @override
-  State<GoldRateScreen> createState() => _GoldRateScreenState();
+  ConsumerState<GoldRateScreen> createState() => _GoldRateScreenState();
 }
 
-class _GoldRateScreenState extends State<GoldRateScreen> {
+class _GoldRateScreenState extends ConsumerState<GoldRateScreen> {
   int _navIndex = 3;
 
   @override
+  void initState() {
+    super.initState();
+    // Always fetch fresh on open — rate can move intraday, matching the
+    // "never trust stale cache" convention used by MySchemesScreen.
+    Future.microtask(() => ref.read(goldRateProvider.notifier).loadRate());
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final state = ref.watch(goldRateProvider);
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
     final textColor = isDark
@@ -68,24 +77,26 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
 
             // ── Body ─────────────────────────────────────────
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  0,
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _RateCard(
-                      onJoinScheme: () {
-                        // TODO: navigate to scheme listing / enrollment flow
-                      },
-                    ),
-                    SizedBox(height: AppSpacing.lg),
-                    const _LiveRateNotice(),
-                  ],
+              child: RefreshIndicator(
+                color: AppColors.primaryGold,
+                onRefresh: () =>
+                    ref.read(goldRateProvider.notifier).loadRate(),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.xl,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _buildRateArea(state, textColor),
+                      SizedBox(height: AppSpacing.lg),
+                      const _LiveRateNotice(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -98,11 +109,51 @@ class _GoldRateScreenState extends State<GoldRateScreen> {
       ),
     );
   }
+
+  Widget _buildRateArea(GoldRateState state, Color textColor) {
+    if (state.isLoading && state.rate == null) {
+      return const _RateCardSkeleton();
+    }
+
+    if (state.hasError && state.rate == null) {
+      return _RateCardError(
+        message: state.errorMessage ?? 'Something went wrong.',
+        onRetry: () => ref.read(goldRateProvider.notifier).loadRate(),
+      );
+    }
+
+    final rate = state.rate;
+    if (rate == null) return const _RateCardSkeleton();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _RateCard(
+          rate22k: rate.rate22KPerGram,
+          rate24k: rate.rate24KPer8Gram,
+          onJoinScheme: () => context.push(RouteName.schemes),
+        ),
+        SizedBox(height: AppSpacing.sm),
+        Center(
+          child: Text(
+            'Last updated: ${AppFormatters.dateTime(rate.lastUpdated.toLocal())}',
+            style: AppTypography.caption(color: AppColors.textMutedLight),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _RateCard extends StatelessWidget {
-  const _RateCard({required this.onJoinScheme});
+  const _RateCard({
+    required this.rate22k,
+    required this.rate24k,
+    required this.onJoinScheme,
+  });
 
+  final double rate22k;
+  final double rate24k;
   final VoidCallback onJoinScheme;
 
   @override
@@ -140,7 +191,7 @@ class _RateCard extends StatelessWidget {
                 Expanded(
                   child: _RateColumn(
                     label: '22k Gold (1g)',
-                    amount: AppFormatters.currencyDecimal(13250),
+                    amount: AppFormatters.currencyDecimal(rate22k),
                   ),
                 ),
                 Container(
@@ -150,7 +201,7 @@ class _RateCard extends StatelessWidget {
                 Expanded(
                   child: _RateColumn(
                     label: '24k Gold (8g)',
-                    amount: AppFormatters.currencyDecimal(106000),
+                    amount: AppFormatters.currencyDecimal(rate24k),
                   ),
                 ),
               ],
@@ -195,6 +246,62 @@ class _RateColumn extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Shown while the very first fetch is in flight (no cached rate yet).
+class _RateCardSkeleton extends StatelessWidget {
+  const _RateCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 220,
+      decoration: BoxDecoration(
+        gradient: AppColors.splashGradient,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+      ),
+      child: const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      ),
+    );
+  }
+}
+
+/// Shown when the first fetch fails outright (nothing to display yet).
+class _RateCardError extends StatelessWidget {
+  const _RateCardError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: AppColors.errorRedLight,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        border: Border.all(color: AppColors.errorRed.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        children: [
+          Icon(Icons.error_outline_rounded, color: AppColors.errorRed, size: AppSpacing.iconXl),
+          SizedBox(height: AppSpacing.sm),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: AppTypography.bodySmall(color: AppColors.errorRed),
+          ),
+          SizedBox(height: AppSpacing.md),
+          OutlinedButton(
+            onPressed: onRetry,
+            style: OutlinedButton.styleFrom(foregroundColor: AppColors.errorRed),
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 }

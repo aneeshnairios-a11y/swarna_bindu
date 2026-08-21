@@ -34,7 +34,7 @@ abstract class ApiEndpoints {
   static const String kycAddress = '/user/kyc/address';
   static const String kycBank = '/user/kyc/bank';
   static const String kycStatus = '/user/kyc/status';
-  // TODO(kyc-submit): wire once the endpoint is finalized.
+  static const String kycSubmitFull = '/user/kyc/submit-full';
   static const String kycSubmit = '/user/kyc/submit';
 
   // ── Users ───────────────────────────────────────────────────
@@ -64,7 +64,7 @@ abstract class ApiEndpoints {
   static const String syncInstallments = '/installments/sync';
 
   // ── Gold rates ──────────────────────────────────────────────
-  static const String goldRateToday = '/gold-rates/today';
+  static const String goldRateToday = '/gold-rate/today';
   static const String goldRateHistory = '/gold-rates/history';
 
   // ── Redemptions ─────────────────────────────────────────────
