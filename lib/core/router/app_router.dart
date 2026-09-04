@@ -20,9 +20,9 @@ import '../../feature/screens/profile/presentation/profile_screen.dart';
 import '../../feature/screens/schemes/presentation/scheme_detail_screen.dart';
 import '../../feature/screens/schemes/presentation/schemes_screen.dart';
 
-import '../../feature/screens/payments/presentation/screens/payment_screen.dart';
+import '../../feature/screens/payments/presentation/screens/checkout_screen.dart';
 import '../../feature/screens/payments/presentation/screens/payment_success_screen.dart';
-import '../../feature/screens/payments/presentation/screens/payments_screen.dart';
+import '../../feature/screens/payments/presentation/screens/payment_screen.dart';
 import '../../feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
 
 import '../../feature/screens/splash/presentation/splash_screen.dart';

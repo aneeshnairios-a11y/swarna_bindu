@@ -1,690 +1,299 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:swarna_bindu/core/constants/image_string/image_strings.dart';
+import 'package:swarna_bindu/core/formatter/app_formatters.dart';
+import 'package:swarna_bindu/core/router/route_name.dart';
 import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
-import 'package:swarna_bindu/feature/global_widgets/common_button.dart';
-import 'package:swarna_bindu/feature/screens/payments/presentation/viewmodels/payment_viewmodel.dart';
 
-/// Complete five-step payment flow opened by the Payments landing page.
-class CheckoutScreen extends ConsumerWidget {
-  const CheckoutScreen({super.key, required this.enrollmentId});
+import '../../../../global_widgets/dashboard_bottom_nav.dart';
+import '../data/models/payment_dues_model.dart';
+import '../viewmodels/payment_dues_viewmodel.dart';
 
-  final String enrollmentId;
+/// Payment landing page. `enrollmentId` is kept for compatibility with the
+/// existing route shape (`/app/pay/:enrollmentId`) but is no longer the
+/// only scheme shown — the dues list now covers every scheme the user has,
+/// each with its own "Pay" entry point into the checkout flow.
+class PaymentScreen extends ConsumerStatefulWidget {
+  const PaymentScreen({super.key, this.enrollmentId});
+
+  final String? enrollmentId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(paymentProvider);
-    return switch (state.step) {
-      PaymentFlowStep.scheme => _SchemeStep(
-        onContinue: () => ref
-            .read(paymentProvider.notifier)
-            .goTo(PaymentFlowStep.installment),
-        onBack: () => context.pop(),
-      ),
-      PaymentFlowStep.installment => _InstallmentStep(
-        onBack: () => ref.read(paymentProvider.notifier).goBack(),
-        onContinue: () =>
-            ref.read(paymentProvider.notifier).goTo(PaymentFlowStep.payment),
-      ),
-      PaymentFlowStep.payment => _MethodStep(
-        onBack: () => ref.read(paymentProvider.notifier).goBack(),
-        onPay: () => ref.read(paymentProvider.notifier).pay(),
-      ),
-      PaymentFlowStep.processing => const _ProcessingStep(),
-      PaymentFlowStep.success => _SuccessStep(onBack: () => context.pop()),
-    };
-  }
+  ConsumerState<PaymentScreen> createState() => _PaymentScreenState();
 }
 
-class _FlowScaffold extends StatelessWidget {
-  const _FlowScaffold({
-    required this.title,
-    required this.onBack,
-    required this.body,
-    this.bottom,
-  });
-  final String title;
-  final VoidCallback onBack;
-  final Widget body;
-  final Widget? bottom;
+class _PaymentScreenState extends ConsumerState<PaymentScreen> {
+  int navIndex = 2;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFFFFCF8),
-    body: SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(5, 8, 16, 8),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: onBack,
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                ),
-                Text(
-                  title,
-                  style: AppTypography.headingSM(color: Colors.black),
-                ),
-              ],
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(paymentDuesProvider.notifier).loadDues());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(paymentDuesProvider);
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFFFFCF6),
+      bottomNavigationBar: DashboardBottomNav(
+        currentIndex: navIndex,
+        onTap: (i) => setState(() => navIndex = i),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            _Header(
+              onBack: () =>
+              context.canPop() ? context.pop() : context.go(RouteName.dashboard),
             ),
-          ),
-          Expanded(child: body),
-          if (bottom != null)
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.lg,
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () => ref.read(paymentDuesProvider.notifier).refresh(),
+                child: _buildBody(state),
               ),
-              child: bottom!,
             ),
-        ],
-      ),
-    ),
-  );
-}
-
-class _SchemeStep extends StatelessWidget {
-  const _SchemeStep({required this.onContinue, required this.onBack});
-  final VoidCallback onContinue;
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) => _FlowScaffold(
-    title: 'Select Scheme',
-    onBack: onBack,
-    body: ListView(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.md,
-        AppSpacing.lg,
-        0,
-      ),
-      children: [
-        const _DueStrip(),
-        SizedBox(height: AppSpacing.lg),
-        Text(
-          'Your Active Schemes',
-          style: AppTypography.sectionTitleSM(color: Colors.black),
+          ],
         ),
-        SizedBox(height: AppSpacing.sm),
-        const _DetailedSchemeCard(selected: true),
-      ],
-    ),
-    bottom: AppButton(
-      text: 'Continue',
-      onPressed: onContinue,
-      backgroundColor: AppColors.maroonDark,
-    ),
-  );
-}
-
-class _InstallmentStep extends ConsumerWidget {
-  const _InstallmentStep({required this.onBack, required this.onContinue});
-  final VoidCallback onBack;
-  final VoidCallback onContinue;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(
-      paymentProvider.select((value) => value.installmentType),
-    );
-    return _FlowScaffold(
-      title: 'Select Installment',
-      onBack: onBack,
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.lg,
-          0,
-        ),
-        children: [
-          const _CompactSchemeCard(),
-          SizedBox(height: AppSpacing.lg),
-          Text(
-            'Select Installment Type',
-            style: AppTypography.sectionTitleSM(color: Colors.black),
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _InstallmentTile(
-            type: InstallmentType.currentMonth,
-            selected: selected == InstallmentType.currentMonth,
-            icon: Icons.calendar_month_outlined,
-            title: 'Current Month Installment',
-            subtitle: 'Pay your current installment',
-            amount: '₹ 5,000.00',
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _InstallmentTile(
-            type: InstallmentType.pendingDues,
-            selected: selected == InstallmentType.pendingDues,
-            icon: Icons.calendar_month_outlined,
-            title: 'Pending Dues',
-            subtitle: 'Clear your pending installments',
-            amount: '₹ 10,000.00',
-            detail: '2 Dues     Total Amount',
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _InstallmentTile(
-            type: InstallmentType.advancePayment,
-            selected: selected == InstallmentType.advancePayment,
-            icon: Icons.calendar_month_outlined,
-            title: 'Advance Payment',
-            subtitle: 'Advance for upcoming installments',
-            amount: '₹ 15,000.00',
-            detail: '3 Months     Total Amount',
-          ),
-          SizedBox(height: AppSpacing.sm),
-          const _NoteCard(),
-          SizedBox(height: AppSpacing.sm),
-          _PaymentSummary(type: selected),
-        ],
-      ),
-      bottom: AppButton(
-        text: 'Continue',
-        onPressed: onContinue,
-        backgroundColor: AppColors.maroonDark,
       ),
     );
   }
-}
 
-class _MethodStep extends ConsumerWidget {
-  const _MethodStep({required this.onBack, required this.onPay});
-  final VoidCallback onBack;
-  final VoidCallback onPay;
+  Widget _buildBody(PaymentDuesState state) {
+    if (state.isLoading && state.dues == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(paymentProvider.select((value) => value.method));
-    return _FlowScaffold(
-      title: 'Select Payment',
-      onBack: onBack,
-      body: ListView(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.lg,
-          0,
-        ),
+    if (state.isError && state.dues == null) {
+      return ListView(
+        padding: EdgeInsets.all(AppSpacing.lg),
         children: [
-          const _CompactSchemeCard(),
-          SizedBox(height: AppSpacing.lg),
-          Text(
-            'Recommended for You',
-            style: AppTypography.sectionTitleSM(color: Colors.black),
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _PaymentTile(
-            method: PaymentMethod.upi,
-            selected: selected == PaymentMethod.upi,
-            icon: Icons.account_balance_wallet_outlined,
-            iconColor: const Color(0xFF377B44),
-            title: 'Pay using UPI',
-            subtitle: 'Instant payment using your UPI app',
-            highlighted: true,
-          ),
-          SizedBox(height: AppSpacing.md),
-          Text(
-            'Card',
-            style: AppTypography.sectionTitleSM(color: Colors.black),
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _PaymentTile(
-            method: PaymentMethod.card,
-            selected: selected == PaymentMethod.card,
-            icon: Icons.credit_card_outlined,
-            iconColor: const Color(0xFFAF7608),
-            title: 'Debit/Credit Card',
-            subtitle: 'Pay using your saved debit card',
-          ),
-          SizedBox(height: AppSpacing.md),
-          Text(
-            'Other Payment Options',
-            style: AppTypography.sectionTitleSM(color: Colors.black),
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _PaymentTile(
-            method: PaymentMethod.netBanking,
-            selected: selected == PaymentMethod.netBanking,
-            icon: Icons.account_balance_outlined,
-            iconColor: const Color(0xFF2175B2),
-            title: 'Net Banking',
-            subtitle: 'Pay using your saved debit card',
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _WalletTile(),
-        ],
-      ),
-      bottom: _PayBar(onPay: onPay),
-    );
-  }
-}
-
-class _ProcessingStep extends ConsumerWidget {
-  const _ProcessingStep();
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => _FlowScaffold(
-    title: 'Processing Payment',
-    onBack: () {},
-    body: ListView(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.xl,
-        AppSpacing.lg,
-        AppSpacing.lg,
-      ),
-      children: [
-        const SizedBox(height: 15),
-        Center(
-          child: Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFFF0B63A), width: 2),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x22E8B03B),
-                  blurRadius: 20,
-                  spreadRadius: 7,
+          SizedBox(height: 80.h),
+          Center(
+            child: Column(
+              children: [
+                Text(
+                  state.errorMessage ?? 'Something went wrong.',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall(color: AppColors.mutedGray),
+                ),
+                SizedBox(height: AppSpacing.md),
+                OutlinedButton(
+                  onPressed: () => ref.read(paymentDuesProvider.notifier).refresh(),
+                  child: const Text('Retry'),
                 ),
               ],
             ),
-            child: const Icon(
-              Icons.currency_rupee_rounded,
-              color: Color(0xFFD5950B),
-              size: 46,
+          ),
+        ],
+      );
+    }
+
+    final dues = state.dues;
+    final schemes = dues?.schemes ?? const <DueSchemeModel>[];
+    final primaryScheme = dues?.primaryDueScheme;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _DueAmountCard(
+            nextDueAmount: dues?.nextDueAmount ?? 0,
+            nextDueDate: dues?.nextDueDateTime,
+            onPay: primaryScheme == null
+                ? null
+                : () => context.push(
+              RouteName.paymentCheckoutPath(primaryScheme.userSchemeId),
             ),
           ),
-        ),
-        SizedBox(height: AppSpacing.xl),
-        Text(
-          'Your Payment Is Being Processed',
-          style: AppTypography.sectionTitleSM(color: Colors.black),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          'Please Wait While We Confirm Your Payment.\nThis Will Only Take A Few Seconds.',
-          style: AppTypography.bodyXSmall(
-            color: AppColors.mutedGray,
-          ).copyWith(fontSize: 10),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: AppSpacing.lg),
-        const _ProgressTrack(),
-        SizedBox(height: AppSpacing.xl),
-        const _TransactionCard(),
-        SizedBox(height: AppSpacing.sm),
-        const _SecureProcessingCard(),
-      ],
-    ),
-  );
-}
-
-class _SuccessStep extends StatelessWidget {
-  const _SuccessStep({required this.onBack});
-  final VoidCallback onBack;
-  @override
-  Widget build(BuildContext context) => _FlowScaffold(
-    title: 'Processing Payment',
-    onBack: onBack,
-    body: ListView(
-      padding: EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        100,
-        AppSpacing.lg,
-        AppSpacing.lg,
+          SizedBox(height: AppSpacing.lg),
+          Text('Quick Actions', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              _QuickAction(
+                icon: Icons.description_outlined,
+                tint: const Color(0xFFDDF5E3),
+                iconColor: const Color(0xFF2E9F4B),
+                title: 'View History',
+                subtitle: 'All Payments',
+                onTap: () => context.push(RouteName.paymentHistory),
+              ),
+              SizedBox(width: AppSpacing.sm),
+              _QuickAction(
+                icon: Icons.file_download_outlined,
+                tint: const Color(0xFFDCEEFF),
+                iconColor: const Color(0xFF1680E8),
+                title: 'Receipts',
+                subtitle: 'Get Your Receipts',
+                onTap: () => context.push(RouteName.paymentReceipt),
+              ),
+              SizedBox(width: AppSpacing.sm),
+              _QuickAction(
+                icon: Icons.calendar_month_outlined,
+                tint: const Color(0xFFF0E2FF),
+                iconColor: const Color(0xFF9747DC),
+                title: 'Upcoming Dues',
+                subtitle: 'See Due Schedule',
+                onTap: () => _comingSoon(context, 'Upcoming dues'),
+              ),
+            ],
+          ),
+          SizedBox(height: AppSpacing.lg),
+          Text('Your Schemes', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          SizedBox(height: AppSpacing.sm),
+          if (schemes.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
+              child: Center(
+                child: Text(
+                  'No active schemes yet',
+                  style: AppTypography.bodySmall(color: AppColors.mutedGray),
+                ),
+              ),
+            )
+          else
+            ...schemes.map(
+                  (scheme) => Padding(
+                padding: EdgeInsets.only(bottom: AppSpacing.sm),
+                child: _SchemeCard(
+                  scheme: scheme,
+                  onPay: () => context.push(
+                    RouteName.paymentCheckoutPath(scheme.userSchemeId),
+                  ),
+                ),
+              ),
+            ),
+          const _SecurityCard(),
+        ],
       ),
-      children: [
-        Text(
-          'Payment Successful',
-          style: AppTypography.headingSM(color: Colors.black),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          'Your Payment Has Been Received Successfully.\nThank You For Your Payment.',
-          style: AppTypography.bodyXSmall(
-            color: AppColors.mutedGray,
-          ).copyWith(fontSize: 10),
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: AppSpacing.lg),
-        const _SuccessNotice(),
-        SizedBox(height: AppSpacing.lg),
-        const _TransactionCard(),
-        SizedBox(height: AppSpacing.lg),
-        const _ReceiptActions(),
-      ],
-    ),
-    bottom: AppButton(
-      text: 'Back',
-      onPressed: onBack,
-      backgroundColor: AppColors.maroonDark,
-    ),
-  );
+    );
+  }
+
+  void _comingSoon(BuildContext context, String label) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('$label will be available soon.')),
+    );
+  }
 }
 
-class _DueStrip extends StatelessWidget {
-  const _DueStrip();
+class _Header extends StatelessWidget {
+  const _Header({required this.onBack});
+  final VoidCallback onBack;
+
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF7EC),
-      border: Border.all(color: const Color(0xFFF5E4C8)),
-      borderRadius: BorderRadius.circular(6),
-    ),
+  Widget build(BuildContext context) => Padding(
+    padding: EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm),
     child: Row(
       children: [
-        const CircleAvatar(
-          radius: 18,
-          backgroundColor: AppColors.maroonDark,
-          child: Icon(
-            Icons.calendar_month_outlined,
-            color: AppColors.primaryGoldLight,
-          ),
+        IconButton(
+          onPressed: onBack,
+          icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
         ),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
+        Text('Payments', style: AppTypography.headingSM(color: Colors.black)),
+      ],
+    ),
+  );
+}
+
+class _DueAmountCard extends StatelessWidget {
+  const _DueAmountCard({
+    required this.nextDueAmount,
+    required this.nextDueDate,
+    required this.onPay,
+  });
+
+  final num nextDueAmount;
+  final DateTime? nextDueDate;
+  final VoidCallback? onPay;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+    borderRadius: BorderRadius.circular(16),
+    child: Container(
+      padding: EdgeInsets.all(AppSpacing.md),
+      decoration: const BoxDecoration(color: AppColors.maroonDark),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Next Due Amount',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 10),
+                style: AppTypography.labelLarge(color: const Color(0xFFE9D7DD)),
               ),
+              const SizedBox(height: 2),
               Text(
-                '₹ 5,000.00',
-                style: AppTypography.sectionTitleSM(color: Colors.black),
+                AppFormatters.currency(nextDueAmount),
+                style: AppTypography.goldAmountSM(color: const Color(0xFFEFC744)),
               ),
-            ],
-          ),
-        ),
-        Container(width: 1, height: 24, color: AppColors.borderStrongLight),
-        SizedBox(width: AppSpacing.lg),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Due Date',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 10),
-              ),
-              Text(
-                '05 Feb 2025',
-                style: AppTypography.sectionTitleSM(color: Colors.black),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _DetailedSchemeCard extends StatelessWidget {
-  const _DetailedSchemeCard({required this.selected});
-  final bool selected;
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(
-        color: selected ? const Color(0xFFC58C27) : AppColors.borderLight,
-      ),
-      boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Radio<bool>(value: true, groupValue: selected, onChanged: (_) {}),
-        const _GoldThumbnail(),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+              const SizedBox(height: 11),
+              const Divider(color: Color(0xFF9A4564), height: 1),
+              const SizedBox(height: 14),
               Row(
                 children: [
-                  Expanded(
-                    child: Text(
-                      'Swarna Bindu',
-                      style: AppTypography.sectionTitleSM(color: Colors.black),
+                  const CircleAvatar(
+                    radius: 16,
+                    backgroundColor: Color(0xFFF7E9BF),
+                    child: Icon(
+                      Icons.calendar_today_outlined,
+                      size: 17,
+                      color: AppColors.maroonDark,
                     ),
                   ),
-                  const _ActiveBadge(),
+                  SizedBox(width: AppSpacing.sm),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Due Date',
+                        style: AppTypography.labelSmall(color: const Color(0xFFE9D7DD)),
+                      ),
+                      Text(
+                        nextDueDate == null ? '—' : AppFormatters.date(nextDueDate!),
+                        style: AppTypography.labelMedium(color: Colors.white),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              Text(
-                'Best for long term wealth creation',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 10),
+              SizedBox(height: AppSpacing.md),
+              SizedBox(
+                width: double.infinity,
+                height: 44,
+                child: FilledButton(
+                  onPressed: onPay,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.maroonDark,
+                    disabledBackgroundColor: Colors.white.withValues(alpha: 0.5),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+                  ),
+                  child: Text(
+                    'Pay Now',
+                    style: AppTypography.sectionTitleSM(color: AppColors.maroonDark),
+                  ),
+                ),
               ),
-              const Divider(),
-              const _SchemeMeta(),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _CompactSchemeCard extends StatelessWidget {
-  const _CompactSchemeCard();
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
-    ),
-    child: Row(
-      children: [
-        const _GoldThumbnail(small: true),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Swarna Bindu',
-                      style: AppTypography.sectionTitleSM(color: Colors.black),
-                    ),
-                  ),
-                  const _ActiveBadge(),
-                ],
-              ),
-              SizedBox(height: AppSpacing.xs),
-              const _SchemeMeta(),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _GoldThumbnail extends StatelessWidget {
-  const _GoldThumbnail({this.small = false});
-  final bool small;
-  @override
-  Widget build(BuildContext context) => Container(
-    width: small ? 64 : 66,
-    height: small ? 58 : 66,
-    decoration: BoxDecoration(
-      color: AppColors.darkNavy,
-      borderRadius: BorderRadius.circular(8),
-      image: DecorationImage(
-        image: AssetImage(AppAssetImage.jewellery),
-        fit: BoxFit.cover,
-      ),
-    ),
-  );
-}
-
-class _ActiveBadge extends StatelessWidget {
-  const _ActiveBadge();
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
-    decoration: BoxDecoration(
-      color: const Color(0xFFDDF6E4),
-      borderRadius: BorderRadius.circular(15),
-    ),
-    child: Text(
-      'Active',
-      style: AppTypography.bodyXSmall(
-        color: const Color(0xFF258B44),
-      ).copyWith(fontSize: 10),
-    ),
-  );
-}
-
-class _SchemeMeta extends StatelessWidget {
-  const _SchemeMeta();
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Expanded(
-        child: _Meta(label: 'Monthly Investment', value: '₹ 5,000.00'),
-      ),
-      Container(width: 1, height: 24, color: AppColors.borderLight),
-      SizedBox(width: AppSpacing.sm),
-      Expanded(
-        child: _Meta(label: 'Gold Accumulated', value: '18.400 g'),
-      ),
-    ],
-  );
-}
-
-class _Meta extends StatelessWidget {
-  const _Meta({required this.label, required this.value});
-  final String label;
-  final String value;
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: AppTypography.bodyXSmall(
-          color: AppColors.mutedGray,
-        ).copyWith(fontSize: 9),
-      ),
-      Text(value, style: AppTypography.labelMedium(color: Colors.black)),
-    ],
-  );
-}
-
-class _InstallmentTile extends ConsumerWidget {
-  const _InstallmentTile({
-    required this.type,
-    required this.selected,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.amount,
-    this.detail,
-  });
-  final InstallmentType type;
-  final bool selected;
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final String amount;
-  final String? detail;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => InkWell(
-    onTap: () => ref.read(paymentProvider.notifier).selectInstallment(type),
-    child: Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: selected ? const Color(0xFFD19A3D) : AppColors.borderLight,
-        ),
-        boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 5)],
-      ),
-      child: Row(
-        children: [
-          Radio<InstallmentType>(
-            value: type,
-            groupValue: ref.watch(
-              paymentProvider.select((v) => v.installmentType),
-            ),
-            onChanged: (v) {
-              if (v != null) {
-                ref.read(paymentProvider.notifier).selectInstallment(v);
-              }
-            },
-            activeColor: const Color(0xFFD09116),
-          ),
-          CircleAvatar(
-            radius: 21,
-            backgroundColor: selected
-                ? const Color(0xFFFFF1D9)
-                : const Color(0xFFFFE8EC),
-            child: Icon(
-              icon,
-              color: selected
-                  ? const Color(0xFFD38A18)
-                  : const Color(0xFFFA5265),
-            ),
-          ),
-          SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.labelMedium(color: Colors.black),
-                ),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodyXSmall(
-                    color: AppColors.mutedGray,
-                  ).copyWith(fontSize: 10),
-                ),
-                if (detail != null)
-                  Text(
-                    detail!,
-                    style: AppTypography.bodyXSmall(
-                      color: type == InstallmentType.pendingDues
-                          ? Colors.red
-                          : const Color(0xFF7E3DD7),
-                    ).copyWith(fontSize: 10),
-                  ),
-              ],
-            ),
-          ),
-          Text(
-            amount,
-            style: AppTypography.labelMedium(
-              color: selected ? const Color(0xFF248A47) : Colors.black,
+          Positioned(
+            top: -6,
+            right: -20,
+            child: Image.asset(
+              AppAssetImage.goldCoin,
+              width: 150,
+              height: 150,
+              fit: BoxFit.contain,
             ),
           ),
         ],
@@ -693,562 +302,199 @@ class _InstallmentTile extends ConsumerWidget {
   );
 }
 
-class _PaymentSummary extends StatelessWidget {
-  const _PaymentSummary({required this.type});
-  final InstallmentType type;
-  @override
-  Widget build(BuildContext context) {
-    final amount = switch (type) {
-      InstallmentType.currentMonth => '₹ 5,000.00',
-      InstallmentType.pendingDues => '₹ 10,000.00',
-      InstallmentType.advancePayment => '₹ 15,000.00',
-    };
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFF6E7D5)),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Payment Summary',
-                style: AppTypography.sectionTitleSM(color: Colors.black),
-              ),
-              Text(
-                'Current Month',
-                style: AppTypography.labelSmall(color: const Color(0xFF258B44)),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSpacing.sm),
-          _TotalRow('Installment Amount', amount),
-          _TotalRow('Convenience Fee', '₹ 0'),
-          _TotalRow('GST (0%)', '₹ 0'),
-          const Divider(),
-          _TotalRow('Total Payable', amount, prominent: true),
-        ],
-      ),
-    );
-  }
-}
-
-class _TotalRow extends StatelessWidget {
-  const _TotalRow(this.label, this.value, {this.prominent = false});
-  final String label;
-  final String value;
-  final bool prominent;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 5),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: AppTypography.bodyXSmall(
-            color: prominent ? Colors.black : AppColors.mutedGray,
-          ),
-        ),
-        Text(
-          value,
-          style: AppTypography.labelMedium(
-            color: prominent ? const Color(0xFFD08112) : Colors.black,
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _NoteCard extends StatelessWidget {
-  const _NoteCard();
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF7EC),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.info, color: Color(0xFFD69B2D)),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Note',
-                style: AppTypography.labelMedium(color: Colors.black),
-              ),
-              Text(
-                'Your payment will be adjusted to the oldest pending installment first.\nAny advance amount will be adjusted to upcoming installments.',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 9),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _PaymentTile extends ConsumerWidget {
-  const _PaymentTile({
-    required this.method,
-    required this.selected,
+class _QuickAction extends StatelessWidget {
+  const _QuickAction({
     required this.icon,
+    required this.tint,
     required this.iconColor,
     required this.title,
     required this.subtitle,
-    this.highlighted = false,
+    required this.onTap,
   });
-  final PaymentMethod method;
-  final bool selected;
   final IconData icon;
+  final Color tint;
   final Color iconColor;
   final String title;
   final String subtitle;
-  final bool highlighted;
-  @override
-  Widget build(BuildContext context, WidgetRef ref) => InkWell(
-    onTap: () => ref.read(paymentProvider.notifier).selectMethod(method),
-    child: Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: highlighted ? const Color(0xFFF7FFF7) : Colors.white,
-        borderRadius: BorderRadius.circular(9),
-        border: Border.all(
-          color: highlighted ? const Color(0xFF75AC79) : AppColors.borderLight,
-        ),
-        boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 4)],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: iconColor.withValues(alpha: .12),
-            child: Icon(icon, color: iconColor),
-          ),
-          SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.labelMedium(color: Colors.black),
-                ),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodyXSmall(
-                    color: AppColors.mutedGray,
-                  ).copyWith(fontSize: 10),
-                ),
-              ],
-            ),
-          ),
-          Radio<PaymentMethod>(
-            value: method,
-            groupValue: ref.watch(paymentProvider.select((v) => v.method)),
-            onChanged: (v) {
-              if (v != null) ref.read(paymentProvider.notifier).selectMethod(v);
-            },
-            activeColor: const Color(0xFF28884B),
-          ),
-        ],
-      ),
-    ),
-  );
-}
+  final VoidCallback onTap;
 
-class _WalletTile extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
+  Widget build(BuildContext context) => Expanded(
+    child: Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(9),
-      border: Border.all(color: AppColors.borderLight),
-      boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 4)],
-    ),
-    child: Row(
-      children: [
-        const CircleAvatar(
-          radius: 20,
-          backgroundColor: Color(0xFFF0E5FF),
-          child: Icon(
-            Icons.account_balance_wallet_outlined,
-            color: Color(0xFF7953B6),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(9),
+        child: Container(
+          height: 94,
+          padding: const EdgeInsets.fromLTRB(8, 8, 5, 6),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(9),
+            boxShadow: const [
+              BoxShadow(color: Color(0x12000000), blurRadius: 7, offset: Offset(0, 2)),
+            ],
           ),
-        ),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Wallets',
-                style: AppTypography.labelMedium(color: Colors.black),
+              CircleAvatar(radius: 19, backgroundColor: tint, child: Icon(icon, color: iconColor, size: 22)),
+              const Spacer(),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(title, maxLines: 1, style: AppTypography.labelSmall(color: Colors.black)),
               ),
-              Text(
-                'Pay using wallet balance',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 10),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  subtitle,
+                  maxLines: 1,
+                  style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
+                ),
               ),
             ],
           ),
         ),
-        const Icon(
-          Icons.radio_button_unchecked,
-          color: AppColors.borderStrongLight,
-        ),
-      ],
+      ),
     ),
   );
 }
 
-class _PayBar extends StatelessWidget {
-  const _PayBar({required this.onPay});
+class _SchemeCard extends StatelessWidget {
+  const _SchemeCard({required this.scheme, required this.onPay});
+
+  final DueSchemeModel scheme;
   final VoidCallback onPay;
+
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: AppColors.maroonDark,
-      borderRadius: BorderRadius.circular(9),
-    ),
-    child: Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Amount Payable',
-                style: AppTypography.bodyXSmall(
-                  color: Colors.white,
-                ).copyWith(fontSize: 10),
-              ),
-              Text(
-                '₹ 5,000.00',
-                style: AppTypography.sectionTitleSM(color: Colors.white),
-              ),
-            ],
-          ),
-        ),
-        SizedBox(
-          width: 150,
-          child: FilledButton(
-            onPressed: onPay,
-            style: FilledButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF7B4E0B),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-            child: const Text('Pay ₹5,000'),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _ProgressTrack extends StatelessWidget {
-  const _ProgressTrack();
-  @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      Row(
-        children: [
-          const CircleAvatar(
-            radius: 10,
-            backgroundColor: Color(0xFFE3B13B),
-            child: Icon(Icons.check, color: Colors.white, size: 14),
-          ),
-          const Expanded(child: Divider(color: Color(0xFFE3B13B))),
-          const CircleAvatar(
-            radius: 10,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.more_horiz, color: Color(0xFFE3B13B), size: 17),
-          ),
-          const Expanded(child: Divider(color: AppColors.borderStrongLight)),
-          const CircleAvatar(
-            radius: 10,
-            backgroundColor: Colors.white,
-            child: Icon(
-              Icons.circle_outlined,
-              color: AppColors.borderStrongLight,
-              size: 17,
-            ),
-          ),
-        ],
-      ),
-      const SizedBox(height: 5),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            'Payment Initiated',
-            style: AppTypography.bodyXSmall(
-              color: Colors.black,
-            ).copyWith(fontSize: 9),
-          ),
-          Text(
-            'Processing...',
-            style: AppTypography.bodyXSmall(
-              color: const Color(0xFFD19115),
-            ).copyWith(fontSize: 9),
-          ),
-          Text(
-            'Payment Successful',
-            style: AppTypography.bodyXSmall(
-              color: AppColors.mutedGray,
-            ).copyWith(fontSize: 9),
-          ),
-        ],
-      ),
-    ],
-  );
-}
-
-class _TransactionCard extends StatelessWidget {
-  const _TransactionCard();
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(13),
+    padding: const EdgeInsets.all(7),
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(10),
-      boxShadow: const [BoxShadow(color: Color(0x18000000), blurRadius: 7)],
+      boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 7, offset: Offset(0, 2))],
     ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Transaction Summary',
-          style: AppTypography.sectionTitleSM(color: Colors.black),
-        ),
-        SizedBox(height: AppSpacing.sm),
-        Row(
+    child: InkWell(
+      onTap: onPay,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.all(3),
+        child: Row(
           children: [
-            const _GoldThumbnail(small: true),
+            Container(
+              width: 59.w,
+              height: 59.h,
+              decoration: BoxDecoration(
+                color: AppColors.darkNavy,
+                borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: AssetImage(AppAssetImage.jewellery),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
             SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Swarna Bindu',
-                    style: AppTypography.labelMedium(color: Colors.black),
+                  Text(scheme.schemeName, style: AppTypography.labelMedium(color: Colors.black)),
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Monthly Investment',
+                              style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
+                            ),
+                            Text(
+                              AppFormatters.currencyDecimal(scheme.monthlyInvestment),
+                              style: AppTypography.labelMedium(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(width: 1, height: 27, color: AppColors.borderLight),
+                      SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Next Due date',
+                              style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
+                            ),
+                            Text(
+                              scheme.nextDueDateTime == null
+                                  ? '—'
+                                  : AppFormatters.dateShort(scheme.nextDueDateTime!),
+                              style: AppTypography.labelMedium(color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                  const _ActiveBadge(),
                 ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                margin: const EdgeInsets.only(top: 1),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                decoration: BoxDecoration(
+                  color: scheme.hasPendingDues ? AppColors.overdueBg : const Color(0xFFDDF6E4),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  scheme.hasPendingDues ? '${scheme.pendingDuesCount} Due' : scheme.status,
+                  style: AppTypography.bodyXSmall(
+                    color: scheme.hasPendingDues ? AppColors.overdueText : const Color(0xFF258B44),
+                  ).copyWith(fontSize: 10),
+                ),
               ),
             ),
           ],
         ),
-        SizedBox(height: AppSpacing.sm),
-        Row(
-          children: [
-            Expanded(
-              child: _Meta(label: 'Installment Type', value: 'Current Month'),
-            ),
-            Container(width: 1, height: 24, color: AppColors.borderLight),
-            SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: _Meta(label: 'Due Date', value: '05 Jun 2025'),
-            ),
-            Container(width: 1, height: 24, color: AppColors.borderLight),
-            SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: _Meta(label: 'Amount Paid', value: '₹5,000'),
-            ),
-          ],
-        ),
-        const Divider(),
-        _TransactionRow('Transaction ID', 'TXN125060512341'),
-        _TransactionRow('Payment Method', 'UPI - Google Pay'),
-        _TransactionRow('Date & Time', '05 Jun 2025, 9:41 AM'),
-      ],
+      ),
     ),
   );
 }
 
-class _TransactionRow extends StatelessWidget {
-  const _TransactionRow(this.label, this.value);
-  final String label;
-  final String value;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 6),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: AppTypography.bodyXSmall(
-            color: AppColors.mutedGray,
-          ).copyWith(fontSize: 10),
-        ),
-        Text(
-          value,
-          style: AppTypography.bodyXSmall(
-            color: Colors.black,
-          ).copyWith(fontSize: 10, fontWeight: FontWeight.w600),
-        ),
-      ],
-    ),
-  );
-}
-
-class _SecureProcessingCard extends StatelessWidget {
-  const _SecureProcessingCard();
+class _SecurityCard extends StatelessWidget {
+  const _SecurityCard();
   @override
   Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(11),
+    padding: EdgeInsets.all(AppSpacing.md),
     decoration: BoxDecoration(
-      color: const Color(0xFFFFF4E7),
-      border: Border.all(color: const Color(0xFFF5E1C6)),
-      borderRadius: BorderRadius.circular(8),
+      color: const Color(0xFFFFF5E9),
+      border: Border.all(color: const Color(0xFFF6DEC1)),
+      borderRadius: BorderRadius.circular(9),
     ),
     child: Row(
       children: [
         const CircleAvatar(
-          radius: 17,
+          radius: 24,
           backgroundColor: AppColors.maroonDark,
-          child: Icon(
-            Icons.verified_user_outlined,
-            size: 19,
-            color: AppColors.primaryGoldLight,
-          ),
+          child: Icon(Icons.verified_user_outlined, color: AppColors.primaryGoldLight, size: 29),
         ),
         SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('Safe & Secure Payments', style: AppTypography.labelMedium(color: Colors.black)),
+              const SizedBox(height: 2),
               Text(
-                'Safe & Secure',
-                style: AppTypography.labelMedium(color: Colors.black),
-              ),
-              Text(
-                'Your payment is secure. Please do not press back\nor close the app while we process your payment.',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 9),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _SuccessNotice extends StatelessWidget {
-  const _SuccessNotice();
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: const Color(0xFFF1F6F1),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.check_circle, color: Color(0xFF338D4B)),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(
-            'Payment Of ₹5,000 Has Been Successfully Processed.\nA Confirmation Has Been Sent To Your Registered Mobile\nNumber And Email ID.',
-            style: AppTypography.bodyXSmall(
-              color: AppColors.textSecondaryLight,
-            ).copyWith(fontSize: 9),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-class _ReceiptActions extends StatelessWidget {
-  const _ReceiptActions();
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Expanded(
-        child: _ReceiptAction(
-          icon: Icons.receipt_long_outlined,
-          label: 'Download Receipt',
-          subtitle: 'Save or share\nyour receipt',
-        ),
-      ),
-      SizedBox(width: AppSpacing.sm),
-      Expanded(
-        child: _ReceiptAction(
-          icon: Icons.calendar_month_outlined,
-          label: 'View Payment History',
-          subtitle: 'Check your all\npayments',
-        ),
-      ),
-    ],
-  );
-}
-
-class _ReceiptAction extends StatelessWidget {
-  const _ReceiptAction({
-    required this.icon,
-    required this.label,
-    required this.subtitle,
-  });
-  final IconData icon;
-  final String label;
-  final String subtitle;
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(9),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border.all(color: const Color(0xFFF1E4D6)),
-      borderRadius: BorderRadius.circular(5),
-    ),
-    child: Row(
-      children: [
-        CircleAvatar(
-          radius: 15,
-          backgroundColor: const Color(0xFFF2E4E6),
-          child: Icon(icon, size: 17, color: AppColors.maroonDark),
-        ),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: AppTypography.bodyXSmall(
-                  color: Colors.black,
-                ).copyWith(fontSize: 9, fontWeight: FontWeight.w600),
-              ),
-              Text(
-                subtitle,
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 8),
+                'Your Payments Are Encrypted And\n100% Secure With Trusted Partners.',
+                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10, height: 1.25),
               ),
             ],
           ),
