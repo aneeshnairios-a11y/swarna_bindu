@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:swarna_bindu/core/formatter/app_formatters.dart';
@@ -8,6 +9,7 @@ import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 import '../../../../core/router/route_name.dart';
 import '../../../global_widgets/dashboard_bottom_nav.dart';
+import '../../auth/presentation/viewmodels/logout_viewmodel.dart';
 import 'my_scheme_list_screen.dart';
 
 /// Profile screen — maroon hero (avatar, name, mobile), an investment
@@ -15,18 +17,76 @@ import 'my_scheme_list_screen.dart';
 ///
 /// Phase 1: static placeholder data. In Phase 2, hydrate from
 /// `GET /users/:id` via a Riverpod AsyncNotifier.
-class ProfileScreen extends StatefulWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   int _navIndex = 4;
+
+  Future<void> _onLogoutTap() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final titleColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final bodyColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        // Explicit color required here — AppTheme's DialogThemeData sets
+        // titleTextStyle/contentTextStyle via AppTypography.xxx() with no
+        // `color:` arg, so a bare Text() with no style of its own inherits
+        // a null color and renders invisible. Every other screen avoids
+        // this by always passing color explicitly at the call site.
+        title: Text('Log Out', style: AppTypography.headingSM(color: titleColor)),
+        content: Text(
+          'Are you sure you want to log out of your account?',
+          style: AppTypography.bodySmall(color: bodyColor),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.errorRed),
+            child: const Text('Log Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    if (!mounted) return;
+    await ref.read(logoutProvider.notifier).logout();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // React once logout completes — navigate to Login and clear the
+    // navigation stack so back-button can't return to authenticated
+    // screens. A failed /auth/logout network call still logs the user
+    // out locally (see LogoutNotifier), so this fires either way.
+    ref.listen<LogoutState>(logoutProvider, (previous, next) {
+      if (next.status == LogoutStatus.done &&
+          previous?.status != LogoutStatus.done) {
+        if (next.serverCallFailed) {
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(
+                content: Text("Logged out. Couldn't reach the server, but your session was cleared."),
+              ),
+            );
+        }
+        context.go(RouteName.login);
+      }
+    });
+
+    final isLoggingOut = ref.watch(logoutProvider).isLoading;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
 
@@ -82,7 +142,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Icons.logout_rounded,
                     title: 'Log Out',
                     subtitle: 'Securely Log Out From Your Account',
-                    onTap: () {},
+                    isLoading: isLoggingOut,
+                    onTap: isLoggingOut ? null : _onLogoutTap,
                   ),
                 ],
               ),
@@ -309,12 +370,14 @@ class _SettingsRow extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.onTap,
+    this.isLoading = false,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -361,6 +424,15 @@ class _SettingsRow extends StatelessWidget {
                   ],
                 ),
               ),
+              if (isLoading)
+                SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.maroonPrimary,
+                  ),
+                ),
             ],
           ),
         ),

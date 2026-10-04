@@ -236,33 +236,33 @@ class PaymentReceiptScreen extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                0,
-                AppSpacing.lg,
-                AppSpacing.lg,
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: FilledButton(
-                  onPressed: () => context.canPop()
-                      ? context.pop()
-                      : context.go(RouteName.dashboard),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.maroonDark,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Text(
-                    'Back',
-                    style: AppTypography.buttonLarge(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: EdgeInsets.fromLTRB(
+            //     AppSpacing.lg,
+            //     0,
+            //     AppSpacing.lg,
+            //     AppSpacing.lg,
+            //   ),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     height: 52,
+            //     child: FilledButton(
+            //       onPressed: () => context.canPop()
+            //           ? context.pop()
+            //           : context.go(RouteName.dashboard),
+            //       style: FilledButton.styleFrom(
+            //         backgroundColor: AppColors.maroonDark,
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //         ),
+            //       ),
+            //       child: Text(
+            //         'Back',
+            //         style: AppTypography.buttonLarge(color: Colors.white),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),

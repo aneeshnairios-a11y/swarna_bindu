@@ -20,7 +20,9 @@ import 'my_schemes_screen.dart';
 /// Flow: agree to both consent checkboxes → tap "Join This Scheme" →
 /// [_ConfirmSchemeDialog] asks the user to confirm → tapping "Add scheme"
 /// there calls the real join endpoint. On success, lands on
-/// [MySchemesScreen] with the server's enrollment. On `KYC_REQUIRED`,
+/// [MySchemesScreen], which re-fetches the live list via
+/// `GET /schemes/my-schemes` rather than being handed the join response
+/// directly. On `KYC_REQUIRED`,
 /// prompts the user to complete KYC instead of showing a generic error.
 class SchemeDetailScreen extends ConsumerStatefulWidget {
   const SchemeDetailScreen({super.key, required this.schemeId});
@@ -78,12 +80,6 @@ class _SchemeDetailScreenState extends ConsumerState<SchemeDetailScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    Future.microtask(() => ref.read(schemeDetailProvider.notifier).loadDetail(widget.schemeId));
-  }
-
-  @override
   Widget build(BuildContext context) {
     final state = ref.watch(schemeDetailProvider);
 
@@ -92,10 +88,9 @@ class _SchemeDetailScreenState extends ConsumerState<SchemeDetailScreen> {
 
       switch (next.joinStatus) {
         case SchemeJoinStatus.success:
-          final userScheme = next.joinedScheme;
-          if (userScheme == null || !mounted) return;
+          if (!mounted) return;
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => MySchemesScreen(userScheme: userScheme)),
+            MaterialPageRoute(builder: (_) => const MySchemesScreen()),
           );
           break;
         case SchemeJoinStatus.kycRequired:
