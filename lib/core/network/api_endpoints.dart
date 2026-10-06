@@ -82,6 +82,9 @@ abstract class ApiEndpoints {
   static String agentStats(String agentId) => '/agents/$agentId/stats';
   static String agentCollections(String agentId) => '/agents/$agentId/collections';
 
+  // ── Dashboard ───────────────────────────────────────────────────
+  static const String userDashboard = '/user/dashboard';
+
   /// Paths that must never carry a stale/expired access token attempt and
   /// must never trigger the 401 → refresh flow (they're either public or
   /// they ARE the refresh call itself).

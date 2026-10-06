@@ -12,20 +12,28 @@ class SchemeSummaryCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.monthlyInvestment,
-    required this.nextDueDate,
     required this.progressPercent,
     required this.paidGrams,
     required this.goalGrams,
+    this.nextDueDate,
+    this.statusLabel,
     this.onTap,
   });
 
   final String name;
   final double monthlyInvestment;
-  final DateTime nextDueDate;
+
+  /// Optional: the dashboard portfolio has no per-scheme due date. When null
+  /// the block shows [statusLabel] (e.g. "Redeemed") or "—".
+  final DateTime? nextDueDate;
+  final String? statusLabel;
   final double progressPercent; // 0 - 100
   final double paidGrams;
   final double goalGrams;
   final VoidCallback? onTap;
+
+  String get _goalText =>
+      '${goalGrams.toStringAsFixed(goalGrams % 1 == 0 ? 0 : 3)}g';
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +78,8 @@ class SchemeSummaryCard extends StatelessWidget {
                     children: [
                       Text(
                         name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: AppTypography.sectionTitleSM(color: textPrimary),
                       ),
                       SizedBox(height: AppSpacing.sm),
@@ -83,8 +93,10 @@ class SchemeSummaryCard extends StatelessWidget {
                             ),
                           ),
                           _InfoBlock(
-                            label: 'Next Due date',
-                            value: AppFormatters.date(nextDueDate),
+                            label: nextDueDate != null ? 'Next Due date' : 'Status',
+                            value: nextDueDate != null
+                                ? AppFormatters.date(nextDueDate!)
+                                : (statusLabel ?? '—'),
                             alignEnd: true,
                           ),
                         ],
@@ -103,7 +115,7 @@ class SchemeSummaryCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  '${AppFormatters.goldWeightShort(paidGrams)} / ${goalGrams.toStringAsFixed(0)}g',
+                  '${AppFormatters.goldWeightShort(paidGrams)} / $_goalText',
                   style: AppTypography.caption(color: AppColors.mutedGray),
                 ),
               ],

@@ -17,8 +17,21 @@ class InstallmentDueCard extends StatelessWidget {
 
   final double amount;
   final DateTime dueDate;
+
+  /// Positive = days left, 0 = due today, negative = overdue by |n| days.
   final int daysLeft;
   final VoidCallback? onTap;
+
+  bool get _overdue => daysLeft < 0;
+
+  String get _badgeText {
+    if (daysLeft < 0) {
+      final n = -daysLeft;
+      return 'Overdue by $n ${n == 1 ? 'day' : 'days'}';
+    }
+    if (daysLeft == 0) return 'Due today';
+    return '$daysLeft ${daysLeft == 1 ? 'day' : 'days'} left';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +40,21 @@ class InstallmentDueCard extends StatelessWidget {
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
 
+    // Overdue / due-today keep the existing red look; upcoming dues use the
+    // softer orange so the card isn't alarming when there is time left.
+    final urgent = daysLeft <= 0;
+    final accent = urgent ? AppColors.errorRed : AppColors.warningOrange;
+    final cardBg = urgent
+        ? (isDark ? AppColors.errorRedDark : AppColors.errorRedLight)
+        : (isDark ? AppColors.warningOrangeDark : AppColors.warningOrangeLight);
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       child: Container(
         padding: EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.errorRedDark : AppColors.errorRedLight,
+          color: cardBg,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         ),
         child: Row(
@@ -43,13 +64,10 @@ class InstallmentDueCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.errorRed.withValues(alpha: 0.15),
+                color: accent.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.receipt_long_rounded,
-                color: AppColors.errorRed,
-              ),
+              child: Icon(Icons.receipt_long_rounded, color: accent),
             ),
             SizedBox(width: AppSpacing.md),
             Expanded(
@@ -60,7 +78,9 @@ class InstallmentDueCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          'Next Installment Due',
+                          _overdue
+                              ? 'Installment Overdue'
+                              : 'Next Installment Due',
                           style: AppTypography.labelMedium(color: textPrimary),
                         ),
                       ),
@@ -84,9 +104,7 @@ class InstallmentDueCard extends StatelessWidget {
                     children: [
                       Text(
                         AppFormatters.currencyDecimal(amount),
-                        style: AppTypography.currencyAmountSM(
-                          color: AppColors.errorRed,
-                        ),
+                        style: AppTypography.currencyAmountSM(color: accent),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
@@ -94,16 +112,14 @@ class InstallmentDueCard extends StatelessWidget {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.errorRed.withValues(alpha: 0.15),
+                          color: accent.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(
                             AppSpacing.radiusFull,
                           ),
                         ),
                         child: Text(
-                          '$daysLeft days left',
-                          style: AppTypography.labelSmall(
-                            color: AppColors.errorRed,
-                          ),
+                          _badgeText,
+                          style: AppTypography.labelSmall(color: accent),
                         ),
                       ),
                     ],

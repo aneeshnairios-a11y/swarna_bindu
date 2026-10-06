@@ -12,12 +12,17 @@ class DashboardHeader extends StatelessWidget {
     super.key,
     required this.userName,
     required this.unreadNotifications,
+    this.profileImageUrl,
     this.onNotificationTap,
     this.onAvatarTap,
   });
 
   final String userName;
   final int unreadNotifications;
+
+  /// Absolute URL of the user's profile picture; falls back to the bundled
+  /// placeholder when null/empty or when the image fails to load.
+  final String? profileImageUrl;
   final VoidCallback? onNotificationTap;
   final VoidCallback? onAvatarTap;
 
@@ -39,15 +44,12 @@ class DashboardHeader extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: onAvatarTap,
-          child: Container(
-            width: 44.w,
-            height: 44.h,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppSpacing.avatarMd),
-              image: DecorationImage(
-                image: AssetImage(AppAssetImage.profile),
-                fit: BoxFit.cover,
-              ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.avatarMd),
+            child: SizedBox(
+              width: 44.w,
+              height: 44.h,
+              child: _Avatar(url: profileImageUrl),
             ),
           ),
         ),
@@ -74,6 +76,26 @@ class DashboardHeader extends StatelessWidget {
         SizedBox(width: AppSpacing.md),
         _NotificationBell(count: unreadNotifications, onTap: onNotificationTap),
       ],
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({this.url});
+
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    final fallback = Image.asset(AppAssetImage.profile, fit: BoxFit.cover);
+    if (url == null || url!.isEmpty) return fallback;
+
+    return Image.network(
+      url!,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, progress) =>
+      progress == null ? child : fallback,
+      errorBuilder: (context, error, stackTrace) => fallback,
     );
   }
 }
