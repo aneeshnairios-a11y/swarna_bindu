@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swarna_bindu/core/constants/image_string/image_strings.dart';
 
 import 'package:swarna_bindu/core/formatter/app_formatters.dart';
 import 'package:swarna_bindu/core/theme/app_colors.dart';
@@ -143,13 +144,10 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                           width: 64,
                           height: 64,
                           decoration: const BoxDecoration(
-                            gradient: AppColors.goldCardGradient,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
-                            Icons.diamond_rounded,
-                            color: AppColors.textOnGold,
-                            size: 30,
+                          child:  Image.asset(
+                            AppAssetImage.goldRate,
                           ),
                         ),
                       ],

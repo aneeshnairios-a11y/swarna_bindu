@@ -329,8 +329,8 @@ class _LiveRateNotice extends StatelessWidget {
               shape: BoxShape.circle,
             ),
             child: const Icon(
-              Icons.shield_rounded,
-              color: Colors.white,
+              Icons.verified_user_outlined,
+              color: AppColors.primaryGoldLight,
               size: 16,
             ),
           ),
