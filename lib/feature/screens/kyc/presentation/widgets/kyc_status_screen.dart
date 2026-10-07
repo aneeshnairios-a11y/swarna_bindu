@@ -177,11 +177,12 @@ class KycStatusScreen extends StatelessWidget {
                                 children: [
                                   Icon(
                                     Icons.schedule,
-                                    size: AppSpacing.iconSm,
+                                    size: AppSpacing.iconXl,
                                     color: AppColors.successGreen,
                                   ),
                                   SizedBox(width: AppSpacing.xs),
                                   Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         k.statusEtaLabel,
@@ -227,7 +228,7 @@ class KycStatusScreen extends StatelessWidget {
                   : AppButton(
                       text: k.statusGoToDashboardCta,
                       onPressed: () =>
-                          context.go(RouteName.paymentPath('demo')),
+                          context.go(RouteName.dashboard),
                     ),
             ),
           ],
