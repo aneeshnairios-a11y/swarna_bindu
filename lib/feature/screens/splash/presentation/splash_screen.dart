@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
+import '../../auth/data/models/auth_models.dart' show KycStatus, KycStatusX;
+import '../../kyc/data/repository/kyc_repository.dart';
+import '../../kyc/presentation/widgets/kyc_status_screen.dart' show KycOutcome;
 import '../../../../core/constants/image_string/image_strings.dart';
 import '../../../../core/router/route_name.dart';
 import '../../../../core/storage/secure_storage_service.dart';
@@ -65,11 +67,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
     await result.when(
       success: (data) async {
         await secureStorage.updateAccessToken(data.accessToken);
-        // TODO(dashboard): route to Dashboard once that screen/route
-        // exists. KycSubmit is the only authenticated route registered
-        // in app_router.dart right now, so it's the temporary landing
-        // spot for a valid, returning session.
-        if (mounted) context.go(RouteName.kycSubmit);
+        KycStatus status = KycStatusX.fromApi(await secureStorage.kycStatus);
+        final statusResult = await ref.read(kycRepositoryProvider).getStatus();
+        await statusResult.when(
+          success: (s) async {
+            status = s.kycStatus;
+            await secureStorage.saveKycStatus(s.kycStatus.apiValue);
+          },
+          failure: (_) async {},
+        );
+        if (!mounted) return;
+
+        switch (status) {
+          case KycStatus.approved:
+            context.go(RouteName.dashboard);
+          case KycStatus.submitted:
+            context.go(RouteName.kycStatus, extra: KycOutcome.pending);
+          default: // notSubmitted, pending (draft), rejected, unknown
+            context.go(RouteName.kycSubmit);
+        }
       },
       failure: (_) async {
         await secureStorage.clearAll();

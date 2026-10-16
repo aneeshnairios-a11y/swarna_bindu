@@ -88,13 +88,30 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallback = Image.asset(AppAssetImage.profile, fit: BoxFit.cover);
-    if (url == null || url!.isEmpty) return fallback;
-
+    final link = url;
+    if (link == null || link.isEmpty) return fallback;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final placeholder = ColoredBox(
+      color: isDark ? AppColors.surfaceDark : AppColors.borderLight,
+    );
     return Image.network(
-      url!,
+      link,
       fit: BoxFit.cover,
-      loadingBuilder: (context, child, progress) =>
-      progress == null ? child : fallback,
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (wasSynchronouslyLoaded) return child;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            placeholder,
+            AnimatedOpacity(
+              opacity: frame == null ? 0 : 1,
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOut,
+              child: child,
+            ),
+          ],
+        );
+      },
       errorBuilder: (context, error, stackTrace) => fallback,
     );
   }

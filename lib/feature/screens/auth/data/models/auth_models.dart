@@ -3,7 +3,7 @@
 /// ApiClient already catches and surfaces as an UnknownApiException —
 /// so a bad payload becomes a normal error state, never a crash.
 
-enum KycStatus { notSubmitted, pending, approved, rejected, unknown }
+enum KycStatus { notSubmitted, pending, approved, rejected, unknown, submitted}
 
 extension KycStatusX on KycStatus {
   static KycStatus fromApi(String? raw) {
@@ -14,6 +14,8 @@ extension KycStatusX on KycStatus {
         return KycStatus.pending;
       case 'REJECTED':
         return KycStatus.rejected;
+      case 'SUBMITTED':
+        return KycStatus.submitted;
       case 'NOT_SUBMITTED':
       case null:
         return KycStatus.notSubmitted;
@@ -26,6 +28,7 @@ extension KycStatusX on KycStatus {
     KycStatus.approved => 'APPROVED',
     KycStatus.pending => 'PENDING',
     KycStatus.rejected => 'REJECTED',
+    KycStatus.submitted => 'SUBMITTED',
     KycStatus.notSubmitted => 'NOT_SUBMITTED',
     KycStatus.unknown => 'UNKNOWN',
   };

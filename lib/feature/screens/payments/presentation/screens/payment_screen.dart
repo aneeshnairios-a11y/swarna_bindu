@@ -11,7 +11,7 @@ import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
 import '../../../../global_widgets/dashboard_bottom_nav.dart';
-import '../data/models/payment_dues_model.dart';
+import '../../data/models/payment_dues_model.dart';
 import '../viewmodels/payment_dues_viewmodel.dart';
 
 /// Payment landing page. `enrollmentId` is kept for compatibility with the
@@ -127,15 +127,15 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 onTap: () => context.push(RouteName.paymentHistory),
               ),
               SizedBox(width: AppSpacing.sm),
-              _QuickAction(
-                icon: Icons.file_download_outlined,
-                tint: const Color(0xFFDCEEFF),
-                iconColor: const Color(0xFF1680E8),
-                title: 'Receipts',
-                subtitle: 'Get Your Receipts',
-                onTap: () => context.push(RouteName.paymentReceipt),
-              ),
-              SizedBox(width: AppSpacing.sm),
+              // _QuickAction(
+              //   icon: Icons.file_download_outlined,
+              //   tint: const Color(0xFFDCEEFF),
+              //   iconColor: const Color(0xFF1680E8),
+              //   title: 'Receipts',
+              //   subtitle: 'Get Your Receipts',
+              //   onTap: () => context.push(RouteName.paymentReceipt),
+              // ),
+              // SizedBox(width: AppSpacing.sm),
               _QuickAction(
                 icon: Icons.calendar_month_outlined,
                 tint: const Color(0xFFF0E2FF),

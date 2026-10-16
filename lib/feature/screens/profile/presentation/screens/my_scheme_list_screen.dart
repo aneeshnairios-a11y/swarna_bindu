@@ -5,7 +5,7 @@ import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
-import '../../../../core/constants/image_string/image_strings.dart';
+import '../../../../../core/constants/image_string/image_strings.dart';
 
 enum _EnrollmentStatus { active, redeemed }
 

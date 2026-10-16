@@ -8,16 +8,17 @@ import '../../data/repository/auth_repository.dart';
 enum OtpStatus { idle, verifying, success, error, resending, resent }
 
 class OtpState {
-  const OtpState({this.status = OtpStatus.idle, this.errorMessage});
+  const OtpState({this.status = OtpStatus.idle, this.errorMessage,this.kycStatus,});
 
   final OtpStatus status;
   final String? errorMessage;
+  final KycStatus? kycStatus;
 
   bool get isVerifying => status == OtpStatus.verifying;
   bool get isResending => status == OtpStatus.resending;
 
-  OtpState copyWith({OtpStatus? status, String? errorMessage}) {
-    return OtpState(status: status ?? this.status, errorMessage: errorMessage);
+  OtpState copyWith({OtpStatus? status, String? errorMessage,KycStatus? kycStatus,}) {
+    return OtpState(status: status ?? this.status, errorMessage: errorMessage,kycStatus: kycStatus ?? this.kycStatus,);
   }
 }
 
@@ -64,8 +65,11 @@ class OtpNotifier extends Notifier<OtpState> {
         await secureStorage.saveUserId(data.user.id);
         await secureStorage.saveUserRole('customer');
         await secureStorage.saveKycStatus(data.user.kycStatus.apiValue);
-        state = state.copyWith(status: OtpStatus.success);
-      },
+        state = state.copyWith(
+          status: OtpStatus.success,
+          kycStatus: data.user.kycStatus,
+        );
+        },
       failure: (exception) async {
         state = state.copyWith(status: OtpStatus.error, errorMessage: exception.message);
       },

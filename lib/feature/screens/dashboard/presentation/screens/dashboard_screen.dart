@@ -152,7 +152,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 icon: Icons.history_rounded,
                 color: const Color(0xFF7C5CD6),
                 onTap: () {
-                  // TODO(Payments): context.push(RouteName.paymentHistory);
+                  context.push(RouteName.paymentHistory);
                 },
               ),
               QuickAction(

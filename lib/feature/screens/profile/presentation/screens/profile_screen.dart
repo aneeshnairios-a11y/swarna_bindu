@@ -7,16 +7,19 @@ import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
-import '../../../../core/router/route_name.dart';
-import '../../../global_widgets/dashboard_bottom_nav.dart';
-import '../../auth/presentation/viewmodels/logout_viewmodel.dart';
-import 'my_scheme_list_screen.dart';
+import '../../../../../core/router/route_name.dart';
+import '../../../../global_widgets/dashboard_bottom_nav.dart';
+import '../../../auth/presentation/viewmodels/logout_viewmodel.dart';
+import '../viewmodels/profile_viewmodel.dart';
 
-/// Profile screen — maroon hero (avatar, name, mobile), an investment
-/// summary that overlaps the hero, and a "General" settings list.
+
+
+/// Profile screen — maroon hero (avatar, name, mobile, KYC chip), an
+/// investment summary that overlaps the hero, and a "General" settings list.
 ///
-/// Phase 1: static placeholder data. In Phase 2, hydrate from
-/// `GET /users/:id` via a Riverpod AsyncNotifier.
+/// Hydrated from `GET /user/profile` via [profileProvider]. The layout is
+/// always rendered (so Log Out stays reachable even if the API fails);
+/// values show "—" until data arrives.
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
@@ -26,6 +29,12 @@ class ProfileScreen extends ConsumerStatefulWidget {
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   int _navIndex = 4;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() => ref.read(profileProvider.notifier).load());
+  }
 
   Future<void> _onLogoutTap() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -86,69 +95,104 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       }
     });
 
+    // A pull-to-refresh that fails keeps the old data and tells the user.
+    ref.listen<ProfileState>(profileProvider, (previous, next) {
+      final refreshFailed = (previous?.isRefreshing ?? false) &&
+          !next.isRefreshing &&
+          next.errorMessage != null &&
+          next.hasData;
+      if (refreshFailed) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text(next.errorMessage!)));
+      }
+    });
+
+    final profile = ref.watch(profileProvider);
     final isLoggingOut = ref.watch(logoutProvider).isLoading;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bg = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
 
     return Scaffold(
       backgroundColor: bg,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _ProfileHero(
-              name: 'John Mathew',
-              mobile: '+91 9876543210',
-              onBack: () => context.go(RouteName.dashboard),
-            ),
-            Transform.translate(
-              offset: const Offset(0, -28),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                child: _InvestmentSummaryCard(
-                  totalInvestment: 245000,
-                  currentValue: 265540,
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(profileProvider.notifier).refresh(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(bottom: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _ProfileHero(
+                name: profile.name,
+                mobile: profile.mobile,
+                pictureUrl: profile.profilePictureUrl,
+                kycStatus: profile.hasData ? profile.kycStatus : '',
+                onBack: () => context.go(RouteName.dashboard),
+              ),
+              Transform.translate(
+                offset: const Offset(0, -28),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  child: _InvestmentSummaryCard(
+                    totalInvestment:
+                    profile.hasData ? AppFormatters.currency(profile.totalInvestment) : '—',
+                    currentValue:
+                    profile.hasData ? AppFormatters.currency(profile.currentValue) : '—',
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'General',
-                    style: AppTypography.sectionTitleSM(
-                      color: AppColors.textPrimaryLight,
+              if (profile.isError)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+                  child: _InlineError(
+                    message: profile.errorMessage ?? 'Could not load your profile.',
+                    onRetry: () => ref.read(profileProvider.notifier).load(),
+                  ),
+                )
+              else if (profile.isLoading && !profile.hasData)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+                  child: const LinearProgressIndicator(minHeight: 2),
+                ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'General',
+                      style: AppTypography.sectionTitleSM(
+                        color: AppColors.textPrimaryLight,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: AppSpacing.sm),
-                  _SettingsRow(
-                    icon: Icons.flag_rounded,
-                    title: 'My Scheme',
-                    subtitle: 'Learn About Our Schemes',
-                    onTap: () => context.push(RouteName.myScheme),
-                  ),
-                  SizedBox(height: AppSpacing.sm),
-                  _SettingsRow(
-                    icon: Icons.badge_rounded,
-                    title: 'Privacy Policy',
-                    subtitle: 'Read Our Privacy Policy',
-                    onTap: () {},
-                  ),
-                  SizedBox(height: AppSpacing.sm),
-                  _SettingsRow(
-                    icon: Icons.logout_rounded,
-                    title: 'Log Out',
-                    subtitle: 'Securely Log Out From Your Account',
-                    isLoading: isLoggingOut,
-                    onTap: isLoggingOut ? null : _onLogoutTap,
-                  ),
-                ],
+                    SizedBox(height: AppSpacing.sm),
+                    _SettingsRow(
+                      icon: Icons.flag_rounded,
+                      title: 'My Scheme',
+                      subtitle: 'Learn About Our Schemes',
+                      onTap: () => context.push(RouteName.myScheme),
+                    ),
+                    SizedBox(height: AppSpacing.sm),
+                    _SettingsRow(
+                      icon: Icons.badge_rounded,
+                      title: 'Privacy Policy',
+                      subtitle: 'Read Our Privacy Policy',
+                      onTap: () {},
+                    ),
+                    SizedBox(height: AppSpacing.sm),
+                    _SettingsRow(
+                      icon: Icons.logout_rounded,
+                      title: 'Log Out',
+                      subtitle: 'Securely Log Out From Your Account',
+                      isLoading: isLoggingOut,
+                      onTap: isLoggingOut ? null : _onLogoutTap,
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: DashboardBottomNav(
@@ -163,11 +207,15 @@ class _ProfileHero extends StatelessWidget {
   const _ProfileHero({
     required this.name,
     required this.mobile,
+    required this.pictureUrl,
+    required this.kycStatus,
     required this.onBack,
   });
 
   final String name;
   final String mobile;
+  final String? pictureUrl;
+  final String kycStatus;
   final VoidCallback onBack;
 
   @override
@@ -208,53 +256,131 @@ class _ProfileHero extends StatelessWidget {
               ),
             ),
             SizedBox(height: AppSpacing.sm),
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: 88,
-                  height: 88,
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.person_rounded,
-                    color: AppColors.maroonPrimary,
-                    size: 48,
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 26,
-                    height: 26,
-                    decoration: BoxDecoration(
-                      color: AppColors.maroonPrimary,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(
-                      Icons.camera_alt_rounded,
-                      color: Colors.white,
-                      size: 13,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Camera badge intentionally removed until the profile-picture
+            // upload API is integrated.
+            _Avatar(url: pictureUrl),
             SizedBox(height: AppSpacing.sm),
             Text(name, style: AppTypography.sectionTitle(color: Colors.white)),
-            SizedBox(height: 2),
+            const SizedBox(height: 2),
             Text(
               'Mobile $mobile',
               style: AppTypography.bodyXSmall(
                 color: Colors.white.withValues(alpha: 0.75),
               ),
             ),
+            if (kycStatus.isNotEmpty) ...[
+              SizedBox(height: AppSpacing.sm),
+              _KycChip(status: kycStatus),
+            ],
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({required this.url});
+
+  final String? url;
+
+  Widget get _placeholder => Icon(
+    Icons.person_rounded,
+    color: AppColors.maroonPrimary,
+    size: 48,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 88,
+      height: 88,
+      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+      clipBehavior: Clip.antiAlias,
+      child: url == null
+          ? _placeholder
+          : Image.network(
+        url!,
+        width: 88,
+        height: 88,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, progress) =>
+        progress == null ? child : _placeholder,
+        errorBuilder: (_, __, ___) => _placeholder,
+      ),
+    );
+  }
+}
+
+class _KycChip extends StatelessWidget {
+  const _KycChip({required this.status});
+
+  final String status;
+
+  @override
+  Widget build(BuildContext context) {
+    final s = status.toUpperCase();
+    final verified = s == 'APPROVED';
+    final rejected = s == 'REJECTED';
+
+    final label = verified
+        ? 'KYC Verified'
+        : rejected
+        ? 'KYC Rejected'
+        : s == 'PENDING' || s == 'SUBMITTED' || s == 'UNDER_REVIEW'
+        ? 'KYC Pending'
+        : 'KYC Not Verified';
+
+    final IconData icon = verified
+        ? Icons.verified_rounded
+        : rejected
+        ? Icons.error_outline_rounded
+        : Icons.schedule_rounded;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.18),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: verified ? const Color(0xFF7BE495) : Colors.white),
+          const SizedBox(width: 5),
+          Text(label, style: AppTypography.bodyXSmall(color: Colors.white)),
+        ],
+      ),
+    );
+  }
+}
+
+class _InlineError extends StatelessWidget {
+  const _InlineError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(color: AppColors.borderLight),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              message,
+              style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+            ),
+          ),
+          TextButton(onPressed: onRetry, child: const Text('Retry')),
+        ],
       ),
     );
   }
@@ -266,8 +392,8 @@ class _InvestmentSummaryCard extends StatelessWidget {
     required this.currentValue,
   });
 
-  final double totalInvestment;
-  final double currentValue;
+  final String totalInvestment;
+  final String currentValue;
 
   @override
   Widget build(BuildContext context) {
@@ -294,7 +420,7 @@ class _InvestmentSummaryCard extends StatelessWidget {
               child: _SummaryItem(
                 icon: Icons.account_balance_wallet_rounded,
                 label: 'Total Investment',
-                value: AppFormatters.currency(totalInvestment),
+                value: totalInvestment,
               ),
             ),
             Container(
@@ -306,7 +432,7 @@ class _InvestmentSummaryCard extends StatelessWidget {
               child: _SummaryItem(
                 icon: Icons.show_chart_rounded,
                 label: 'Current Value',
-                value: AppFormatters.currency(currentValue),
+                value: currentValue,
               ),
             ),
           ],
@@ -352,6 +478,8 @@ class _SummaryItem extends StatelessWidget {
               ),
               Text(
                 value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppTypography.sectionTitleSM(
                   color: AppColors.textPrimaryLight,
                 ),
@@ -414,7 +542,7 @@ class _SettingsRow extends StatelessWidget {
                         color: AppColors.textPrimaryLight,
                       ),
                     ),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: AppTypography.caption(

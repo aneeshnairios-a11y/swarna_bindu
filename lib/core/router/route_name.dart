@@ -25,13 +25,14 @@ abstract class RouteName {
   // ── Enrollment & passbook ─────────────────────────────────────
 
   static const String passbook = '/app/enrollments/:id/passbook';
-  // ── Payments ──────────────────────────────────────────────────
 
+  // ── Payments ──────────────────────────────────────────────────
   static const String payment = '/app/pay/:enrollmentId';
   static const String paymentCheckout = '/app/pay/:enrollmentId/checkout';
   static const String paymentSuccess = '/app/pay/success';
   static const String paymentHistory = '/app/paymentHistory';
-  static const String paymentReceipt = '/app/paymentReceipt';
+  static const String paymentReceipt = '/app/paymentReceipt/:transactionId';
+
   // ── Profile & KYC ────────────────────────────────────────────
 
   static const String kycSubmit = '/app/profile/kyc';
@@ -67,4 +68,5 @@ abstract class RouteName {
   static String redemptionStatusPath(String id) => '/app/redemption/$id/status';
   static String agentCollectPath(String customerId) =>
       '/app/agent/collect/$customerId';
+  static String paymentReceiptPath(String transactionId) => '/app/paymentReceipt/$transactionId';
 }

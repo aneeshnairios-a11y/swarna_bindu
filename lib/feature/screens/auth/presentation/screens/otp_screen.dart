@@ -13,7 +13,8 @@ import 'package:swarna_bindu/core/constants/image_string/image_strings.dart';
 import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
-
+import '../../../kyc/presentation/widgets/kyc_status_screen.dart';
+import '../../data/models/auth_models.dart' show KycStatus;
 import '../../../../../core/router/route_name.dart';
 import '../../../../global_widgets/common_button.dart';
 import '../../data/repository/auth_repository.dart' show normalizeMobileNumber;
@@ -94,7 +95,14 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   Widget build(BuildContext context) {
     ref.listen<OtpState>(otpProvider, (previous, next) {
       if (next.status == OtpStatus.success) {
-        context.go(RouteName.kycSubmit);
+        switch (next.kycStatus) {
+          case KycStatus.approved:
+            context.go(RouteName.dashboard);
+          case KycStatus.submitted:
+            context.go(RouteName.kycStatus, extra: KycOutcome.pending);
+          default:
+            context.go(RouteName.kycSubmit);
+        }
       } else if (next.status == OtpStatus.resent && previous?.status != OtpStatus.resent) {
         _startResendTimer();
         ScaffoldMessenger.of(context)

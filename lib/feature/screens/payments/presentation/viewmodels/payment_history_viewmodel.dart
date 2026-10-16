@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/models/payment_history_model.dart';
-import '../data/repository/payments_repository.dart';
+import '../../data/models/payment_history_model.dart';
+import '../../data/repository/payments_repository.dart';
+
 
 enum PaymentHistoryLoadStatus { idle, loading, loaded, error }
 

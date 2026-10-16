@@ -7,7 +7,7 @@ import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 import 'package:swarna_bindu/feature/global_widgets/common_button.dart';
-import '../data/models/payment_dues_model.dart';
+import '../../data/models/payment_dues_model.dart';
 import '../viewmodels/payment_viewmodel.dart';
 
 /// Complete five-step payment flow opened by the Payments landing page.

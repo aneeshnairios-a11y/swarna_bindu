@@ -9,11 +9,14 @@ import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 
-import '../data/models/payment_history_model.dart';
+import '../../data/models/payment_history_model.dart';
 import '../viewmodels/payment_history_viewmodel.dart';
+import '../viewmodels/payment_receipt_viewmodel.dart';
+import '../widgets/receipt_action_feedback.dart';
 
 /// Shown when the customer taps "View History" from the payment screen's
-/// quick actions. Bottom-scroll auto-loads the next page.
+/// quick actions. Bottom-scroll auto-loads the next page. Successful
+/// payments have "View Receipt" and "Download" actions.
 class PaymentHistoryScreen extends ConsumerStatefulWidget {
   const PaymentHistoryScreen({super.key});
 
@@ -49,6 +52,12 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(paymentHistoryProvider);
+
+    // Snackbar feedback for downloads started from the cards.
+    ref.listen<ReceiptActionState>(
+      receiptActionProvider,
+          (prev, next) => handleReceiptActionChange(context, prev, next),
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFFCF6),
@@ -115,7 +124,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
         onRefresh: () => ref.read(paymentHistoryProvider.notifier).refresh(),
         child: ListView(
           children: [
-            SizedBox(height: 120.0),
+            const SizedBox(height: 120.0),
             Center(
               child: Text(
                 'No payments yet',
@@ -131,6 +140,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
       onRefresh: () => ref.read(paymentHistoryProvider.notifier).refresh(),
       child: ListView.separated(
         controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
         itemCount: state.items.length + (state.hasMore ? 1 : 0),
         separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
@@ -148,14 +158,27 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
   }
 }
 
-class _TransactionCard extends StatelessWidget {
+class _TransactionCard extends ConsumerWidget {
   const _TransactionCard({required this.transaction});
 
   final PaymentHistoryItemModel transaction;
 
+  bool get _hasReceipt => transaction.status.toUpperCase() == 'SUCCESSFUL';
+
   @override
-  Widget build(BuildContext context) {
-    final dt = transaction.paidAtDateTime;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final dt = transaction.paidAtDateTime?.toLocal();
+
+    // Only this card's own download state — avoids rebuilding every card.
+    final downloading = ref.watch(
+      receiptActionProvider.select(
+            (s) =>
+        s.transactionId == transaction.transactionId &&
+            s.status == ReceiptActionStatus.downloading,
+      ),
+    );
+    final anyBusy = ref.watch(receiptActionProvider.select((s) => s.isBusy));
+
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
@@ -209,6 +232,50 @@ class _TransactionCard extends StatelessWidget {
             value: AppFormatters.currency(transaction.amountPaid),
             emphasize: true,
           ),
+          if (_hasReceipt) ...[
+            SizedBox(height: AppSpacing.sm),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => context.push(
+                      RouteName.paymentReceiptPath(transaction.transactionId),
+                    ),
+                    icon: const Icon(Icons.receipt_long_outlined, size: 16),
+                    label: const Text('View Receipt'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.maroonDark,
+                      side: const BorderSide(color: Color(0xFFF0D9DE)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+                SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: anyBusy
+                        ? null
+                        : () => ref
+                        .read(receiptActionProvider.notifier)
+                        .download(transaction.transactionId),
+                    icon: downloading
+                        ? const SizedBox(
+                      width: 14,
+                      height: 14,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                        : const Icon(Icons.file_download_outlined, size: 16),
+                    label: Text(downloading ? 'Downloading' : 'Download'),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.maroonDark,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

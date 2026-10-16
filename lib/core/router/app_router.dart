@@ -15,8 +15,8 @@ import '../../feature/screens/kyc/presentation/screens/kyc_screen.dart';
 import '../../feature/screens/kyc/presentation/widgets/kyc_status_screen.dart';
 import '../../feature/screens/onboarding/presentation/screens/onboarding_screen.dart';
 import '../../feature/screens/payments/presentation/screens/payment_history_screen.dart';
-import '../../feature/screens/profile/presentation/my_scheme_list_screen.dart';
-import '../../feature/screens/profile/presentation/profile_screen.dart';
+import '../../feature/screens/profile/presentation/screens/my_scheme_list_screen.dart';
+import '../../feature/screens/profile/presentation/screens/profile_screen.dart';
 import '../../feature/screens/schemes/presentation/scheme_detail_screen.dart';
 import '../../feature/screens/schemes/presentation/schemes_screen.dart';
 
@@ -134,8 +134,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: RouteName.paymentReceipt,
         parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (ctx, state) =>
-            _slideTransition(state, const PaymentReceiptScreen()),
+        pageBuilder: (ctx, state) {
+          final txnId = state.pathParameters['transactionId']!;
+          return _slideTransition(state, PaymentReceiptScreen(transactionId: txnId));
+        },
       ),
       // ── Schemes ─────────────────────────────────────────────
       GoRoute(

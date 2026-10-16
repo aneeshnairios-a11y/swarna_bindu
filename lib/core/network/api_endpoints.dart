@@ -62,6 +62,9 @@ abstract class ApiEndpoints {
   static const String paymentHistory = '/payments/history';
   static const String paymentInitialize = '/payments/initialize';
   static const String paymentVerify = '/payments/verify';
+  static String paymentReceipt(String transactionId) => '/payments/receipt/$transactionId';
+  static String paymentReceiptDownload(String transactionId) =>
+      '/payments/receipt/$transactionId/download';
 
   // ── Gold rates ──────────────────────────────────────────────
   static const String goldRateToday = '/gold-rate/today';
@@ -83,6 +86,9 @@ abstract class ApiEndpoints {
   static String agentCollections(String agentId) => '/agents/$agentId/collections';
 
   // ── Dashboard ───────────────────────────────────────────────────
+  static const String userProfileMe = '/user/profile';
+
+  // ── Profile ───────────────────────────────────────────────────
   static const String userDashboard = '/user/dashboard';
 
   /// Paths that must never carry a stale/expired access token attempt and
