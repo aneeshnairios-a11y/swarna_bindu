@@ -25,7 +25,7 @@ class DashboardBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const double _barHeight = 64;
+  static const double _barHeight = 76;
   static const double _centerButtonSize = 56;
   static const double _haloSize = 72;
 
@@ -156,7 +156,7 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final color = selected
-        ? AppColors.maroonDark
+        ? (isDark ? AppColors.primaryGold : AppColors.maroonDark)
         : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight);
 
     return InkWell(
@@ -189,7 +189,7 @@ class _NavItem extends StatelessWidget {
                 width: 18,
                 height: 3,
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: color,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -216,7 +216,7 @@ class _CenterAction extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final labelColor = selected
-        ? AppColors.maroonDark
+        ? (isDark ? AppColors.primaryGold : AppColors.maroonDark)
         : (isDark ? AppColors.textMutedDark : AppColors.textMutedLight);
     return GestureDetector(
       onTap: onTap,

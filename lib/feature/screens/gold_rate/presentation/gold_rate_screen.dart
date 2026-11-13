@@ -53,19 +53,20 @@ class _GoldRateScreenState extends ConsumerState<GoldRateScreen> {
                 vertical: AppSpacing.md,
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                    onTap: () => context.go(RouteName.dashboard),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.arrow_back_rounded,
-                        color: textColor,
-                        size: AppSpacing.iconLg,
-                      ),
-                    ),
-                  ),
+                  // InkWell(
+                  //   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                  //   onTap: () => context.go(RouteName.dashboard),
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(4),
+                  //     child: Icon(
+                  //       Icons.arrow_back_rounded,
+                  //       color: textColor,
+                  //       size: AppSpacing.iconLg,
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(width: AppSpacing.sm),
                   Text(
                     'Gold Rate',

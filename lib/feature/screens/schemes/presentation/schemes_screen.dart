@@ -29,8 +29,12 @@ class _SchemesScreenState extends ConsumerState<SchemesScreen> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? AppColors.backgroundDark : AppColors.backgroundLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     final state = ref.watch(schemesListProvider);
 
     return Scaffold(
@@ -50,20 +54,21 @@ class _SchemesScreenState extends ConsumerState<SchemesScreen> {
                 vertical: AppSpacing.md,
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                    onTap: () => context.go(RouteName.dashboard),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.arrow_back_rounded,
-                        color: textColor,
-                        size: AppSpacing.iconLg,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: AppSpacing.sm),
+                  // InkWell(
+                  //   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                  //   onTap: () => context.go(RouteName.dashboard),
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(4),
+                  //     child: Icon(
+                  //       Icons.arrow_back_rounded,
+                  //       color: textColor,
+                  //       size: AppSpacing.iconLg,
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(width: AppSpacing.sm),
                   Text(
                     'Schemes',
                     style: AppTypography.headingSM(color: textColor),
@@ -99,7 +104,7 @@ class _SchemesScreenState extends ConsumerState<SchemesScreen> {
       child: ListView.separated(
         padding: EdgeInsets.all(AppSpacing.lg),
         itemCount: state.schemes.length + (state.hasMore ? 1 : 0),
-        separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
+        separatorBuilder: (_, _) => SizedBox(height: AppSpacing.md),
         itemBuilder: (context, i) {
           if (i >= state.schemes.length) {
             return _LoadMoreButton(
@@ -120,9 +125,14 @@ class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
+    final mutedColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
     return Center(
-      child: Text('No schemes available right now.', style: AppTypography.bodySmall(color: mutedColor)),
+      child: Text(
+        'No schemes available right now.',
+        style: AppTypography.bodySmall(color: mutedColor),
+      ),
     );
   }
 }
@@ -136,16 +146,26 @@ class _ErrorState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     return Center(
       child: Padding(
         padding: EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.error_outline_rounded, size: 40, color: AppColors.errorRed),
+            Icon(
+              Icons.error_outline_rounded,
+              size: 40,
+              color: AppColors.errorRed,
+            ),
             SizedBox(height: AppSpacing.sm),
-            Text(message, textAlign: TextAlign.center, style: AppTypography.bodySmall(color: textColor)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTypography.bodySmall(color: textColor),
+            ),
             SizedBox(height: AppSpacing.md),
             OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
           ],
@@ -168,10 +188,10 @@ class _LoadMoreButton extends StatelessWidget {
       child: Center(
         child: isLoading
             ? const SizedBox(
-          width: 22,
-          height: 22,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        )
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
             : TextButton(onPressed: onTap, child: const Text('Load more')),
       ),
     );
@@ -183,16 +203,23 @@ class _SchemeCard extends StatelessWidget {
 
   final SchemeModel scheme;
 
-  void _openDetail(BuildContext context) => context.push(RouteName.schemeDetailPath(scheme.id));
+  void _openDetail(BuildContext context) =>
+      context.push(RouteName.schemeDetailPath(scheme.id));
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cardColor = isDark ? AppColors.surfaceDark : AppColors.surfaceLight;
     final border = isDark ? AppColors.borderDark : AppColors.borderLight;
-    final textColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final mutedColor = isDark ? AppColors.textMutedDark : AppColors.textMutedLight;
-    final footerBg = isDark ? AppColors.goldSurfaceDark : AppColors.goldSurfaceLight;
+    final textColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final mutedColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
+    final footerBg = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
@@ -247,7 +274,9 @@ class _SchemeCard extends StatelessWidget {
                             children: [
                               Text(
                                 scheme.name,
-                                style: AppTypography.sectionTitleSM(color: textColor),
+                                style: AppTypography.sectionTitleSM(
+                                  color: textColor,
+                                ),
                               ),
                               SizedBox(height: 2),
                               Text(
@@ -264,43 +293,57 @@ class _SchemeCard extends StatelessWidget {
                     SizedBox(height: AppSpacing.md),
                     Container(height: 1, color: border),
                     SizedBox(height: AppSpacing.md),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Column(
                       children: [
-                        Expanded(
-                          child: _StatCell(
-                            label: 'Monthly Investment',
-                            value: AppFormatters.currency(scheme.monthlyInvestment),
-                            textColor: textColor,
-                            mutedColor: mutedColor,
-                          ),
-                        ),
-                        _StatDivider(color: border),
-                        Expanded(
-                          child: _StatCell(
-                            label: 'Duration',
-                            value: AppFormatters.months(scheme.durationMonths),
-                            textColor: textColor,
-                            mutedColor: mutedColor,
-                          ),
-                        ),
-                        _StatDivider(color: border),
-                        Expanded(
-                          child: _StatCell(
-                            label: 'Maturity Bene',
-                            value: 'Up to ${scheme.maturityBenefitPercent.toStringAsFixed(0)}%',
-                            textColor: AppColors.successGreen,
-                            mutedColor: mutedColor,
-                          ),
-                        ),
-                        _StatDivider(color: border),
-                        Expanded(
-                          child: _StatCell(
-                            label: 'Min. Gold',
-                            value: '${scheme.minGoldGram.toStringAsFixed(0)} Gram',
-                            textColor: textColor,
-                            mutedColor: mutedColor,
-                          ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 14,
+                              child: _StatCell(
+                                label: 'Monthly Investment',
+                                value: AppFormatters.currency(
+                                  scheme.monthlyInvestment,
+                                ),
+                                textColor: textColor,
+                                mutedColor: mutedColor,
+                              ),
+                            ),
+                            _StatDivider(color: border),
+                            Expanded(
+                              flex: 10,
+                              child: _StatCell(
+                                label: 'Duration',
+                                value: AppFormatters.months(
+                                  scheme.durationMonths,
+                                ),
+                                textColor: textColor,
+                                mutedColor: mutedColor,
+                              ),
+                            ),
+                            _StatDivider(color: border),
+                            Expanded(
+                              flex: 11,
+                              child: _StatCell(
+                                label: 'Maturity Benefits',
+                                value:
+                                    'Up to ${scheme.maturityBenefitPercent.toStringAsFixed(0)}%',
+                                textColor: AppColors.successGreen,
+                                mutedColor: mutedColor,
+                              ),
+                            ),
+                            _StatDivider(color: border),
+                            Expanded(
+                              flex: 9,
+                              child: _StatCell(
+                                label: 'Min. Gold',
+                                value:
+                                    '${scheme.minGoldGram.toStringAsFixed(0)} Gram',
+                                textColor: textColor,
+                                mutedColor: mutedColor,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

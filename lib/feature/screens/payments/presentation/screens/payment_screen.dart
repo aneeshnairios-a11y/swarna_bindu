@@ -38,10 +38,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bgColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
     final state = ref.watch(paymentDuesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFCF6),
+      backgroundColor: bgColor,
       bottomNavigationBar: DashboardBottomNav(
         currentIndex: navIndex,
         onTap: (i) => setState(() => navIndex = i),
@@ -50,12 +54,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
         child: Column(
           children: [
             _Header(
-              onBack: () =>
-              context.canPop() ? context.pop() : context.go(RouteName.dashboard),
+              onBack: () => context.canPop()
+                  ? context.pop()
+                  : context.go(RouteName.dashboard),
             ),
             Expanded(
               child: RefreshIndicator(
-                onRefresh: () => ref.read(paymentDuesProvider.notifier).refresh(),
+                onRefresh: () =>
+                    ref.read(paymentDuesProvider.notifier).refresh(),
                 child: _buildBody(state),
               ),
             ),
@@ -85,7 +91,8 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
                 ),
                 SizedBox(height: AppSpacing.md),
                 OutlinedButton(
-                  onPressed: () => ref.read(paymentDuesProvider.notifier).refresh(),
+                  onPressed: () =>
+                      ref.read(paymentDuesProvider.notifier).refresh(),
                   child: const Text('Retry'),
                 ),
               ],
@@ -98,9 +105,15 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     final dues = state.dues;
     final schemes = dues?.schemes ?? const <DueSchemeModel>[];
     final primaryScheme = dues?.primaryDueScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -110,11 +123,14 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             onPay: primaryScheme == null
                 ? null
                 : () => context.push(
-              RouteName.paymentCheckoutPath(primaryScheme.userSchemeId),
-            ),
+                    RouteName.paymentCheckoutPath(primaryScheme.userSchemeId),
+                  ),
           ),
           SizedBox(height: AppSpacing.lg),
-          Text('Quick Actions', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Quick Actions',
+            style: AppTypography.sectionTitleSM(color: isDark ? AppColors.textPrimaryDark : Colors.black,),
+          ),
           SizedBox(height: AppSpacing.sm),
           Row(
             children: [
@@ -147,7 +163,10 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             ],
           ),
           SizedBox(height: AppSpacing.lg),
-          Text('Your Schemes', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Your Schemes',
+            style: AppTypography.sectionTitleSM(color: isDark ? AppColors.textPrimaryDark : Colors.black,),
+          ),
           SizedBox(height: AppSpacing.sm),
           if (schemes.isEmpty)
             Padding(
@@ -161,7 +180,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
             )
           else
             ...schemes.map(
-                  (scheme) => Padding(
+              (scheme) => Padding(
                 padding: EdgeInsets.only(bottom: AppSpacing.sm),
                 child: _SchemeCard(
                   scheme: scheme,
@@ -190,14 +209,29 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.fromLTRB(AppSpacing.xs, AppSpacing.sm, AppSpacing.lg, AppSpacing.sm),
+    padding: EdgeInsets.fromLTRB(
+      AppSpacing.xs,
+      AppSpacing.sm,
+      AppSpacing.lg,
+      AppSpacing.sm,
+    ),
     child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        IconButton(
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+        // IconButton(
+        //   onPressed: onBack,
+        //   icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+        // ),
+        SizedBox(width: AppSpacing.sm),
+
+        Text(
+          'Payments',
+          style: AppTypography.headingSM(
+            color: Theme.of(context).brightness == Brightness.dark
+                ? AppColors.textPrimaryDark
+                : Colors.black,
+          ),
         ),
-        Text('Payments', style: AppTypography.headingSM(color: Colors.black)),
       ],
     ),
   );
@@ -234,7 +268,9 @@ class _DueAmountCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 AppFormatters.currency(nextDueAmount),
-                style: AppTypography.goldAmountSM(color: const Color(0xFFEFC744)),
+                style: AppTypography.goldAmountSM(
+                  color: const Color(0xFFEFC744),
+                ),
               ),
               const SizedBox(height: 11),
               const Divider(color: Color(0xFF9A4564), height: 1),
@@ -256,10 +292,14 @@ class _DueAmountCard extends StatelessWidget {
                     children: [
                       Text(
                         'Due Date',
-                        style: AppTypography.labelSmall(color: const Color(0xFFE9D7DD)),
+                        style: AppTypography.labelSmall(
+                          color: const Color(0xFFE9D7DD),
+                        ),
                       ),
                       Text(
-                        nextDueDate == null ? '—' : AppFormatters.date(nextDueDate!),
+                        nextDueDate == null
+                            ? '—'
+                            : AppFormatters.date(nextDueDate!),
                         style: AppTypography.labelMedium(color: Colors.white),
                       ),
                     ],
@@ -275,12 +315,18 @@ class _DueAmountCard extends StatelessWidget {
                   style: FilledButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: AppColors.maroonDark,
-                    disabledBackgroundColor: Colors.white.withValues(alpha: 0.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
+                    disabledBackgroundColor: Colors.white.withValues(
+                      alpha: 0.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7),
+                    ),
                   ),
                   child: Text(
                     'Pay Now',
-                    style: AppTypography.sectionTitleSM(color: AppColors.maroonDark),
+                    style: AppTypography.sectionTitleSM(
+                      color: AppColors.maroonDark,
+                    ),
                   ),
                 ),
               ),
@@ -319,47 +365,69 @@ class _QuickAction extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Expanded(
-    child: Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(9),
-      child: InkWell(
-        onTap: onTap,
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Expanded(
+      child: Material(
+        color: isDark ? AppColors.surfaceVariantDark : Colors.white,
         borderRadius: BorderRadius.circular(9),
-        child: Container(
-          height: 94,
-          padding: const EdgeInsets.fromLTRB(8, 8, 5, 6),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(9),
-            boxShadow: const [
-              BoxShadow(color: Color(0x12000000), blurRadius: 7, offset: Offset(0, 2)),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(radius: 19, backgroundColor: tint, child: Icon(icon, color: iconColor, size: 22)),
-              const Spacer(),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(title, maxLines: 1, style: AppTypography.labelSmall(color: Colors.black)),
-              ),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  subtitle,
-                  maxLines: 1,
-                  style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(9),
+          child: Container(
+            height: 94,
+            padding: const EdgeInsets.fromLTRB(8, 8, 5, 6),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(9),
+              boxShadow: const [
+                BoxShadow(
+                  color: Color(0x12000000),
+                  blurRadius: 7,
+                  offset: Offset(0, 2),
                 ),
-              ),
-            ],
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 19,
+                  backgroundColor: tint,
+                  child: Icon(icon, color: iconColor, size: 22),
+                ),
+                const Spacer(),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    style: AppTypography.labelSmall(
+                      color: isDark ? AppColors.textPrimaryDark : Colors.black,
+                    ),
+                  ),
+                ),
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    subtitle,
+                    maxLines: 1,
+                    style: AppTypography.bodyXSmall(
+                      color: isDark
+                          ? AppColors.textMutedDark
+                          : AppColors.mutedGray,
+                    ).copyWith(fontSize: 9),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _SchemeCard extends StatelessWidget {
@@ -369,137 +437,212 @@ class _SchemeCard extends StatelessWidget {
   final VoidCallback onPay;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(7),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 7, offset: Offset(0, 2))],
-    ),
-    child: InkWell(
-      onTap: onPay,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.all(3),
-        child: Row(
-          children: [
-            Container(
-              width: 59.w,
-              height: 59.h,
-              decoration: BoxDecoration(
-                color: AppColors.darkNavy,
-                borderRadius: BorderRadius.circular(8),
-                image: DecorationImage(
-                  image: AssetImage(AppAssetImage.jewellery),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(scheme.schemeName, style: AppTypography.labelMedium(color: Colors.black)),
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Monthly Investment',
-                              style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
-                            ),
-                            Text(
-                              AppFormatters.currencyDecimal(scheme.monthlyInvestment),
-                              style: AppTypography.labelMedium(color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(width: 1, height: 27, color: AppColors.borderLight),
-                      SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Next Due date',
-                              style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
-                            ),
-                            Text(
-                              scheme.nextDueDateTime == null
-                                  ? '—'
-                                  : AppFormatters.dateShort(scheme.nextDueDateTime!),
-                              style: AppTypography.labelMedium(color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                margin: const EdgeInsets.only(top: 1),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(7),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceVariantDark : Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x15000000),
+            blurRadius: 7,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: onPay,
+        borderRadius: BorderRadius.circular(10),
+        child: Padding(
+          padding: const EdgeInsets.all(3),
+          child: Row(
+            children: [
+              Container(
+                width: 59.w,
+                height: 59.h,
                 decoration: BoxDecoration(
-                  color: scheme.hasPendingDues ? AppColors.overdueBg : const Color(0xFFDDF6E4),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  scheme.hasPendingDues ? '${scheme.pendingDuesCount} Due' : scheme.status,
-                  style: AppTypography.bodyXSmall(
-                    color: scheme.hasPendingDues ? AppColors.overdueText : const Color(0xFF258B44),
-                  ).copyWith(fontSize: 10),
+                  color: AppColors.darkNavy,
+                  borderRadius: BorderRadius.circular(8),
+                  image: DecorationImage(
+                    image: AssetImage(AppAssetImage.jewellery),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-          ],
+              SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      scheme.schemeName,
+                      style: AppTypography.labelMedium(
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Monthly Investment',
+                                style: AppTypography.bodyXSmall(
+                                  color: isDark
+                                      ? AppColors.textMutedDark
+                                      : AppColors.mutedGray,
+                                ).copyWith(fontSize: 9),
+                              ),
+                              Text(
+                                AppFormatters.currencyDecimal(
+                                  scheme.monthlyInvestment,
+                                ),
+                                style: AppTypography.labelMedium(
+                                  color: isDark
+                                      ? AppColors.textPrimaryDark
+                                      : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: 27,
+                          color: AppColors.borderLight,
+                        ),
+                        SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Next Due date',
+                                style: AppTypography.bodyXSmall(
+                                  color: isDark
+                                      ? AppColors.textMutedDark
+                                      : AppColors.mutedGray,
+                                ).copyWith(fontSize: 9),
+                              ),
+                              Text(
+                                scheme.nextDueDateTime == null
+                                    ? '—'
+                                    : AppFormatters.dateShort(
+                                        scheme.nextDueDateTime!,
+                                      ),
+                                style: AppTypography.labelMedium(
+                                  color: isDark
+                                      ? AppColors.textPrimaryDark
+                                      : Colors.black,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.topCenter,
+                child: Container(
+                  margin: const EdgeInsets.only(top: 1),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.hasPendingDues
+                        ? (isDark
+                              ? AppColors.overdueBgDark
+                              : AppColors.overdueBg)
+                        : (isDark
+                              ? AppColors.paidBgDark
+                              : const Color(0xFFDDF6E4)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    scheme.hasPendingDues
+                        ? '${scheme.pendingDuesCount} Due'
+                        : scheme.status,
+                    style: AppTypography.bodyXSmall(
+                      color: scheme.hasPendingDues
+                          ? (isDark
+                                ? AppColors.overdueTextDark
+                                : AppColors.overdueText)
+                          : (isDark
+                                ? AppColors.paidTextDark
+                                : const Color(0xFF258B44)),
+                    ).copyWith(fontSize: 10),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _SecurityCard extends StatelessWidget {
   const _SecurityCard();
   @override
-  Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.all(AppSpacing.md),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF5E9),
-      border: Border.all(color: const Color(0xFFF6DEC1)),
-      borderRadius: BorderRadius.circular(9),
-    ),
-    child: Row(
-      children: [
-        const CircleAvatar(
-          radius: 24,
-          backgroundColor: AppColors.maroonDark,
-          child: Icon(Icons.verified_user_outlined, color: AppColors.primaryGoldLight, size: 29),
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceVariantDark : const Color(0xFFFFF5E9),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFF6DEC1),
         ),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Safe & Secure Payments', style: AppTypography.labelMedium(color: Colors.black)),
-              const SizedBox(height: 2),
-              Text(
-                'Your Payments Are Encrypted And\n100% Secure With Trusted Partners.',
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10, height: 1.25),
-              ),
-            ],
+        borderRadius: BorderRadius.circular(9),
+      ),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 24,
+            backgroundColor: AppColors.maroonDark,
+            child: Icon(
+              Icons.verified_user_outlined,
+              color: AppColors.primaryGoldLight,
+              size: 29,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+          SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Safe & Secure Payments',
+                  style: AppTypography.labelMedium(
+                    color: isDark ? AppColors.textPrimaryDark : Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Your Payments Are Encrypted And\n100% Secure With Trusted Partners.',
+                  style: AppTypography.bodyXSmall(
+                    color: isDark
+                        ? AppColors.textMutedDark
+                        : AppColors.mutedGray,
+                  ).copyWith(fontSize: 10, height: 1.25),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

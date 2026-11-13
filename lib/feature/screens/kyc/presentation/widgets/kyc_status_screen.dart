@@ -67,47 +67,17 @@ class KycStatusScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                0,
-              ),
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () => context.pop(),
-                    customBorder: const CircleBorder(),
-                    child: Padding(
-                      padding: EdgeInsets.all(AppSpacing.xs),
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: AppSpacing.iconLg,
-                        color: AppColors.textPrimaryLight,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: AppSpacing.xs),
-                  Text(
-                    appBarTitle,
-                    style: AppTypography.headingSM(
-                      color: AppColors.textPrimaryLight,
-                    ),
-                  ),
-                ],
+            Text(
+              appBarTitle,
+              style: AppTypography.headingSM(
+                color: AppColors.textPrimaryLight,
               ),
             ),
-            Padding(
-              padding: EdgeInsets.only(left: AppSpacing.xxxl + AppSpacing.lg),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  k.statusStepCaption,
-                  style: AppTypography.caption(color: AppColors.textMutedLight),
-                ),
-              ),
+            Text(
+              k.statusStepCaption,
+              style: AppTypography.caption(color: AppColors.textMutedLight),
             ),
+
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -182,7 +152,8 @@ class KycStatusScreen extends StatelessWidget {
                                   ),
                                   SizedBox(width: AppSpacing.xs),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         k.statusEtaLabel,
@@ -227,8 +198,7 @@ class KycStatusScreen extends StatelessWidget {
                     )
                   : AppButton(
                       text: k.statusGoToDashboardCta,
-                      onPressed: () =>
-                          context.go(RouteName.dashboard),
+                      onPressed: () => context.go(RouteName.dashboard),
                     ),
             ),
           ],

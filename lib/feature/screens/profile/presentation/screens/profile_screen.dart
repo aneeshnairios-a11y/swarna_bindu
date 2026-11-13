@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,8 +12,6 @@ import '../../../../../core/router/route_name.dart';
 import '../../../../global_widgets/dashboard_bottom_nav.dart';
 import '../../../auth/presentation/viewmodels/logout_viewmodel.dart';
 import '../viewmodels/profile_viewmodel.dart';
-
-
 
 /// Profile screen — maroon hero (avatar, name, mobile, KYC chip), an
 /// investment summary that overlaps the hero, and a "General" settings list.
@@ -38,8 +37,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   Future<void> _onLogoutTap() async {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final titleColor = isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight;
-    final bodyColor = isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight;
+    final titleColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final bodyColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
 
     final confirmed = await showDialog<bool>(
       context: context,
@@ -49,7 +52,10 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         // `color:` arg, so a bare Text() with no style of its own inherits
         // a null color and renders invisible. Every other screen avoids
         // this by always passing color explicitly at the call site.
-        title: Text('Log Out', style: AppTypography.headingSM(color: titleColor)),
+        title: Text(
+          'Log Out',
+          style: AppTypography.headingSM(color: titleColor),
+        ),
         content: Text(
           'Are you sure you want to log out of your account?',
           style: AppTypography.bodySmall(color: bodyColor),
@@ -87,7 +93,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             ..hideCurrentSnackBar()
             ..showSnackBar(
               const SnackBar(
-                content: Text("Logged out. Couldn't reach the server, but your session was cleared."),
+                content: Text(
+                  "Logged out. Couldn't reach the server, but your session was cleared.",
+                ),
               ),
             );
         }
@@ -97,7 +105,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     // A pull-to-refresh that fails keeps the old data and tells the user.
     ref.listen<ProfileState>(profileProvider, (previous, next) {
-      final refreshFailed = (previous?.isRefreshing ?? false) &&
+      final refreshFailed =
+          (previous?.isRefreshing ?? false) &&
           !next.isRefreshing &&
           next.errorMessage != null &&
           next.hasData;
@@ -135,35 +144,55 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   child: _InvestmentSummaryCard(
-                    totalInvestment:
-                    profile.hasData ? AppFormatters.currency(profile.totalInvestment) : '—',
-                    currentValue:
-                    profile.hasData ? AppFormatters.currency(profile.currentValue) : '—',
+                    totalInvestment: profile.hasData
+                        ? AppFormatters.currency(profile.totalInvestment)
+                        : '—',
+                    currentValue: profile.hasData
+                        ? AppFormatters.currency(profile.currentValue)
+                        : '—',
                   ),
                 ),
               ),
               if (profile.isError)
                 Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                  ),
                   child: _InlineError(
-                    message: profile.errorMessage ?? 'Could not load your profile.',
+                    message:
+                        profile.errorMessage ?? 'Could not load your profile.',
                     onRetry: () => ref.read(profileProvider.notifier).load(),
                   ),
                 )
               else if (profile.isLoading && !profile.hasData)
                 Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md),
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.md,
+                  ),
                   child: const LinearProgressIndicator(minHeight: 2),
                 ),
               Padding(
-                padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 0),
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'General',
                       style: AppTypography.sectionTitleSM(
-                        color: AppColors.textPrimaryLight,
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight,
                       ),
                     ),
                     SizedBox(height: AppSpacing.sm),
@@ -234,20 +263,21 @@ class _ProfileHero extends StatelessWidget {
                 vertical: AppSpacing.md,
               ),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
-                    onTap: onBack,
-                    child: const Padding(
-                      padding: EdgeInsets.all(4),
-                      child: Icon(
-                        Icons.arrow_back_rounded,
-                        color: Colors.white,
-                        size: 22,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: AppSpacing.sm),
+                  // InkWell(
+                  //   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                  //   onTap: onBack,
+                  //   child: const Padding(
+                  //     padding: EdgeInsets.all(4),
+                  //     child: Icon(
+                  //       Icons.arrow_back_rounded,
+                  //       color: Colors.white,
+                  //       size: 22,
+                  //     ),
+                  //   ),
+                  // ),
+                  // SizedBox(width: AppSpacing.sm),
                   Text(
                     'Profile',
                     style: AppTypography.headingSM(color: Colors.white),
@@ -284,30 +314,38 @@ class _Avatar extends StatelessWidget {
 
   final String? url;
 
-  Widget get _placeholder => Icon(
+  Widget _placeholder(BuildContext context) => Icon(
     Icons.person_rounded,
-    color: AppColors.maroonPrimary,
+    color: Theme.of(context).brightness == Brightness.dark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary,
     size: 48,
   );
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = url?.trim();
+
     return Container(
       width: 88,
       height: 88,
-      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-      clipBehavior: Clip.antiAlias,
-      child: url == null
-          ? _placeholder
-          : Image.network(
-        url!,
-        width: 88,
-        height: 88,
-        fit: BoxFit.cover,
-        loadingBuilder: (context, child, progress) =>
-        progress == null ? child : _placeholder,
-        errorBuilder: (_, __, ___) => _placeholder,
+      decoration: BoxDecoration(
+        color: Theme.of(context).brightness == Brightness.dark
+            ? AppColors.surfaceVariantDark
+            : AppColors.surfaceLight,
+        shape: BoxShape.circle,
       ),
+      clipBehavior: Clip.antiAlias,
+      child: imageUrl == null || imageUrl.isEmpty
+          ? _placeholder(context)
+          : CachedNetworkImage(
+              imageUrl: imageUrl,
+              width: 88,
+              height: 88,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => _placeholder(context),
+              errorWidget: (context, url, error) => _placeholder(context),
+            ),
     );
   }
 }
@@ -347,7 +385,11 @@ class _KycChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: verified ? const Color(0xFF7BE495) : Colors.white),
+          Icon(
+            icon,
+            size: 14,
+            color: verified ? const Color(0xFF7BE495) : Colors.white,
+          ),
           const SizedBox(width: 5),
           Text(label, style: AppTypography.bodyXSmall(color: Colors.white)),
         ],
@@ -364,19 +406,26 @@ class _InlineError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+        ),
       ),
       child: Row(
         children: [
           Expanded(
             child: Text(
               message,
-              style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+              style: AppTypography.bodySmall(
+                color: isDark
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textMutedLight,
+              ),
             ),
           ),
           TextButton(onPressed: onRetry, child: const Text('Retry')),
@@ -397,17 +446,18 @@ class _InvestmentSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.lg,
         vertical: AppSpacing.lg,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.08),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -425,7 +475,7 @@ class _InvestmentSummaryCard extends StatelessWidget {
             ),
             Container(
               width: 1,
-              color: AppColors.borderLight,
+              color: isDark ? AppColors.borderDark : AppColors.borderLight,
               margin: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
             ),
             Expanded(
@@ -455,6 +505,7 @@ class _SummaryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -462,10 +513,16 @@ class _SummaryItem extends StatelessWidget {
           width: 34,
           height: 34,
           decoration: BoxDecoration(
-            color: AppColors.infoBlueLight,
+            color: isDark
+                ? AppColors.infoBlue.withValues(alpha: 0.18)
+                : AppColors.infoBlueLight,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.infoBlue, size: 17),
+          child: Icon(
+            icon,
+            color: isDark ? AppColors.primaryGoldLight : AppColors.infoBlue,
+            size: 17,
+          ),
         ),
         SizedBox(width: AppSpacing.sm),
         Expanded(
@@ -474,14 +531,20 @@ class _SummaryItem extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: AppTypography.caption(color: AppColors.textMutedLight),
+                style: AppTypography.caption(
+                  color: isDark
+                      ? AppColors.textMutedDark
+                      : AppColors.textMutedLight,
+                ),
               ),
               Text(
                 value,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: AppTypography.sectionTitleSM(
-                  color: AppColors.textPrimaryLight,
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight,
                 ),
               ),
             ],
@@ -509,8 +572,11 @@ class _SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Material(
-      color: AppColors.goldSurfaceLight.withValues(alpha: 0.5),
+      color: isDark
+          ? AppColors.goldSurfaceDark
+          : AppColors.goldSurfaceLight.withValues(alpha: 0.5),
       borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -526,10 +592,18 @@ class _SettingsRow extends StatelessWidget {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: AppColors.maroonPrimary.withValues(alpha: 0.1),
+                  color: isDark
+                      ? AppColors.maroonPrimary.withValues(alpha: 0.25)
+                      : AppColors.maroonPrimary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: AppColors.maroonPrimary, size: 18),
+                child: Icon(
+                  icon,
+                  color: isDark
+                      ? AppColors.primaryGoldLight
+                      : AppColors.maroonPrimary,
+                  size: 18,
+                ),
               ),
               SizedBox(width: AppSpacing.md),
               Expanded(
@@ -539,14 +613,18 @@ class _SettingsRow extends StatelessWidget {
                     Text(
                       title,
                       style: AppTypography.labelLarge(
-                        color: AppColors.textPrimaryLight,
+                        color: isDark
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimaryLight,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
                       style: AppTypography.caption(
-                        color: AppColors.textMutedLight,
+                        color: isDark
+                            ? AppColors.textMutedDark
+                            : AppColors.textMutedLight,
                       ),
                     ),
                   ],
@@ -558,7 +636,9 @@ class _SettingsRow extends StatelessWidget {
                   height: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: AppColors.maroonPrimary,
+                    color: isDark
+                        ? AppColors.primaryGold
+                        : AppColors.maroonPrimary,
                   ),
                 ),
             ],

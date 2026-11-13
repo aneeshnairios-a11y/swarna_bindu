@@ -170,8 +170,8 @@ class _OnboardingPage extends StatelessWidget {
             style: AppTypography.headingLG(color: AppColors.maroonPrimary),
           ),
           SizedBox(height: AppSpacing.xxxl),
-          const _SectionDivider(),
-          SizedBox(height: AppSpacing.xl),
+          // const _SectionDivider(),
+          // SizedBox(height: AppSpacing.xl),
           Padding(
             padding: EdgeInsets.all(16.w),
             child: Text(
@@ -196,11 +196,11 @@ class _SectionDivider extends StatelessWidget {
       children: [
         Container(width: 20, height: 1.5, color: AppColors.borderStrongLight),
         SizedBox(width: AppSpacing.xs),
-        _dot(AppColors.borderStrongLight, 4),
+        _dot(AppColors.maroonPrimary, 4),
         SizedBox(width: AppSpacing.xs),
         _dot(AppColors.maroonPrimary, 6),
         SizedBox(width: AppSpacing.xs),
-        _dot(AppColors.borderStrongLight, 4),
+        _dot(AppColors.maroonPrimary, 4),
         SizedBox(width: AppSpacing.xs),
         Container(width: 20, height: 1.5, color: AppColors.borderStrongLight),
       ],
@@ -265,19 +265,28 @@ class _BottomBar extends StatelessWidget {
           Positioned(
             right: AppSpacing.xxl,
             bottom: 12,
-            child: Material(
-              color: AppColors.maroonPrimary,
-              shape: const CircleBorder(),
-              elevation: 4,
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: onNext,
-                child: Padding(
-                  padding: EdgeInsets.all(AppSpacing.md),
-                  child: Icon(
-                    Icons.arrow_forward,
-                    color: Colors.white,
-                    size: AppSpacing.iconLg,
+            child: Semantics(
+              label: currentPage == pageCount - 1
+                  ? 'Get Started'
+                  : 'Next slide',
+              button: true,
+              enabled: true,
+              child: ExcludeSemantics(
+                child: Material(
+                  color: AppColors.maroonPrimary,
+                  shape: const CircleBorder(),
+                  elevation: 4,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: onNext,
+                    child: Padding(
+                      padding: EdgeInsets.all(AppSpacing.md),
+                      child: Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                        size: AppSpacing.iconLg,
+                      ),
+                    ),
                   ),
                 ),
               ),
