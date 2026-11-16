@@ -27,6 +27,32 @@ class UploadDocumentBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = _hasFile
+        ? (isDark
+              ? AppColors.successGreen.withValues(alpha: 0.16)
+              : AppColors.successGreenLight)
+        : (isDark
+              ? AppColors.goldSurfaceDark.withValues(alpha: 0.5)
+              : AppColors.goldSurfaceLight.withValues(alpha: 0.5));
+
+    final borderColor = _hasFile
+        ? AppColors.successGreen
+        : (isDark ? AppColors.borderStrongDark : AppColors.goldBorderLight);
+
+    final iconColor = _hasFile
+        ? AppColors.successGreen
+        : (isDark ? AppColors.primaryGold : AppColors.primaryGoldDark);
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -37,23 +63,17 @@ class UploadDocumentBox extends StatelessWidget {
           horizontal: AppSpacing.sm,
         ),
         decoration: BoxDecoration(
-          color: _hasFile
-              ? AppColors.successGreenLight
-              : AppColors.goldSurfaceLight.withValues(alpha: 0.5),
+          color: backgroundColor,
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           border: Border.all(
-            color: _hasFile
-                ? AppColors.successGreen
-                : AppColors.goldBorderLight,
+            color: borderColor,
           ),
         ),
         child: Column(
           children: [
             Icon(
               _hasFile ? Icons.check_circle : Icons.file_upload_outlined,
-              color: _hasFile
-                  ? AppColors.successGreen
-                  : AppColors.primaryGoldDark,
+              color: iconColor,
               size: AppSpacing.iconLg,
             ),
             SizedBox(height: AppSpacing.xs),
@@ -61,14 +81,14 @@ class UploadDocumentBox extends StatelessWidget {
               _hasFile ? 'Uploaded' : label,
               textAlign: TextAlign.center,
               style: AppTypography.labelSmall(
-                color: AppColors.textPrimaryLight,
+                color: primaryTextColor,
               ),
             ),
             SizedBox(height: 2.h),
             Text(
               hint ?? AppStrings.kyc.uploadHint,
               textAlign: TextAlign.center,
-              style: AppTypography.caption(color: AppColors.textMutedLight),
+              style: AppTypography.caption(color: secondaryTextColor),
             ),
           ],
         ),

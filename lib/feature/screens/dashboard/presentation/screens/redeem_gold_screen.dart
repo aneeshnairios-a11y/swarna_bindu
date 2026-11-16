@@ -63,6 +63,9 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
     final mutedColor = isDark
         ? AppColors.textMutedDark
         : AppColors.textMutedLight;
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -146,7 +149,7 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                           ),
-                          child:  Image.asset(
+                          child: Image.asset(
                             AppAssetImage.goldRate,
                           ),
                         ),
@@ -209,7 +212,7 @@ class _RedeemGoldScreenState extends State<RedeemGoldScreen> {
                           value: AppFormatters.goldWeight(
                             widget.availableGoldGrams,
                           ),
-                          textColor: AppColors.maroonPrimary,
+                          textColor: accentColor,
                           mutedColor: textColor,
                           emphasize: true,
                         ),

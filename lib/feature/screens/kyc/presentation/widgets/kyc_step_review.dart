@@ -26,18 +26,41 @@ class KycStepReview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final k = AppStrings.kyc;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final goldSurfaceColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final goldIconColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.primaryGoldDark;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           k.reviewTitle,
-          style: AppTypography.sectionTitle(color: AppColors.textPrimaryLight),
+          style: AppTypography.sectionTitle(color: primaryTextColor),
         ),
         SizedBox(height: 4.h),
         Text(
           k.reviewSubtitle,
-          style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+          style: AppTypography.bodySmall(color: secondaryTextColor),
         ),
         SizedBox(height: AppSpacing.xl),
 
@@ -146,7 +169,7 @@ class KycStepReview extends StatelessWidget {
           width: double.infinity,
           padding: EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
-            color: AppColors.goldSurfaceLight,
+            color: goldSurfaceColor,
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           ),
           child: Row(
@@ -155,7 +178,7 @@ class KycStepReview extends StatelessWidget {
               Icon(
                 Icons.shield_outlined,
                 size: AppSpacing.iconMd,
-                color: AppColors.primaryGoldDark,
+                color: goldIconColor,
               ),
               SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -198,13 +221,36 @@ class _ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final goldSurfaceColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final iconColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.primaryGoldDark;
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -214,13 +260,13 @@ class _ReviewCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(AppSpacing.xs),
                 decoration: BoxDecoration(
-                  color: AppColors.goldSurfaceLight,
+                  color: goldSurfaceColor,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Icon(
                   icon,
                   size: AppSpacing.iconMd,
-                  color: AppColors.primaryGoldDark,
+                  color: iconColor,
                 ),
               ),
               SizedBox(width: AppSpacing.sm),
@@ -228,7 +274,7 @@ class _ReviewCard extends StatelessWidget {
                 child: Text(
                   title,
                   style: AppTypography.sectionTitleSM(
-                    color: AppColors.textPrimaryLight,
+                    color: primaryTextColor,
                   ),
                 ),
               ),
@@ -247,13 +293,13 @@ class _ReviewCard extends StatelessWidget {
                         Icon(
                           Icons.edit_outlined,
                           size: 14.sp,
-                          color: AppColors.maroonPrimary,
+                          color: accentColor,
                         ),
                         SizedBox(width: 2.w),
                         Text(
                           'Edit',
                           style: AppTypography.labelSmall(
-                            color: AppColors.maroonPrimary,
+                            color: accentColor,
                           ),
                         ),
                       ],
@@ -297,17 +343,26 @@ class _ReviewField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final labelColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final valueColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: AppTypography.caption(color: AppColors.textMutedLight),
+          style: AppTypography.caption(color: labelColor),
         ),
         SizedBox(height: 2.h),
         Text(
           value,
-          style: AppTypography.labelMedium(color: AppColors.textPrimaryLight),
+          style: AppTypography.labelMedium(color: valueColor),
         ),
       ],
     );
@@ -327,14 +382,36 @@ class _SelfieCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final k = AppStrings.kyc;
     final captured = selfieCapturedAt != null;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final goldSurfaceColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final iconColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.primaryGoldDark;
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
 
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,13 +421,13 @@ class _SelfieCard extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(AppSpacing.xs),
                 decoration: BoxDecoration(
-                  color: AppColors.goldSurfaceLight,
+                  color: goldSurfaceColor,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                 ),
                 child: Icon(
                   Icons.camera_alt_outlined,
                   size: AppSpacing.iconMd,
-                  color: AppColors.primaryGoldDark,
+                  color: iconColor,
                 ),
               ),
               SizedBox(width: AppSpacing.sm),
@@ -358,7 +435,7 @@ class _SelfieCard extends StatelessWidget {
                 child: Text(
                   k.selfieSectionLabel,
                   style: AppTypography.sectionTitleSM(
-                    color: AppColors.textPrimaryLight,
+                    color: primaryTextColor,
                   ),
                 ),
               ),
@@ -374,7 +451,7 @@ class _SelfieCard extends StatelessWidget {
                     child: Text(
                       k.captureSelfieCta,
                       style: AppTypography.labelSmall(
-                        color: AppColors.maroonPrimary,
+                        color: accentColor,
                       ),
                     ),
                   ),

@@ -108,6 +108,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.md,
@@ -129,7 +130,7 @@ class _PaymentScreenState extends ConsumerState<PaymentScreen> {
           SizedBox(height: AppSpacing.lg),
           Text(
             'Quick Actions',
-            style: AppTypography.sectionTitleSM(color: isDark ? AppColors.textPrimaryDark : Colors.black,),
+            style: AppTypography.sectionTitleSM(color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,),
           ),
           SizedBox(height: AppSpacing.sm),
           Row(
@@ -442,7 +443,7 @@ class _SchemeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(7),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceVariantDark : Colors.white,
+        color: isDark ? AppColors.surfaceVariantDark : AppColors.surfaceLight,
         borderRadius: BorderRadius.circular(10),
         boxShadow: const [
           BoxShadow(
@@ -482,7 +483,7 @@ class _SchemeCard extends StatelessWidget {
                       style: AppTypography.labelMedium(
                         color: isDark
                             ? AppColors.textPrimaryDark
-                            : Colors.black,
+                            : AppColors.textPrimaryLight,
                       ),
                     ),
                     const SizedBox(height: 5),
@@ -507,7 +508,7 @@ class _SchemeCard extends StatelessWidget {
                                 style: AppTypography.labelMedium(
                                   color: isDark
                                       ? AppColors.textPrimaryDark
-                                      : Colors.black,
+                                      : AppColors.textPrimaryLight,
                                 ),
                               ),
                             ],

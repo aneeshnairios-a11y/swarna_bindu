@@ -35,6 +35,14 @@ class KycStatusScreen extends StatelessWidget {
     late final String title;
     late final String subtitle;
 
+    final etaBackgroundColor = outcome == KycOutcome.pending
+        ? AppColors.warningOrangeLight
+        : AppColors.successGreenLight;
+
+    final etaTextColor = outcome == KycOutcome.pending
+        ? AppColors.warningOrange
+        : AppColors.successGreen;
+
     switch (outcome) {
       case KycOutcome.success:
         appBarTitle = k.statusAppBarTitle;
@@ -61,21 +69,40 @@ class KycStatusScreen extends StatelessWidget {
         subtitle = k.statusPendingSubtitle;
         break;
     }
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [
             Text(
               appBarTitle,
               style: AppTypography.headingSM(
-                color: AppColors.textPrimaryLight,
+                color: primaryTextColor,
               ),
             ),
             Text(
               k.statusStepCaption,
-              style: AppTypography.caption(color: AppColors.textMutedLight),
+              style: AppTypography.caption(color: secondaryTextColor),
             ),
 
             Expanded(
@@ -91,11 +118,11 @@ class KycStatusScreen extends StatelessWidget {
                         horizontal: AppSpacing.lg,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.surfaceLight,
+                        color: surfaceColor,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusLg,
                         ),
-                        border: Border.all(color: AppColors.borderLight),
+                        border: Border.all(color: borderColor),
                       ),
                       child: Column(
                         children: [
@@ -116,7 +143,7 @@ class KycStatusScreen extends StatelessWidget {
                             title,
                             textAlign: TextAlign.center,
                             style: AppTypography.headingSM(
-                              color: AppColors.textPrimaryLight,
+                              color: primaryTextColor,
                             ),
                           ),
                           SizedBox(height: AppSpacing.sm),
@@ -124,7 +151,7 @@ class KycStatusScreen extends StatelessWidget {
                             subtitle,
                             textAlign: TextAlign.center,
                             style: AppTypography.bodySmall(
-                              color: AppColors.textMutedLight,
+                              color: secondaryTextColor,
                             ),
                           ),
                           if (outcome == KycOutcome.success ||

@@ -31,6 +31,7 @@ class AppTextField extends StatelessWidget {
     this.inputFormatters,
     this.isRequired = false,
     this.autovalidateMode,
+    this.initialValue,
   });
 
   final String? label;
@@ -51,6 +52,7 @@ class AppTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final bool isRequired;
   final AutovalidateMode? autovalidateMode;
+  final String? initialValue;
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +63,9 @@ class AppTextField extends StatelessWidget {
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
+    final iconColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.mutedGray;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,6 +91,8 @@ class AppTextField extends StatelessWidget {
         ],
         TextFormField(
           controller: controller,
+          initialValue: controller == null ? initialValue : null,
+
           keyboardType: keyboardType,
           textCapitalization: textCapitalization,
           obscureText: obscureText,
@@ -106,7 +113,7 @@ class AppTextField extends StatelessWidget {
                 ? Icon(
                     prefixIcon,
                     size: AppSpacing.iconMd,
-                    color: AppColors.mutedGray,
+                    color: iconColor,
                   )
                 : null,
             suffixIcon: suffixIcon,
@@ -152,7 +159,9 @@ class AppDropdownField<T> extends StatelessWidget {
     final textColor = isDark
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
-
+    final iconColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.mutedGray;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,7 +198,7 @@ class AppDropdownField<T> extends StatelessWidget {
                 ? Icon(
                     prefixIcon,
                     size: AppSpacing.iconMd,
-                    color: AppColors.mutedGray,
+                    color: iconColor,
                   )
                 : null,
           ),

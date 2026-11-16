@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter/services.dart';
+import 'package:swarna_bindu/core/router/route_name.dart';
+import 'package:swarna_bindu/core/services/auth_event_bus.dart';
 import 'core/constants/app_string/app_strings.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
@@ -17,11 +21,41 @@ Future<void> main() async {
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends ConsumerWidget {
+
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  StreamSubscription<void>? _sessionSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Listen once for session expiry.
+    _sessionSubscription = ref
+        .read(authEventBusProvider)
+        .onSessionExpired
+        .listen((_) {
+          if (!mounted) return;
+
+          // Clear the navigation stack and return to login.
+          ref.read(appRouterProvider).go(RouteName.login);
+        });
+  }
+
+  @override
+  void dispose() {
+    _sessionSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeProvider);
 
@@ -45,12 +79,10 @@ class MyApp extends ConsumerWidget {
   Size _getDesignSize(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
 
-    // Tablet design size
     if (width >= 600) {
-      return const Size(834, 1194); // iPad
+      return const Size(834, 1194);
     }
 
-    // Phone design size
-    return const Size(375, 812); // iPhone X/11/12/13
+    return const Size(375, 812);
   }
 }

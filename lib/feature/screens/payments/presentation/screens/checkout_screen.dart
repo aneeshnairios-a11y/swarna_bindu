@@ -27,24 +27,28 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-          () => ref.read(paymentProvider.notifier).loadDues(widget.enrollmentId),
+      () => ref.read(paymentProvider.notifier).loadDues(widget.enrollmentId),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(paymentProvider);
 
-    if (state.isDuesLoading || state.dues == null) {
-      if (state.isDuesError) {
-        return _DuesErrorScaffold(
-          message: state.duesErrorMessage ?? 'Could not load scheme details.',
-          onRetry: () => ref.read(paymentProvider.notifier).retryLoadDues(),
-          onBack: () => context.pop(),
-        );
-      }
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (state.isDuesLoading) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state.isDuesError || state.dues == null) {
+      return _DuesErrorScaffold(
+        message:
+            state.duesErrorMessage ??
+            'Unable to load scheme details. Please try again.',
+        onRetry: () => ref.read(paymentProvider.notifier).retryLoadDues(),
+        onBack: () => context.pop(),
+      );
     }
 
     if (state.selectedScheme == null) {
@@ -57,8 +61,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     return switch (state.step) {
       PaymentFlowStep.scheme => _SchemeStep(
-        onContinue: () =>
-            ref.read(paymentProvider.notifier).goTo(PaymentFlowStep.installment),
+        onContinue: () => ref
+            .read(paymentProvider.notifier)
+            .goTo(PaymentFlowStep.installment),
         onBack: () => context.pop(),
       ),
       PaymentFlowStep.installment => _InstallmentStep(
@@ -91,46 +96,66 @@ class _DuesErrorScaffold extends StatelessWidget {
   final VoidCallback onBack;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFFFFCF8),
-    body: SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(5, 8, 16, 8),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: onBack,
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                ),
-                Text('Payment', style: AppTypography.headingSM(color: Colors.black)),
-              ],
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(5, 8, 16, 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: onBack,
+                    icon: Icon(Icons.arrow_back, color: primaryTextColor),
+                  ),
+                  Text(
+                    'Payment',
+                    style: AppTypography.headingSM(color: primaryTextColor),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      message,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.bodySmall(color: AppColors.mutedGray),
-                    ),
-                    SizedBox(height: AppSpacing.md),
-                    OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
-                  ],
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        message,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.bodySmall(
+                          color: secondaryTextColor,
+                        ),
+                      ),
+                      SizedBox(height: AppSpacing.md),
+                      OutlinedButton(
+                        onPressed: onRetry,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _FlowScaffold extends StatelessWidget {
@@ -146,38 +171,50 @@ class _FlowScaffold extends StatelessWidget {
   final Widget? bottom;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFFFFFCF8),
-    body: SafeArea(
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(5, 8, 16, 8),
-            child: Row(
-              children: [
-                IconButton(
-                  onPressed: onBack,
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                ),
-                Text(title, style: AppTypography.headingSM(color: Colors.black)),
-              ],
-            ),
-          ),
-          Expanded(child: body),
-          if (bottom != null)
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.lg,
+              padding: const EdgeInsets.fromLTRB(5, 8, 16, 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: onBack,
+                    icon: Icon(Icons.arrow_back, color: primaryTextColor),
+                  ),
+                  Text(
+                    title,
+                    style: AppTypography.headingSM(color: primaryTextColor),
+                  ),
+                ],
               ),
-              child: bottom!,
             ),
-        ],
+            Expanded(child: body),
+            if (bottom != null)
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                ),
+                child: bottom!,
+              ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _SchemeStep extends ConsumerWidget {
@@ -187,21 +224,37 @@ class _SchemeStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     final scheme = ref.watch(paymentProvider.select((s) => s.selectedScheme))!;
     return _FlowScaffold(
       title: 'Select Scheme',
       onBack: onBack,
       body: ListView(
-        padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          0,
+        ),
         children: [
           _DueStrip(scheme: scheme),
           SizedBox(height: AppSpacing.lg),
-          Text('Your Active Schemes', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Your Active Schemes',
+            style: AppTypography.sectionTitleSM(color: primaryTextColor),
+          ),
           SizedBox(height: AppSpacing.sm),
           _DetailedSchemeCard(scheme: scheme, selected: true),
         ],
       ),
-      bottom: AppButton(text: 'Continue', onPressed: onContinue, backgroundColor: AppColors.maroonDark),
+      bottom: AppButton(
+        text: 'Continue',
+        onPressed: onContinue,
+        backgroundColor: AppColors.maroonDark,
+      ),
     );
   }
 }
@@ -213,18 +266,32 @@ class _InstallmentStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selected = ref.watch(paymentProvider.select((v) => v.installmentType));
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final selected = ref.watch(
+      paymentProvider.select((v) => v.installmentType),
+    );
     final scheme = ref.watch(paymentProvider.select((v) => v.selectedScheme))!;
 
     return _FlowScaffold(
       title: 'Select Installment',
       onBack: onBack,
       body: ListView(
-        padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          0,
+        ),
         children: [
           _CompactSchemeCard(scheme: scheme),
           SizedBox(height: AppSpacing.lg),
-          Text('Select Installment Type', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Select Installment Type',
+            style: AppTypography.sectionTitleSM(color: primaryTextColor),
+          ),
           SizedBox(height: AppSpacing.sm),
           _InstallmentTile(
             type: InstallmentType.currentMonth,
@@ -262,7 +329,11 @@ class _InstallmentStep extends ConsumerWidget {
           _PaymentSummary(type: selected, scheme: scheme),
         ],
       ),
-      bottom: AppButton(text: 'Continue', onPressed: onContinue, backgroundColor: AppColors.maroonDark),
+      bottom: AppButton(
+        text: 'Continue',
+        onPressed: onContinue,
+        backgroundColor: AppColors.maroonDark,
+      ),
     );
   }
 }
@@ -274,6 +345,10 @@ class _MethodStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     final selected = ref.watch(paymentProvider.select((v) => v.method));
     final scheme = ref.watch(paymentProvider.select((v) => v.selectedScheme))!;
 
@@ -281,11 +356,19 @@ class _MethodStep extends ConsumerWidget {
       title: 'Select Payment',
       onBack: onBack,
       body: ListView(
-        padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 0),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.md,
+          AppSpacing.lg,
+          0,
+        ),
         children: [
           _CompactSchemeCard(scheme: scheme),
           SizedBox(height: AppSpacing.lg),
-          Text('Recommended for You', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Recommended for You',
+            style: AppTypography.sectionTitleSM(color: primaryTextColor),
+          ),
           SizedBox(height: AppSpacing.sm),
           _PaymentTile(
             method: PaymentMethod.upi,
@@ -297,7 +380,10 @@ class _MethodStep extends ConsumerWidget {
             highlighted: true,
           ),
           SizedBox(height: AppSpacing.md),
-          Text('Card', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Card',
+            style: AppTypography.sectionTitleSM(color: primaryTextColor),
+          ),
           SizedBox(height: AppSpacing.sm),
           _PaymentTile(
             method: PaymentMethod.card,
@@ -308,7 +394,10 @@ class _MethodStep extends ConsumerWidget {
             subtitle: 'Pay using your saved debit card',
           ),
           SizedBox(height: AppSpacing.md),
-          Text('Other Payment Options', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Other Payment Options',
+            style: AppTypography.sectionTitleSM(color: primaryTextColor),
+          ),
           SizedBox(height: AppSpacing.sm),
           _PaymentTile(
             method: PaymentMethod.netBanking,
@@ -332,6 +421,13 @@ class _ProcessingStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
     final state = ref.watch(paymentProvider);
     final scheme = state.selectedScheme;
 
@@ -340,7 +436,12 @@ class _ProcessingStep extends ConsumerWidget {
         title: 'Payment Failed',
         onBack: onRetry,
         body: ListView(
-          padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.lg),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.xl,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
           children: [
             const SizedBox(height: 15),
             Center(
@@ -351,24 +452,34 @@ class _ProcessingStep extends ConsumerWidget {
                   shape: BoxShape.circle,
                   color: AppColors.errorRedLight,
                 ),
-                child: const Icon(Icons.close_rounded, color: AppColors.errorRed, size: 46),
+                child: const Icon(
+                  Icons.close_rounded,
+                  color: AppColors.errorRed,
+                  size: 46,
+                ),
               ),
             ),
             SizedBox(height: AppSpacing.xl),
             Text(
               'Your Payment Could Not Be Processed',
-              style: AppTypography.sectionTitleSM(color: Colors.black),
+              style: AppTypography.sectionTitleSM(color: primaryTextColor),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 5),
             Text(
               state.errorMessage ?? 'Something went wrong. Please try again.',
-              style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+              style: AppTypography.bodyXSmall(
+                color: secondaryTextColor,
+              ).copyWith(fontSize: 10),
               textAlign: TextAlign.center,
             ),
           ],
         ),
-        bottom: AppButton(text: 'Try Again', onPressed: onPayAgain, backgroundColor: AppColors.maroonDark),
+        bottom: AppButton(
+          text: 'Try Again',
+          onPressed: onPayAgain,
+          backgroundColor: AppColors.maroonDark,
+        ),
       );
     }
 
@@ -376,7 +487,12 @@ class _ProcessingStep extends ConsumerWidget {
       title: 'Processing Payment',
       onBack: () {},
       body: ListView(
-        padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.lg),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.xl,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
         children: [
           const SizedBox(height: 15),
           Center(
@@ -387,22 +503,32 @@ class _ProcessingStep extends ConsumerWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: const Color(0xFFF0B63A), width: 2),
                 boxShadow: const [
-                  BoxShadow(color: Color(0x22E8B03B), blurRadius: 20, spreadRadius: 7),
+                  BoxShadow(
+                    color: Color(0x22E8B03B),
+                    blurRadius: 20,
+                    spreadRadius: 7,
+                  ),
                 ],
               ),
-              child: const Icon(Icons.currency_rupee_rounded, color: Color(0xFFD5950B), size: 46),
+              child: const Icon(
+                Icons.currency_rupee_rounded,
+                color: Color(0xFFD5950B),
+                size: 46,
+              ),
             ),
           ),
           SizedBox(height: AppSpacing.xl),
           Text(
             'Your Payment Is Being Processed',
-            style: AppTypography.sectionTitleSM(color: Colors.black),
+            style: AppTypography.sectionTitleSM(color: primaryTextColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 5),
           Text(
             'Please Wait While We Confirm Your Payment.\nThis Will Only Take A Few Seconds.',
-            style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+            style: AppTypography.bodyXSmall(
+              color: secondaryTextColor,
+            ).copyWith(fontSize: 10),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: AppSpacing.lg),
@@ -423,6 +549,13 @@ class _SuccessStep extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
     final state = ref.watch(paymentProvider);
     final scheme = state.selectedScheme;
     final payment = state.verifyResult?.payment;
@@ -431,17 +564,24 @@ class _SuccessStep extends ConsumerWidget {
       title: 'Payment Successful',
       onBack: onBack,
       body: ListView(
-        padding: EdgeInsets.fromLTRB(AppSpacing.lg, 60, AppSpacing.lg, AppSpacing.lg),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          60,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
         children: [
           Text(
             'Payment Successful',
-            style: AppTypography.headingSM(color: Colors.black),
+            style: AppTypography.headingSM(color: primaryTextColor),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 5),
           Text(
             'Your Payment Has Been Received Successfully.\nThank You For Your Payment.',
-            style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+            style: AppTypography.bodyXSmall(
+              color: secondaryTextColor,
+            ).copyWith(fontSize: 10),
             textAlign: TextAlign.center,
           ),
           SizedBox(height: AppSpacing.lg),
@@ -454,7 +594,11 @@ class _SuccessStep extends ConsumerWidget {
           ],
         ],
       ),
-      bottom: AppButton(text: 'Back', onPressed: onBack, backgroundColor: AppColors.maroonDark),
+      bottom: AppButton(
+        text: 'Back',
+        onPressed: onBack,
+        backgroundColor: AppColors.maroonDark,
+      ),
     );
   }
 }
@@ -464,19 +608,33 @@ class _DueStrip extends StatelessWidget {
   final DueSchemeModel scheme;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = darkMode ? AppColors.primaryGoldDark : AppColors.primaryGoldLight;
+    final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
+    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    return Container(
     padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-      color: const Color(0xFFFFF7EC),
-      border: Border.all(color: const Color(0xFFF5E4C8)),
+      color: backgroundColor,
+      border: Border.all(color: borderColor),
       borderRadius: BorderRadius.circular(6),
     ),
     child: Row(
       children: [
-        const CircleAvatar(
+         CircleAvatar(
           radius: 18,
-          backgroundColor: AppColors.maroonDark,
-          child: Icon(Icons.calendar_month_outlined, color: AppColors.primaryGoldLight),
+          backgroundColor: accentColor.withOpacity(0.1),
+          child: Icon(
+            Icons.calendar_month_outlined,
+            color: accentColor,
+          ),
         ),
         SizedBox(width: AppSpacing.sm),
         Expanded(
@@ -485,11 +643,13 @@ class _DueStrip extends StatelessWidget {
             children: [
               Text(
                 'Next Due Amount',
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+                style: AppTypography.bodyXSmall(
+                  color: secondaryTextColor,
+                ).copyWith(fontSize: 10),
               ),
               Text(
                 AppFormatters.currencyDecimal(scheme.nextDueAmount),
-                style: AppTypography.sectionTitleSM(color: Colors.black),
+                style: AppTypography.sectionTitleSM(color: primaryTextColor),
               ),
             ],
           ),
@@ -502,11 +662,15 @@ class _DueStrip extends StatelessWidget {
             children: [
               Text(
                 'Due Date',
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+                style: AppTypography.bodyXSmall(
+                  color: secondaryTextColor,
+                ).copyWith(fontSize: 10),
               ),
               Text(
-                scheme.nextDueDateTime == null ? '—' : AppFormatters.date(scheme.nextDueDateTime!),
-                style: AppTypography.sectionTitleSM(color: Colors.black),
+                scheme.nextDueDateTime == null
+                    ? '—'
+                    : AppFormatters.date(scheme.nextDueDateTime!),
+                style: AppTypography.sectionTitleSM(color: primaryTextColor ),
               ),
             ],
           ),
@@ -514,6 +678,7 @@ class _DueStrip extends StatelessWidget {
       ],
     ),
   );
+  }
 }
 
 class _DetailedSchemeCard extends StatelessWidget {
@@ -522,12 +687,20 @@ class _DetailedSchemeCard extends StatelessWidget {
   final bool selected;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = darkMode ? AppColors.primaryGoldDark : AppColors.primaryGoldLight;
+    final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
+    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+
+    return Container(
     padding: const EdgeInsets.all(10),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: backgroundColor,
       borderRadius: BorderRadius.circular(10),
-      border: Border.all(color: selected ? const Color(0xFFC58C27) : AppColors.borderLight),
+      border: Border.all(
+        color: selected ? const Color(0xFFC58C27) : borderColor,
+      ),
       boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
     ),
     child: Row(
@@ -543,14 +716,19 @@ class _DetailedSchemeCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text(scheme.schemeName, style: AppTypography.sectionTitleSM(color: Colors.black)),
+                    child: Text(
+                      scheme.schemeName,
+                      style: AppTypography.sectionTitleSM(color: Colors.black),
+                    ),
                   ),
                   _StatusBadge(status: scheme.status),
                 ],
               ),
               Text(
                 '${scheme.paidInstallments} of ${scheme.totalInstallments} installments paid',
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+                style: AppTypography.bodyXSmall(
+                  color: AppColors.mutedGray,
+                ).copyWith(fontSize: 10),
               ),
               const Divider(),
               _SchemeMeta(scheme: scheme),
@@ -560,6 +738,7 @@ class _DetailedSchemeCard extends StatelessWidget {
       ],
     ),
   );
+  }
 }
 
 class _CompactSchemeCard extends StatelessWidget {
@@ -567,10 +746,16 @@ class _CompactSchemeCard extends StatelessWidget {
   final DueSchemeModel scheme;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context){
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    return Container(
     padding: const EdgeInsets.all(8),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: backgroundColor,
       borderRadius: BorderRadius.circular(10),
       boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
     ),
@@ -585,7 +770,10 @@ class _CompactSchemeCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text(scheme.schemeName, style: AppTypography.sectionTitleSM(color: Colors.black)),
+                    child: Text(
+                      scheme.schemeName,
+                      style: AppTypography.sectionTitleSM(color: primaryTextColor),
+                    ),
                   ),
                   _StatusBadge(status: scheme.status),
                 ],
@@ -598,6 +786,7 @@ class _CompactSchemeCard extends StatelessWidget {
       ],
     ),
   );
+  }
 }
 
 class _StatusBadge extends StatelessWidget {
@@ -605,17 +794,25 @@ class _StatusBadge extends StatelessWidget {
   final String status;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
-    decoration: BoxDecoration(
-      color: const Color(0xFFDDF6E4),
-      borderRadius: BorderRadius.circular(15),
-    ),
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final badgeColor = darkMode ? const Color(0xFFDDF6E4) : const Color(0xFFDDF6E4);
+    final textColor = darkMode ? const Color(0xFF258B44) : const Color(0xFF258B44);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+      decoration: BoxDecoration(
+        color: badgeColor,
+        borderRadius: BorderRadius.circular(15),
+      ),
     child: Text(
       status,
-      style: AppTypography.bodyXSmall(color: const Color(0xFF258B44)).copyWith(fontSize: 10),
+      style: AppTypography.bodyXSmall(
+        color: textColor,
+      ).copyWith(fontSize: 10),
     ),
   );
+  }
 }
 
 class _GoldThumbnail extends StatelessWidget {
@@ -628,7 +825,10 @@ class _GoldThumbnail extends StatelessWidget {
     decoration: BoxDecoration(
       color: AppColors.darkNavy,
       borderRadius: BorderRadius.circular(8),
-      image: DecorationImage(image: AssetImage(AppAssetImage.jewellery), fit: BoxFit.cover),
+      image: DecorationImage(
+        image: AssetImage(AppAssetImage.jewellery),
+        fit: BoxFit.cover,
+      ),
     ),
   );
 }
@@ -665,13 +865,27 @@ class _Meta extends StatelessWidget {
   final String label;
   final String value;
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+        final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(label, style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9)),
-      Text(value, style: AppTypography.labelMedium(color: Colors.black)),
+      Text(
+        label,
+        style: AppTypography.bodyXSmall(
+          color: secondaryTextColor,
+        ).copyWith(fontSize: 9),
+      ),
+      Text(value, style: AppTypography.labelMedium(color: primaryTextColor)),
     ],
   );
+  }
 }
 
 class _InstallmentTile extends ConsumerWidget {
@@ -693,46 +907,74 @@ class _InstallmentTile extends ConsumerWidget {
   final String? detail;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => InkWell(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    return InkWell(
     onTap: () => ref.read(paymentProvider.notifier).selectInstallment(type),
     child: Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: selected ? const Color(0xFFD19A3D) : AppColors.borderLight),
+        border: Border.all(
+          color: selected ? const Color(0xFFD19A3D) : AppColors.borderLight,
+        ),
         boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 5)],
       ),
       child: Row(
         children: [
           Radio<InstallmentType>(
             value: type,
-            groupValue: ref.watch(paymentProvider.select((v) => v.installmentType)),
+            groupValue: ref.watch(
+              paymentProvider.select((v) => v.installmentType),
+            ),
             onChanged: (v) {
-              if (v != null) ref.read(paymentProvider.notifier).selectInstallment(v);
+              if (v != null)
+                ref.read(paymentProvider.notifier).selectInstallment(v);
             },
             activeColor: const Color(0xFFD09116),
           ),
           CircleAvatar(
             radius: 21,
-            backgroundColor: selected ? const Color(0xFFFFF1D9) : const Color(0xFFFFE8EC),
-            child: Icon(icon, color: selected ? const Color(0xFFD38A18) : const Color(0xFFFA5265)),
+            backgroundColor: selected
+                ? const Color(0xFFFFF1D9)
+                : const Color(0xFFFFE8EC),
+            child: Icon(
+              icon,
+              color: selected
+                  ? const Color(0xFFD38A18)
+                  : const Color(0xFFFA5265),
+            ),
           ),
           SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTypography.labelMedium(color: Colors.black)),
+                Text(
+                  title,
+                  style: AppTypography.labelMedium(color: primaryTextColor),
+                ),
                 Text(
                   subtitle,
-                  style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+                  style: AppTypography.bodyXSmall(
+                    color: secondaryTextColor,
+                  ).copyWith(fontSize: 10),
                 ),
                 if (detail != null)
                   Text(
                     detail!,
                     style: AppTypography.bodyXSmall(
-                      color: type == InstallmentType.pendingDues ? Colors.red : const Color(0xFF7E3DD7),
+                      color: type == InstallmentType.pendingDues
+                          ? Colors.red
+                          : const Color(0xFF7E3DD7),
                     ).copyWith(fontSize: 10),
                   ),
               ],
@@ -740,12 +982,15 @@ class _InstallmentTile extends ConsumerWidget {
           ),
           Text(
             amount,
-            style: AppTypography.labelMedium(color: selected ? const Color(0xFF248A47) : Colors.black),
+            style: AppTypography.labelMedium(
+              color: selected ? const Color(0xFF248A47) : Colors.black,
+            ),
           ),
         ],
       ),
     ),
   );
+  }
 }
 
 class _PaymentSummary extends StatelessWidget {
@@ -779,16 +1024,29 @@ class _PaymentSummary extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Payment Summary', style: AppTypography.sectionTitleSM(color: Colors.black)),
-              Text(label, style: AppTypography.labelSmall(color: const Color(0xFF258B44))),
+              Text(
+                'Payment Summary',
+                style: AppTypography.sectionTitleSM(color: Colors.black),
+              ),
+              Text(
+                label,
+                style: AppTypography.labelSmall(color: const Color(0xFF258B44)),
+              ),
             ],
           ),
           SizedBox(height: AppSpacing.sm),
-          _TotalRow('Installment Amount', AppFormatters.currencyDecimal(amount)),
+          _TotalRow(
+            'Installment Amount',
+            AppFormatters.currencyDecimal(amount),
+          ),
           _TotalRow('Convenience Fee', AppFormatters.currency(0)),
           _TotalRow('GST (0%)', AppFormatters.currency(0)),
           const Divider(),
-          _TotalRow('Total Payable', AppFormatters.currencyDecimal(amount), prominent: true),
+          _TotalRow(
+            'Total Payable',
+            AppFormatters.currencyDecimal(amount),
+            prominent: true,
+          ),
         ],
       ),
     );
@@ -808,7 +1066,9 @@ class _TotalRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTypography.bodyXSmall(color: prominent ? Colors.black : AppColors.mutedGray),
+          style: AppTypography.bodyXSmall(
+            color: prominent ? Colors.black : AppColors.mutedGray,
+          ),
         ),
         Text(
           value,
@@ -826,7 +1086,10 @@ class _NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(color: const Color(0xFFFFF7EC), borderRadius: BorderRadius.circular(8)),
+    decoration: BoxDecoration(
+      color: const Color(0xFFFFF7EC),
+      borderRadius: BorderRadius.circular(8),
+    ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -836,10 +1099,15 @@ class _NoteCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Note', style: AppTypography.labelMedium(color: Colors.black)),
+              Text(
+                'Note',
+                style: AppTypography.labelMedium(color: Colors.black),
+              ),
               Text(
                 'Your payment will be adjusted to the oldest pending installment first.\nAny advance amount will be adjusted to upcoming installments.',
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
+                style: AppTypography.bodyXSmall(
+                  color: AppColors.mutedGray,
+                ).copyWith(fontSize: 9),
               ),
             ],
           ),
@@ -874,7 +1142,9 @@ class _PaymentTile extends ConsumerWidget {
       decoration: BoxDecoration(
         color: highlighted ? const Color(0xFFF7FFF7) : Colors.white,
         borderRadius: BorderRadius.circular(9),
-        border: Border.all(color: highlighted ? const Color(0xFF75AC79) : AppColors.borderLight),
+        border: Border.all(
+          color: highlighted ? const Color(0xFF75AC79) : AppColors.borderLight,
+        ),
         boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 4)],
       ),
       child: Row(
@@ -889,10 +1159,15 @@ class _PaymentTile extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTypography.labelMedium(color: Colors.black)),
+                Text(
+                  title,
+                  style: AppTypography.labelMedium(color: Colors.black),
+                ),
                 Text(
                   subtitle,
-                  style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+                  style: AppTypography.bodyXSmall(
+                    color: AppColors.mutedGray,
+                  ).copyWith(fontSize: 10),
                 ),
               ],
             ),
@@ -918,11 +1193,16 @@ class _PayBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final amount = ref.watch(paymentProvider.select((v) => v.selectedAmount));
-    final isProcessing = ref.watch(paymentProvider.select((v) => v.isProcessing));
+    final isProcessing = ref.watch(
+      paymentProvider.select((v) => v.isProcessing),
+    );
 
     return Container(
       padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(color: AppColors.maroonDark, borderRadius: BorderRadius.circular(9)),
+      decoration: BoxDecoration(
+        color: AppColors.maroonDark,
+        borderRadius: BorderRadius.circular(9),
+      ),
       child: Row(
         children: [
           Expanded(
@@ -931,7 +1211,9 @@ class _PayBar extends ConsumerWidget {
               children: [
                 Text(
                   'Amount Payable',
-                  style: AppTypography.bodyXSmall(color: Colors.white).copyWith(fontSize: 10),
+                  style: AppTypography.bodyXSmall(
+                    color: Colors.white,
+                  ).copyWith(fontSize: 10),
                 ),
                 Text(
                   AppFormatters.currencyDecimal(amount),
@@ -947,14 +1229,16 @@ class _PayBar extends ConsumerWidget {
               style: FilledButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: const Color(0xFF7B4E0B),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
               ),
               child: isProcessing
                   ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
                   : Text('Pay ${AppFormatters.currency(amount)}'),
             ),
           ),
@@ -986,7 +1270,11 @@ class _ProgressTrack extends StatelessWidget {
           const CircleAvatar(
             radius: 10,
             backgroundColor: Colors.white,
-            child: Icon(Icons.circle_outlined, color: AppColors.borderStrongLight, size: 17),
+            child: Icon(
+              Icons.circle_outlined,
+              color: AppColors.borderStrongLight,
+              size: 17,
+            ),
           ),
         ],
       ),
@@ -994,9 +1282,24 @@ class _ProgressTrack extends StatelessWidget {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Payment Initiated', style: AppTypography.bodyXSmall(color: Colors.black).copyWith(fontSize: 9)),
-          Text('Processing...', style: AppTypography.bodyXSmall(color: const Color(0xFFD19115)).copyWith(fontSize: 9)),
-          Text('Payment Successful', style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9)),
+          Text(
+            'Payment Initiated',
+            style: AppTypography.bodyXSmall(
+              color: Colors.black,
+            ).copyWith(fontSize: 9),
+          ),
+          Text(
+            'Processing...',
+            style: AppTypography.bodyXSmall(
+              color: const Color(0xFFD19115),
+            ).copyWith(fontSize: 9),
+          ),
+          Text(
+            'Payment Successful',
+            style: AppTypography.bodyXSmall(
+              color: AppColors.mutedGray,
+            ).copyWith(fontSize: 9),
+          ),
         ],
       ),
     ],
@@ -1026,7 +1329,10 @@ class _TransactionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Transaction Summary', style: AppTypography.sectionTitleSM(color: Colors.black)),
+          Text(
+            'Transaction Summary',
+            style: AppTypography.sectionTitleSM(color: Colors.black),
+          ),
           SizedBox(height: AppSpacing.sm),
           Row(
             children: [
@@ -1036,7 +1342,10 @@ class _TransactionCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(scheme.schemeName, style: AppTypography.labelMedium(color: Colors.black)),
+                    Text(
+                      scheme.schemeName,
+                      style: AppTypography.labelMedium(color: Colors.black),
+                    ),
                     _StatusBadge(status: scheme.status),
                   ],
                 ),
@@ -1089,10 +1398,17 @@ class _TransactionRow extends StatelessWidget {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10)),
+        Text(
+          label,
+          style: AppTypography.bodyXSmall(
+            color: AppColors.mutedGray,
+          ).copyWith(fontSize: 10),
+        ),
         Text(
           value,
-          style: AppTypography.bodyXSmall(color: Colors.black).copyWith(fontSize: 10, fontWeight: FontWeight.w600),
+          style: AppTypography.bodyXSmall(
+            color: Colors.black,
+          ).copyWith(fontSize: 10, fontWeight: FontWeight.w600),
         ),
       ],
     ),
@@ -1114,17 +1430,26 @@ class _SecureProcessingCard extends StatelessWidget {
         const CircleAvatar(
           radius: 17,
           backgroundColor: AppColors.maroonDark,
-          child: Icon(Icons.verified_user_outlined, size: 19, color: AppColors.primaryGoldLight),
+          child: Icon(
+            Icons.verified_user_outlined,
+            size: 19,
+            color: AppColors.primaryGoldLight,
+          ),
         ),
         SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Safe & Secure', style: AppTypography.labelMedium(color: Colors.black)),
+              Text(
+                'Safe & Secure',
+                style: AppTypography.labelMedium(color: Colors.black),
+              ),
               Text(
                 'Your payment is secure. Please do not press back\nor close the app while we process your payment.',
-                style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 9),
+                style: AppTypography.bodyXSmall(
+                  color: AppColors.mutedGray,
+                ).copyWith(fontSize: 9),
               ),
             ],
           ),
@@ -1141,7 +1466,10 @@ class _SuccessNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(color: const Color(0xFFF1F6F1), borderRadius: BorderRadius.circular(8)),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF1F6F1),
+      borderRadius: BorderRadius.circular(8),
+    ),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1150,7 +1478,9 @@ class _SuccessNotice extends StatelessWidget {
         Expanded(
           child: Text(
             'Payment of ${AppFormatters.currency(amount)} has been successfully processed.\nA confirmation has been sent to your registered mobile number and email ID.',
-            style: AppTypography.bodyXSmall(color: AppColors.textSecondaryLight).copyWith(fontSize: 9),
+            style: AppTypography.bodyXSmall(
+              color: AppColors.textSecondaryLight,
+            ).copyWith(fontSize: 9),
           ),
         ),
       ],
@@ -1171,13 +1501,19 @@ class _GoldGainedCard extends StatelessWidget {
     ),
     child: Row(
       children: [
-        const Icon(Icons.workspace_premium_outlined, color: AppColors.primaryGoldDark),
+        const Icon(
+          Icons.workspace_premium_outlined,
+          color: AppColors.primaryGoldDark,
+        ),
         SizedBox(width: AppSpacing.sm),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Gold Credited', style: AppTypography.labelMedium(color: Colors.black)),
+              Text(
+                'Gold Credited',
+                style: AppTypography.labelMedium(color: Colors.black),
+              ),
               Text(
                 AppFormatters.goldWeight(goldGained.toDouble()),
                 style: AppTypography.goldAmountSM(),

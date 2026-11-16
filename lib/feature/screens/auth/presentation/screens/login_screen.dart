@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -38,6 +39,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceVariantDark
+        : AppColors.surfaceLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
     ref.listen<LoginState>(loginProvider, (previous, next) {
       if (next.status == LoginStatus.sent &&
           previous?.status != LoginStatus.sent) {
@@ -59,7 +84,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final isSending = ref.watch(loginProvider.select((s) => s.isSending));
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: EdgeInsets.only(bottom: AppSpacing.xxxl),
@@ -77,7 +102,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       AppStrings.login.welcomeTitle,
                       textAlign: TextAlign.center,
                       style: AppTypography.headingLG(
-                        color: AppColors.textPrimaryLight,
+                        color: primaryTextColor,
                       ),
                     ),
                     SizedBox(height: AppSpacing.xs),
@@ -85,20 +110,26 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       AppStrings.login.welcomeSubtitle,
                       textAlign: TextAlign.center,
                       style: AppTypography.bodySmall(
-                        color: AppColors.textMutedLight,
+                        color: secondaryTextColor,
                       ),
                     ),
                   ],
                 ),
               ),
               SizedBox(height: AppSpacing.xxxl),
-              Image.asset(AppAssetImage.welcomeScreen),
+                 Image.asset(
+                  AppAssetImage.welcomeScreen,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: 260.h,
+                
+              ),
               SizedBox(height: AppSpacing.xxxl),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceLight,
+                    color: surfaceColor,
                     border: Border.all(
                       width: 1.w,
                       color: AppColors.borderLight,
@@ -118,6 +149,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         _PhoneField(
                           formKey: _formKey,
                           controller: _phoneController,
+                          surfaceColor: surfaceColor,
+                          primaryTextColor: primaryTextColor,
+                          secondaryTextColor: secondaryTextColor,
+                          borderColor: borderColor,
+                          accentColor: accentColor,
                         ),
                         SizedBox(height: AppSpacing.sm),
                         Row(
@@ -132,7 +168,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               child: Text(
                                 AppStrings.login.otpHint,
                                 style: AppTypography.caption(
-                                  color: AppColors.textMutedLight,
+                                  color: secondaryTextColor,
                                 ),
                               ),
                             ),
@@ -158,10 +194,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 }
 
 class _PhoneField extends StatelessWidget {
-  const _PhoneField({required this.formKey, required this.controller});
+  const _PhoneField({
+    required this.formKey,
+    required this.controller,
+    this.surfaceColor,
+    this.primaryTextColor,
+    this.secondaryTextColor,
+    this.borderColor,
+    this.accentColor,
+  });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController controller;
+  final Color? surfaceColor;
+  final Color? primaryTextColor;
+  final Color? secondaryTextColor;
+  final Color? borderColor;
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +222,7 @@ class _PhoneField extends StatelessWidget {
           Text(
             AppStrings.login.mobileLabel,
             style: AppTypography.labelMedium(
-              color: AppColors.textSecondaryLight,
+              color: primaryTextColor,
             ),
           ),
           SizedBox(height: AppSpacing.sm),
@@ -185,14 +234,14 @@ class _PhoneField extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceLight,
+                  color: surfaceColor,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  border: Border.all(color: AppColors.borderLight),
+                  border: Border.all(color:  AppColors.borderLight),
                 ),
                 child: Text(
                   '+91',
                   style: AppTypography.bodyMedium(
-                    color: AppColors.textPrimaryLight,
+                    color: primaryTextColor,
                   ),
                 ),
               ),
@@ -204,21 +253,24 @@ class _PhoneField extends StatelessWidget {
                     controller: controller,
                     keyboardType: TextInputType.phone,
                     maxLength: 10,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                    ],
                     style: AppTypography.bodyMedium(
-                      color: AppColors.textPrimaryLight,
+                      color: primaryTextColor,
                     ),
                     decoration: InputDecoration(
                       counterText: '',
                       hintText: AppStrings.login.mobileHint,
                       hintStyle: AppTypography.bodyMedium(
-                        color: AppColors.textMutedLight,
+                        color: secondaryTextColor,
                       ),
                       contentPadding: EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
                         vertical: AppSpacing.md,
                       ),
                       filled: true,
-                      fillColor: AppColors.surfaceLight,
+                      fillColor: surfaceColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMd,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:swarna_bindu/core/constants/app_string/app_strings.dart';
@@ -48,7 +49,21 @@ class KycStepBank extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final k = AppStrings.kyc;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
     return Form(
       key: formKey,
       child: Column(
@@ -57,13 +72,13 @@ class KycStepBank extends StatelessWidget {
           Text(
             k.bankTitle,
             style: AppTypography.sectionTitle(
-              color: AppColors.textPrimaryLight,
+              color: primaryTextColor,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             k.bankSubtitle,
-            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+            style: AppTypography.bodySmall(color: secondaryTextColor),
           ),
           SizedBox(height: AppSpacing.xl),
 
@@ -71,9 +86,9 @@ class KycStepBank extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               children: [
@@ -108,6 +123,10 @@ class KycStepBank extends StatelessWidget {
                   controller: accountNumberController,
                   keyboardType: TextInputType.number,
                   prefixIcon: Icons.credit_card_outlined,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(18),
+                  ],
                   validator: (v) {
                     final value = (v ?? '').trim();
                     if (value.isEmpty) return 'Account number is required';
@@ -124,6 +143,10 @@ class KycStepBank extends StatelessWidget {
                   controller: confirmAccountNumberController,
                   keyboardType: TextInputType.number,
                   prefixIcon: Icons.credit_card_outlined,
+                   inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(18),
+                  ],
                   validator: (v) {
                     final value = (v ?? '').trim();
                     if (value.isEmpty)
@@ -178,9 +201,9 @@ class KycStepBank extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,7 +211,7 @@ class KycStepBank extends StatelessWidget {
                 Text(
                   k.upiLabel,
                   style: AppTypography.labelMedium(
-                    color: AppColors.textSecondaryLight,
+                    color: primaryTextColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
@@ -221,23 +244,42 @@ class _InfoStrip extends StatelessWidget {
   final String text;
 
   @override
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final iconColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.primaryGoldDark;
+
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.goldSurfaceLight,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: AppSpacing.iconMd, color: AppColors.primaryGoldDark),
+          Icon(
+            icon,
+            size: AppSpacing.iconMd,
+            color: iconColor,
+          ),
           SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               text,
-              style: AppTypography.caption(color: AppColors.textMutedLight),
+              style: AppTypography.caption(color: textColor),
             ),
           ),
         ],

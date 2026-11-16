@@ -12,6 +12,7 @@ import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 import 'package:swarna_bindu/core/utils/image_picker_helper.dart';
 import 'package:swarna_bindu/feature/screens/auth/data/models/auth_models.dart' show KycStatus;
+import 'package:swarna_bindu/feature/screens/auth/presentation/viewmodels/otp_viewmodels.dart';
 
 import '../../../../global_widgets/common_button.dart';
 import '../viewmodels/kyc_viewmodels.dart';
@@ -290,14 +291,21 @@ class _KycScreenState extends ConsumerState<KycScreen> {
     _upiController.text = data.upiId;
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
     final kycState = ref.watch(kycProvider);
     final isReview = kycState.isReviewStep;
     final isBusy = kycState.isSavingStep || kycState.isSubmitting;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           children: [

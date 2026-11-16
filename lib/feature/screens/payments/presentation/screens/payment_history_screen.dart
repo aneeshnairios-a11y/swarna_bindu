@@ -21,7 +21,8 @@ class PaymentHistoryScreen extends ConsumerStatefulWidget {
   const PaymentHistoryScreen({super.key});
 
   @override
-  ConsumerState<PaymentHistoryScreen> createState() => _PaymentHistoryScreenState();
+  ConsumerState<PaymentHistoryScreen> createState() =>
+      _PaymentHistoryScreenState();
 }
 
 class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
@@ -31,7 +32,9 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    Future.microtask(() => ref.read(paymentHistoryProvider.notifier).loadFirstPage());
+    Future.microtask(
+      () => ref.read(paymentHistoryProvider.notifier).loadFirstPage(),
+    );
   }
 
   @override
@@ -51,16 +54,36 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceVariantDark
+        : AppColors.surfaceLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
     final state = ref.watch(paymentHistoryProvider);
 
     // Snackbar feedback for downloads started from the cards.
     ref.listen<ReceiptActionState>(
       receiptActionProvider,
-          (prev, next) => handleReceiptActionChange(context, prev, next),
+      (prev, next) => handleReceiptActionChange(context, prev, next),
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFCF6),
+      backgroundColor: backgroundColor,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -78,9 +101,16 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                     onPressed: () => context.canPop()
                         ? context.pop()
                         : context.go(RouteName.dashboard),
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: primaryTextColor,
+                      size: 24,
+                    ),
                   ),
-                  Text('Payment History', style: AppTypography.headingSM(color: Colors.black)),
+                  Text(
+                    'Payment History',
+                    style: AppTypography.headingSM(color: primaryTextColor),
+                  ),
                 ],
               ),
             ),
@@ -110,7 +140,8 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
               ),
               SizedBox(height: AppSpacing.md),
               OutlinedButton(
-                onPressed: () => ref.read(paymentHistoryProvider.notifier).refresh(),
+                onPressed: () =>
+                    ref.read(paymentHistoryProvider.notifier).refresh(),
                 child: const Text('Retry'),
               ),
             ],
@@ -141,7 +172,10 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
       child: ListView.separated(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        padding: EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         itemCount: state.items.length + (state.hasMore ? 1 : 0),
         separatorBuilder: (_, __) => SizedBox(height: AppSpacing.md),
         itemBuilder: (context, i) {
@@ -167,13 +201,36 @@ class _TransactionCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceVariantDark
+        : AppColors.surfaceLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
     final dt = transaction.paidAtDateTime?.toLocal();
 
     // Only this card's own download state — avoids rebuilding every card.
     final downloading = ref.watch(
       receiptActionProvider.select(
-            (s) =>
-        s.transactionId == transaction.transactionId &&
+        (s) =>
+            s.transactionId == transaction.transactionId &&
             s.status == ReceiptActionStatus.downloading,
       ),
     );
@@ -182,10 +239,15 @@ class _TransactionCard extends ConsumerWidget {
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        border: Border.all(color: borderColor),
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
@@ -197,7 +259,9 @@ class _TransactionCard extends ConsumerWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.darkNavy,
+                  color: isDark
+                      ? AppColors.surfaceVariantDark
+                      : AppColors.surfaceLight,
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: AssetImage(AppAssetImage.jewellery),
@@ -209,14 +273,14 @@ class _TransactionCard extends ConsumerWidget {
               Expanded(
                 child: Text(
                   transaction.schemeName,
-                  style: AppTypography.labelLarge(color: Colors.black),
+                  style: AppTypography.labelLarge(color: primaryTextColor),
                 ),
               ),
               _StatusChip(status: transaction.status),
             ],
           ),
           SizedBox(height: AppSpacing.sm),
-          Container(height: 1, color: AppColors.borderLight),
+          Container(height: 1, color: borderColor),
           SizedBox(height: AppSpacing.sm),
           _DetailRow(label: 'Transaction ID', value: transaction.transactionId),
           const SizedBox(height: 6),
@@ -244,9 +308,11 @@ class _TransactionCard extends ConsumerWidget {
                     icon: const Icon(Icons.receipt_long_outlined, size: 16),
                     label: const Text('View Receipt'),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.maroonDark,
+                      foregroundColor: accentColor,
                       side: const BorderSide(color: Color(0xFFF0D9DE)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
@@ -256,20 +322,25 @@ class _TransactionCard extends ConsumerWidget {
                     onPressed: anyBusy
                         ? null
                         : () => ref
-                        .read(receiptActionProvider.notifier)
-                        .download(transaction.transactionId),
+                              .read(receiptActionProvider.notifier)
+                              .download(transaction.transactionId),
                     icon: downloading
                         ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
                         : const Icon(Icons.file_download_outlined, size: 16),
                     label: Text(downloading ? 'Downloading' : 'Download'),
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.maroonDark,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ),
@@ -306,7 +377,11 @@ class _StatusChip extends StatelessWidget {
 }
 
 class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value, this.emphasize = false});
+  const _DetailRow({
+    required this.label,
+    required this.value,
+    this.emphasize = false,
+  });
 
   final String label;
   final String value;
@@ -314,15 +389,32 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: AppTypography.bodyXSmall(color: AppColors.mutedGray)),
+        Text(
+          label,
+          style: AppTypography.bodyXSmall(color: secondaryTextColor),
+        ),
         Text(
           value,
           style: emphasize
-              ? AppTypography.labelMedium(color: Colors.black)
-              : AppTypography.labelMedium(color: Colors.black).copyWith(fontWeight: FontWeight.w600),
+              ? AppTypography.labelMedium(color: primaryTextColor)
+              : AppTypography.labelMedium(
+                  color: primaryTextColor.withValues(alpha: 0.8),
+                ).copyWith(fontWeight: FontWeight.w600),
         ),
       ],
     );

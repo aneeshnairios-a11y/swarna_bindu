@@ -40,7 +40,33 @@ class KycStepIdentity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final k = AppStrings.kyc;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textMutedDark
+        : AppColors.textMutedLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final goldSurfaceColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final goldBorderColor = isDark
+        ? AppColors.borderStrongDark
+        : AppColors.goldBorderLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
     return Form(
       key: formKey,
       child: Column(
@@ -49,13 +75,13 @@ class KycStepIdentity extends StatelessWidget {
           Text(
             k.identityTitle,
             style: AppTypography.sectionTitle(
-              color: AppColors.textPrimaryLight,
+              color: primaryTextColor,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             k.identitySubtitle,
-            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+            style: AppTypography.bodySmall(color: secondaryTextColor),
           ),
           SizedBox(height: AppSpacing.xl),
 
@@ -128,9 +154,9 @@ class KycStepIdentity extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               children: [
@@ -149,14 +175,14 @@ class KycStepIdentity extends StatelessWidget {
                           Text(
                             k.digiLockerTitle,
                             style: AppTypography.sectionTitleSM(
-                              color: AppColors.textPrimaryLight,
+                              color: primaryTextColor,
                             ),
                           ),
                           SizedBox(height: 2.h),
                           Text(
                             k.digiLockerSubtitle,
                             style: AppTypography.caption(
-                              color: AppColors.textMutedLight,
+                              color: secondaryTextColor,
                             ),
                           ),
                         ],
@@ -171,7 +197,7 @@ class KycStepIdentity extends StatelessWidget {
                     onPressed: onConnectDigiLocker,
                     style: ButtonStyle(
                       side: WidgetStateProperty.all(
-                        BorderSide(color: AppColors.maroonPrimary, width: 1.w),
+                        BorderSide(color: accentColor, width: 1.w),
                       ),
                       shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
@@ -184,7 +210,7 @@ class KycStepIdentity extends StatelessWidget {
                     child: Text(
                       k.digiLockerCta,
                       style: AppTypography.buttonMedium(
-                        color: AppColors.maroonPrimary,
+                        color: accentColor,
                       ),
                     ),
                   ),
@@ -252,13 +278,24 @@ class _DocCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
+        color: surfaceColor,
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.borderLight),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +313,7 @@ class _DocCard extends StatelessWidget {
               Text(
                 title,
                 style: AppTypography.sectionTitleSM(
-                  color: AppColors.textPrimaryLight,
+                  color: primaryTextColor,
                 ),
               ),
               if (required) ...[
@@ -314,12 +351,29 @@ class _InfoStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final borderColor = isDark
+        ? AppColors.borderStrongDark
+        : AppColors.goldBorderLight;
+
+    final textColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final iconColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.primaryGoldDark;
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.goldSurfaceLight.withValues(alpha: 0.5),
-        border: Border.all(color: AppColors.goldBorderLight),
+        color: backgroundColor.withValues(alpha: 0.5),
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
       ),
       child: Row(
@@ -329,13 +383,13 @@ class _InfoStrip extends StatelessWidget {
             width: AppSpacing.iconLg,
             height: AppSpacing.iconLg,
             decoration: BoxDecoration(
-              color: AppColors.goldSurfaceLight,
+              color: backgroundColor,
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Icon(
                 icon,
-                color: AppColors.primaryGoldDark,
+                color: iconColor,
                 size: AppSpacing.iconMd,
               ),
             ),
@@ -344,7 +398,7 @@ class _InfoStrip extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: AppTypography.caption(color: AppColors.textMutedLight),
+              style: AppTypography.caption(color: textColor),
             ),
           ),
         ],

@@ -57,6 +57,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     _timer?.cancel();
     setState(() => _secondsLeft = _kResendSeconds);
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
       if (_secondsLeft <= 1) {
         timer.cancel();
         setState(() => _secondsLeft = 0);
@@ -67,6 +71,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   }
 
   void _verify() {
+    if (_pinController.text.length != _kOtpLength) return;
+    if (ref.read(otpProvider).isVerifying) return;
+    FocusScope.of(context).unfocus();
+
     ref
         .read(otpProvider.notifier)
         .verify(
@@ -87,12 +95,38 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   String _maskedNumber() {
     final e164 = normalizeMobileNumber(widget.phoneNumber);
     final digits = e164.replaceAll(RegExp(r'\D'), '');
-    if (digits.length < 4) return e164;
-    return '+91 ${digits.substring(digits.length - 10, digits.length - 4)} ${digits.substring(digits.length - 4)}';
+    if (digits.length < 10) return e164;
+    final mobile = digits.substring(digits.length - 10);
+
+    return '+91 ${mobile.substring(0, 6)} ${mobile.substring(6)}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceVariantDark
+        : AppColors.surfaceLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
     ref.listen<OtpState>(otpProvider, (previous, next) {
       if (next.status == OtpStatus.success) {
         switch (next.kycStatus) {
@@ -101,13 +135,32 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
           case KycStatus.submitted:
             context.go(RouteName.kycStatus, extra: KycOutcome.pending);
           default:
-            context.go(RouteName.kycSubmit);
+            context.push(RouteName.kycSubmit).then((_) {
+              if (!mounted) return;
+
+              _pinController.clear();
+              _pinFocusNode.unfocus();
+
+              ref.read(otpProvider.notifier).resetOtpState();
+            });
         }
-      } else if (next.status == OtpStatus.resent && previous?.status != OtpStatus.resent) {
+      } else if (next.status == OtpStatus.resent &&
+          previous?.status != OtpStatus.resent) {
         _startResendTimer();
         ScaffoldMessenger.of(context)
           ..hideCurrentSnackBar()
-          ..showSnackBar(const SnackBar(content: Text('OTP resent successfully')));
+          ..showSnackBar(
+            SnackBar(
+              content: Text(
+                'OTP resent successfully',
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.textPrimaryLight
+                      : AppColors.textPrimaryDark,
+                ),
+              ),
+            ),
+          );
       }
     });
 
@@ -117,9 +170,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final error = otpState.errorMessage;
 
     return Scaffold(
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
+        backgroundColor: backgroundColor,
         elevation: 0,
+        iconTheme: IconThemeData(color: primaryTextColor),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -130,20 +185,30 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
               Container(
                 padding: EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  image: DecorationImage(image: AssetImage(AppAssetImage.otpBg), fit: BoxFit.cover),
+                  image: DecorationImage(
+                    image: AssetImage(
+                      AppAssetImage.otpBg,
+                    ),
+                    fit: BoxFit.cover,
+                    opacity: 0.5,
+                  ),
                 ),
                 child: Column(
                   children: [
                     Text(
                       AppStrings.otp.title,
                       textAlign: TextAlign.center,
-                      style: AppTypography.headingLG(color: AppColors.textPrimaryLight),
+                      style: AppTypography.headingLG(
+                        color: primaryTextColor,
+                      ),
                     ),
                     SizedBox(height: AppSpacing.sm),
                     Text(
                       '${AppStrings.otp.subtitle.split('\n').first} ${_maskedNumber()}',
                       textAlign: TextAlign.center,
-                      style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+                      style: AppTypography.bodySmall(
+                        color: primaryTextColor,
+                      ),
                     ),
                   ],
                 ),
@@ -155,7 +220,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                   children: [
                     Text(
                       AppStrings.otp.fieldLabel,
-                      style: AppTypography.labelMedium(color: AppColors.textSecondaryLight),
+                      style: AppTypography.labelMedium(
+                        color: secondaryTextColor,
+                      ),
                     ),
                     SizedBox(height: AppSpacing.md),
                     Pinput(
@@ -165,68 +232,77 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                       autofocus: true,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      onChanged: (_) => ref.read(otpProvider.notifier).clearError(),
+                      onChanged: (_) =>
+                          ref.read(otpProvider.notifier).clearError(),
                       onCompleted: (_) => _verify(),
-                      defaultPinTheme: PinTheme(
-                        width: 44,
-                        height: 52,
-                        textStyle: AppTypography.headingSM(color: AppColors.textPrimaryLight),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(
-                            color: error != null ? AppColors.errorRed : AppColors.borderLight,
+                      defaultPinTheme: buildPinTheme(
+                        background: surfaceColor,
+                        textColor: primaryTextColor,
+                        borderColor: borderColor,
+                      ),
+                      focusedPinTheme:
+                          buildPinTheme(
+                            background: surfaceColor,
+                            textColor: primaryTextColor,
+                            borderColor: accentColor,
+                          ).copyWith(
+                            decoration: BoxDecoration(
+                              color: surfaceColor,
+                              borderRadius: BorderRadius.circular(
+                                AppSpacing.radiusMd,
+                              ),
+                              border: Border.all(
+                                color: accentColor,
+                                width: 1.5,
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      focusedPinTheme: PinTheme(
-                        width: 44,
-                        height: 52,
-                        textStyle: AppTypography.headingSM(color: AppColors.textPrimaryLight),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(color: AppColors.maroonPrimary, width: 1.5),
-                        ),
-                      ),
-                      errorPinTheme: PinTheme(
-                        width: 44,
-                        height: 52,
-                        textStyle: AppTypography.headingSM(color: AppColors.textPrimaryLight),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceLight,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                          border: Border.all(color: AppColors.errorRed),
-                        ),
+                      errorPinTheme: buildPinTheme(
+                        background: surfaceColor,
+                        textColor: primaryTextColor,
+                        borderColor: AppColors.errorRed,
                       ),
                     ),
                     if (error != null) ...[
                       SizedBox(height: AppSpacing.sm),
-                      Text(error, style: AppTypography.caption(color: AppColors.errorRed)),
+                      Text(
+                        error,
+                        style: AppTypography.caption(color: AppColors.errorRed),
+                      ),
                     ],
                     SizedBox(height: AppSpacing.md),
                     Center(
                       child: RichText(
                         textAlign: TextAlign.center,
                         text: TextSpan(
-                          style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+                          style: AppTypography.bodySmall(
+                            color: secondaryTextColor,
+                          ),
                           children: [
                             TextSpan(text: AppStrings.otp.resendPrefix),
                             if (isResending)
                               TextSpan(
                                 text: 'Sending…',
-                                style: AppTypography.labelMedium(color: AppColors.textMutedLight),
+                                style: AppTypography.labelMedium(
+                                  color: secondaryTextColor,
+                                ),
                               )
                             else if (_secondsLeft > 0)
                               TextSpan(
-                                text: '${AppStrings.otp.resendCountingLabel}${_formatSeconds(_secondsLeft)}',
-                                style: AppTypography.labelMedium(color: AppColors.textPrimaryLight),
+                                text:
+                                    '${AppStrings.otp.resendCountingLabel}${_formatSeconds(_secondsLeft)}',
+                                style: AppTypography.labelMedium(
+                                  color: primaryTextColor,
+                                ),
                               )
                             else
                               TextSpan(
                                 text: AppStrings.otp.resendCta,
-                                style: AppTypography.labelMedium(color: AppColors.maroonPrimary),
-                                recognizer: TapGestureRecognizer()..onTap = _resendOtp,
+                                style: AppTypography.labelMedium(
+                                  color: accentColor,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = _resendOtp,
                               ),
                           ],
                         ),
@@ -254,4 +330,21 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
     final s = (seconds % 60).toString().padLeft(2, '0');
     return '$m:$s';
   }
+}
+
+PinTheme buildPinTheme({
+  required Color background,
+  required Color textColor,
+  required Color borderColor,
+}) {
+  return PinTheme(
+    width: 44,
+    height: 52,
+    textStyle: AppTypography.headingSM(color: textColor),
+    decoration: BoxDecoration(
+      color: background,
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      border: Border.all(color: borderColor),
+    ),
+  );
 }

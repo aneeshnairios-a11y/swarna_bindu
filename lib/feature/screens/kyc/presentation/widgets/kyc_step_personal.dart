@@ -54,41 +54,64 @@ class KycStepPersonal extends StatelessWidget {
 
   Future<void> _pickDob(BuildContext context) async {
     final now = DateTime.now();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
     final picked = await showDatePicker(
       context: context,
       initialDate: dob ?? DateTime(now.year - 18, now.month, now.day),
       firstDate: DateTime(now.year - 100),
       lastDate: DateTime(now.year - 18, now.month, now.day),
       builder: (context, child) {
+        final theme = Theme.of(context);
+
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.maroonPrimary, // Header background & selected date
-              onPrimary: Colors.white, // Header text
-              surface: Colors.white, // Dialog background
-              onSurface: Colors.black87, // Calendar text
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
+              primary: accentColor,
             ),
             datePickerTheme: DatePickerThemeData(
-              backgroundColor: Colors.white,
-              headerBackgroundColor: AppColors.maroonPrimary,
-              headerForegroundColor: Colors.white,
-              todayForegroundColor: WidgetStatePropertyAll(
-                AppColors.maroonPrimary,
-              ),
-              todayBorder: BorderSide(color: AppColors.maroonPrimary),
+              headerBackgroundColor: accentColor,
+              headerForegroundColor: isDark
+                  ? AppColors.textOnGold
+                  : Colors.white,
+              todayForegroundColor: WidgetStatePropertyAll(accentColor),
+              todayBorder: BorderSide(color: accentColor),
             ),
           ),
           child: child!,
         );
       },
     );
-    if (picked != null) onDobChanged(picked);
+
+    if (picked != null) {
+      onDobChanged(picked);
+    }
   }
 
-  String get _dobText => dob == null ? '' : '${dob!.day.toString().padLeft(2, '0')} ${_months[dob!.month - 1]} ${dob!.year}';
+  String get _dobText => dob == null
+      ? ''
+      : '${dob!.day.toString().padLeft(2, '0')} ${_months[dob!.month - 1]} ${dob!.year}';
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
     return Form(
       key: formKey,
       child: Column(
@@ -112,28 +135,34 @@ class KycStepPersonal extends StatelessWidget {
                         height: AppSpacing.avatarXl,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
+                          color: isDark
+                              ? AppColors.surfaceVariantDark
+                              : AppColors.surfaceVariantLight,
                           border: Border.all(
-                            color: AppColors.maroonPrimary,
+                            color: accentColor,
                             width: 2,
                           ),
                         ),
                         child: ClipOval(
-                          child: profileImagePath == null
+                          child:
+                              profileImagePath == null ||
+                                  profileImagePath!.trim().isEmpty
                               ? Icon(
                                   Icons.person,
                                   size: AppSpacing.iconXl,
-                                  color: AppColors.maroonPrimary,
+                                  color: accentColor,
                                 )
                               : Image.file(
-                                  File(profileImagePath!),
+                                  File(profileImagePath!.trim()),
                                   width: AppSpacing.avatarXl,
                                   height: AppSpacing.avatarXl,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Icon(
-                                    Icons.person,
-                                    size: AppSpacing.iconXl,
-                                    color: AppColors.maroonPrimary,
-                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Icon(
+                                        Icons.person,
+                                        size: AppSpacing.iconXl,
+                                        color: accentColor,
+                                      ),
                                 ),
                         ),
                       ), // CircleAvatar(
@@ -148,9 +177,12 @@ class KycStepPersonal extends StatelessWidget {
                         child: Container(
                           padding: EdgeInsets.all(AppSpacing.xs),
                           decoration: BoxDecoration(
-                            color: AppColors.maroonPrimary,
+                            color: accentColor,
                             shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
+                            border: Border.all(
+                              color: surfaceColor,
+                              width: 2,
+                            ),
                           ),
                           child: Icon(
                             Icons.camera_alt,
@@ -165,7 +197,7 @@ class KycStepPersonal extends StatelessWidget {
                   Text(
                     AppStrings.kyc.addProfilePicture,
                     style: AppTypography.labelMedium(
-                      color: AppColors.maroonPrimary,
+                      color: accentColor,
                     ),
                   ),
                 ],
@@ -177,9 +209,9 @@ class KycStepPersonal extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,7 +219,7 @@ class KycStepPersonal extends StatelessWidget {
                 Text(
                   AppStrings.kyc.personalDetailsTitle,
                   style: AppTypography.sectionTitleSM(
-                    color: AppColors.textPrimaryLight,
+                    color: primaryTextColor,
                   ),
                 ),
                 SizedBox(height: AppSpacing.lg),
@@ -198,29 +230,31 @@ class KycStepPersonal extends StatelessWidget {
                   controller: nameController,
                   prefixIcon: Icons.person_outline,
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Full name is required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Full name is required'
+                      : null,
                 ),
                 SizedBox(height: AppSpacing.lg),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: GestureDetector(
+                      child: AppTextField(
+                        key: ValueKey(_dobText),
+                        label: AppStrings.kyc.dobLabel,
+                        isRequired: true,
+                        hintText: AppStrings.kyc.dobHint,
+                        initialValue: _dobText,
+                        readOnly: true,
                         onTap: () => _pickDob(context),
-                        child: AbsorbPointer(
-                          child: AppTextField(
-                            label: AppStrings.kyc.dobLabel,
-                            isRequired: true,
-                            hintText: AppStrings.kyc.dobHint,
-                            controller: TextEditingController(text: _dobText),
-                            suffixIcon: Icon(
-                              Icons.calendar_today_outlined,
-                              size: AppSpacing.iconSm,
-                              color: AppColors.mutedGray,
-                            ),
-                            validator: (_) => dob == null ? 'Required' : null,
-                          ),
+                        suffixIcon: Icon(
+                          Icons.calendar_today_outlined,
+                          size: AppSpacing.iconSm,
+                          color: isDark
+                              ? AppColors.textSecondaryDark
+                              : AppColors.mutedGray,
                         ),
+                        validator: (_) => dob == null ? 'Required' : null,
                       ),
                     ),
                     SizedBox(width: AppSpacing.md),
@@ -285,12 +319,25 @@ class _KycBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final titleColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final subtitleColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
     return Container(
       padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.goldSurfaceLight.withValues(alpha: 0.5),
+        color: backgroundColor.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.goldSurfaceLight, width: 1),
+        border: Border.all(color: backgroundColor, width: 1),
       ),
       child: Row(
         children: [
@@ -314,13 +361,13 @@ class _KycBanner extends StatelessWidget {
                 Text(
                   title,
                   style: AppTypography.sectionTitleSM(
-                    color: AppColors.textPrimaryLight,
+                    color: titleColor,
                   ),
                 ),
                 SizedBox(height: 2.h),
                 Text(
                   subtitle,
-                  style: AppTypography.caption(color: AppColors.textMutedLight),
+                  style: AppTypography.caption(color: subtitleColor),
                 ),
               ],
             ),

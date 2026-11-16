@@ -17,3 +17,4 @@ final authEventBusProvider = Provider<AuthEventBus>((ref) {
   ref.onDispose(bus.dispose);
   return bus;
 });
+

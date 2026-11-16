@@ -26,7 +26,26 @@ class KycProgressHeader extends StatelessWidget {
   final VoidCallback? onSkip;
 
   @override
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
+    final progressBackgroundColor = isDark
+        ? AppColors.borderDark
+        : AppColors.borderLight;
+
     final percent = ((currentStep / totalSteps) * 100).round();
 
     return Column(
@@ -42,7 +61,7 @@ class KycProgressHeader extends StatelessWidget {
                 child: Icon(
                   Icons.arrow_back,
                   size: AppSpacing.iconLg,
-                  color: AppColors.textPrimaryLight,
+                  color: primaryTextColor,
                 ),
               ),
             ),
@@ -51,7 +70,7 @@ class KycProgressHeader extends StatelessWidget {
               child: Text(
                 AppStrings.kyc.appBarTitle,
                 style: AppTypography.headingSM(
-                  color: AppColors.textPrimaryLight,
+                  color: primaryTextColor,
                 ),
               ),
             ),
@@ -69,14 +88,14 @@ class KycProgressHeader extends StatelessWidget {
                     Text(
                       AppStrings.kyc.skip,
                       style: AppTypography.labelMedium(
-                        color: AppColors.maroonPrimary,
+                        color: accentColor,
                       ),
                     ),
                     SizedBox(width: 2.w),
                     Icon(
                       Icons.arrow_forward,
                       size: 14.sp,
-                      color: AppColors.maroonPrimary,
+                      color: accentColor,
                     ),
                   ],
                 ),
@@ -86,10 +105,14 @@ class KycProgressHeader extends StatelessWidget {
         ),
         SizedBox(height: 2.h),
         Padding(
-          padding: EdgeInsets.only(left: AppSpacing.xxxl + AppSpacing.xs),
+          padding: EdgeInsets.only(
+            left: AppSpacing.xxxl + AppSpacing.xs,
+          ),
           child: Text(
             'Step $currentStep of $totalSteps • $sectionLabel',
-            style: AppTypography.caption(color: AppColors.textMutedLight),
+            style: AppTypography.caption(
+              color: secondaryTextColor,
+            ),
           ),
         ),
         SizedBox(height: AppSpacing.md),
@@ -99,6 +122,7 @@ class KycProgressHeader extends StatelessWidget {
               child: Row(
                 children: List.generate(totalSteps, (i) {
                   final filled = i < currentStep;
+
                   return Expanded(
                     child: Container(
                       margin: EdgeInsets.only(
@@ -106,9 +130,7 @@ class KycProgressHeader extends StatelessWidget {
                       ),
                       height: 5.h,
                       decoration: BoxDecoration(
-                        color: filled
-                            ? AppColors.maroonPrimary
-                            : AppColors.borderLight,
+                        color: filled ? accentColor : progressBackgroundColor,
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusFull,
                         ),
@@ -122,7 +144,7 @@ class KycProgressHeader extends StatelessWidget {
             Text(
               '$percent%',
               style: AppTypography.labelSmall(
-                color: AppColors.textPrimaryLight,
+                color: primaryTextColor,
               ),
             ),
           ],

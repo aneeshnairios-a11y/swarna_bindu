@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:swarna_bindu/core/constants/app_string/app_strings.dart';
@@ -65,7 +66,33 @@ class KycStepAddress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final k = AppStrings.kyc;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textMutedLight;
+
+    final surfaceColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
+    final goldSurfaceColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final accentColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.primaryGoldDark;
+
+    final iconColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.mutedGray;
     return Form(
       key: formKey,
       child: Column(
@@ -74,13 +101,13 @@ class KycStepAddress extends StatelessWidget {
           Text(
             k.addressTitle,
             style: AppTypography.sectionTitle(
-              color: AppColors.textPrimaryLight,
+              color: primaryTextColor,
             ),
           ),
           SizedBox(height: 4.h),
           Text(
             k.addressSubtitle,
-            style: AppTypography.bodySmall(color: AppColors.textMutedLight),
+            style: AppTypography.bodySmall(color: secondaryTextColor),
           ),
           SizedBox(height: AppSpacing.xl),
 
@@ -88,9 +115,9 @@ class KycStepAddress extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
+              color: surfaceColor,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.borderLight),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               children: [
@@ -175,10 +202,16 @@ class KycStepAddress extends StatelessWidget {
                         controller: pinController,
                         keyboardType: TextInputType.number,
                         prefixIcon: Icons.pin_drop_outlined,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(6),
+                        ],
                         validator: (v) {
                           final value = (v ?? '').trim();
                           if (value.isEmpty) return 'Required';
-                          if (value.length != 6) return 'Enter 6-digit PIN';
+                          if (!RegExp(r'^\d{6}$').hasMatch(value)) {
+                            return 'Enter a valid 6-digit PIN';
+                          }
                           return null;
                         },
                       ),
@@ -197,15 +230,15 @@ class KycStepAddress extends StatelessWidget {
               width: double.infinity,
               padding: EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: AppColors.surfaceLight,
+                color: surfaceColor,
                 borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                border: Border.all(color: AppColors.borderLight),
+                border: Border.all(color: borderColor),
               ),
               child: Row(
                 children: [
                   Icon(
                     Icons.my_location,
-                    color: AppColors.primaryGoldDark,
+                    color: accentColor,
                     size: AppSpacing.iconLg,
                   ),
                   SizedBox(width: AppSpacing.md),
@@ -216,20 +249,20 @@ class KycStepAddress extends StatelessWidget {
                         Text(
                           k.detectLocationTitle,
                           style: AppTypography.sectionTitleSM(
-                            color: AppColors.textPrimaryLight,
+                            color: primaryTextColor,
                           ),
                         ),
                         SizedBox(height: 2.h),
                         Text(
                           k.detectLocationSubtitle,
                           style: AppTypography.caption(
-                            color: AppColors.textMutedLight,
+                            color: secondaryTextColor,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right, color: AppColors.mutedGray),
+                  Icon(Icons.chevron_right, color: iconColor),
                 ],
               ),
             ),
@@ -240,7 +273,7 @@ class KycStepAddress extends StatelessWidget {
             width: double.infinity,
             padding: EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: AppColors.goldSurfaceLight,
+              color: goldSurfaceColor,
               borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             ),
             child: Row(
@@ -249,14 +282,14 @@ class KycStepAddress extends StatelessWidget {
                 Icon(
                   Icons.shield_outlined,
                   size: AppSpacing.iconMd,
-                  color: AppColors.primaryGoldDark,
+                  color: accentColor,
                 ),
                 SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
                     k.addressSecureNote,
                     style: AppTypography.caption(
-                      color: AppColors.textMutedLight,
+                      color: secondaryTextColor,
                     ),
                   ),
                 ),

@@ -21,7 +21,8 @@ class PaymentReceiptScreen extends ConsumerStatefulWidget {
   final String transactionId;
 
   @override
-  ConsumerState<PaymentReceiptScreen> createState() => _PaymentReceiptScreenState();
+  ConsumerState<PaymentReceiptScreen> createState() =>
+      _PaymentReceiptScreenState();
 }
 
 class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
@@ -29,22 +30,39 @@ class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
   void initState() {
     super.initState();
     Future.microtask(
-          () => ref.read(paymentReceiptProvider.notifier).load(widget.transactionId),
+      () =>
+          ref.read(paymentReceiptProvider.notifier).load(widget.transactionId),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
     final state = ref.watch(paymentReceiptProvider);
     final action = ref.watch(receiptActionProvider);
 
     ref.listen<ReceiptActionState>(
       receiptActionProvider,
-          (prev, next) => handleReceiptActionChange(context, prev, next),
+      (prev, next) => handleReceiptActionChange(context, prev, next),
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFCF6),
+      backgroundColor: backgroundColor,
       body: SafeArea(
         bottom: false,
         child: Column(
@@ -59,11 +77,19 @@ class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () =>
-                    context.canPop() ? context.pop() : context.go(RouteName.dashboard),
-                    icon: const Icon(Icons.arrow_back, color: Colors.black, size: 24),
+                    onPressed: () => context.canPop()
+                        ? context.pop()
+                        : context.go(RouteName.dashboard),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: primaryTextColor,
+                      size: 24,
+                    ),
                   ),
-                  Text('Payment Receipt', style: AppTypography.headingSM(color: Colors.black)),
+                  Text(
+                    'Payment Receipt',
+                    style: AppTypography.headingSM(color: primaryTextColor),
+                  ),
                 ],
               ),
             ),
@@ -92,7 +118,8 @@ class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
                 ),
                 SizedBox(height: AppSpacing.md),
                 OutlinedButton(
-                  onPressed: () => ref.read(paymentReceiptProvider.notifier).retry(),
+                  onPressed: () =>
+                      ref.read(paymentReceiptProvider.notifier).retry(),
                   child: const Text('Retry'),
                 ),
               ],
@@ -103,13 +130,19 @@ class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final txn = receipt.transactionId.isNotEmpty ? receipt.transactionId : widget.transactionId;
+    final txn = receipt.transactionId.isNotEmpty
+        ? receipt.transactionId
+        : widget.transactionId;
     final isThisTxn = action.transactionId == txn;
-    final downloading = isThisTxn && action.status == ReceiptActionStatus.downloading;
+    final downloading =
+        isThisTxn && action.status == ReceiptActionStatus.downloading;
     final sharing = isThisTxn && action.status == ReceiptActionStatus.sharing;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -125,7 +158,9 @@ class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
                   loading: downloading,
                   onTap: action.isBusy
                       ? null
-                      : () => ref.read(receiptActionProvider.notifier).download(txn),
+                      : () => ref
+                            .read(receiptActionProvider.notifier)
+                            .download(txn),
                 ),
               ),
               SizedBox(width: AppSpacing.sm),
@@ -137,10 +172,13 @@ class _PaymentReceiptScreenState extends ConsumerState<PaymentReceiptScreen> {
                   loading: sharing,
                   onTap: action.isBusy
                       ? null
-                      : () => ref.read(receiptActionProvider.notifier).share(
-                    txn,
-                    subject: 'Swarna Bindu receipt ${receipt.invoiceNo ?? txn}',
-                  ),
+                      : () => ref
+                            .read(receiptActionProvider.notifier)
+                            .share(
+                              txn,
+                              subject:
+                                  'Swarna Bindu receipt ${receipt.invoiceNo ?? txn}',
+                            ),
                 ),
               ),
             ],
@@ -158,16 +196,36 @@ class _ReceiptCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final backgroundColor = isDark
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+
     final paidAt = receipt.paidAtDateTime;
     final active = receipt.isSchemeActive;
 
     return Container(
       padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(14),
         boxShadow: const [
-          BoxShadow(color: Color(0x12000000), blurRadius: 10, offset: Offset(0, 3)),
+          BoxShadow(
+            color: Color(0x12000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
         ],
       ),
       child: Column(
@@ -179,7 +237,7 @@ class _ReceiptCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: AppColors.darkNavy,
+                  color: AppColors.surfaceLight,
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     image: AssetImage(AppAssetImage.jewellery),
@@ -194,19 +252,26 @@ class _ReceiptCard extends StatelessWidget {
                   children: [
                     Text(
                       receipt.schemeName,
-                      style: AppTypography.labelLarge(color: Colors.black),
+                      style: AppTypography.labelLarge(color: primaryTextColor),
                     ),
                     const SizedBox(height: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: active ? const Color(0xFFDDF6E4) : AppColors.pendingBg,
+                        color: active
+                            ? const Color(0xFFDDF6E4)
+                            : AppColors.pendingBg,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
                         receipt.schemeStatusLabel,
                         style: AppTypography.bodyXSmall(
-                          color: active ? const Color(0xFF258B44) : AppColors.pendingText,
+                          color: active
+                              ? const Color(0xFF258B44)
+                              : AppColors.pendingText,
                         ).copyWith(fontSize: 10),
                       ),
                     ),
@@ -219,17 +284,20 @@ class _ReceiptCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _ColumnStat(label: 'Installment Type', value: receipt.installmentLabel),
+                child: _ColumnStat(
+                  label: 'Installment Type',
+                  value: receipt.installmentLabel,
+                ),
               ),
-              Container(width: 1, height: 30, color: AppColors.borderLight),
+              Container(width: 1, height: 30, color: borderColor),
               SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _ColumnStat(
                   label: 'Paid On',
-                  value: paidAt == null ? '—' : AppFormatters.date(paidAt),
+                  value: paidAt == null ? '—' : AppFormatters.dateTime(paidAt),
                 ),
               ),
-              Container(width: 1, height: 30, color: AppColors.borderLight),
+              Container(width: 1, height: 30, color: borderColor),
               SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _ColumnStat(
@@ -240,13 +308,16 @@ class _ReceiptCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: AppSpacing.md),
-          Container(height: 1, color: AppColors.borderLight),
+          Container(height: 1, color: borderColor),
           SizedBox(height: AppSpacing.md),
           _DetailRow(label: 'Transaction ID', value: receipt.transactionId),
           const SizedBox(height: 8),
           _DetailRow(label: 'Invoice No', value: receipt.invoiceNo ?? '—'),
           const SizedBox(height: 8),
-          _DetailRow(label: 'Razorpay order id', value: receipt.razorpayOrderId ?? '—'),
+          _DetailRow(
+            label: 'Razorpay order id',
+            value: receipt.razorpayOrderId ?? '—',
+          ),
           const SizedBox(height: 8),
           _DetailRow(label: 'Payment Method', value: receipt.paymentMethod),
           const SizedBox(height: 8),
@@ -255,14 +326,17 @@ class _ReceiptCard extends StatelessWidget {
             value: paidAt == null ? '—' : AppFormatters.dateTime(paidAt),
           ),
           const SizedBox(height: 8),
-          _DetailRow(label: 'GST', value: AppFormatters.currencyDecimal(receipt.gst)),
+          _DetailRow(
+            label: 'GST',
+            value: AppFormatters.currencyDecimal(receipt.gst),
+          ),
           const SizedBox(height: 8),
           _DetailRow(
             label: 'Convenience Fee',
             value: AppFormatters.currencyDecimal(receipt.convenienceFee),
           ),
           SizedBox(height: AppSpacing.sm),
-          Container(height: 1, color: AppColors.borderLight),
+          Container(height: 1, color: borderColor),
           SizedBox(height: AppSpacing.sm),
           _DetailRow(
             label: 'Total Paid',
@@ -283,17 +357,28 @@ class _ColumnStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: AppTypography.bodyXSmall(color: AppColors.mutedGray).copyWith(fontSize: 10),
+          style: AppTypography.bodyXSmall(
+            color: secondaryTextColor,
+          ).copyWith(fontSize: 10),
         ),
         const SizedBox(height: 3),
         Text(
           value,
-          style: AppTypography.labelMedium(color: Colors.black).copyWith(fontWeight: FontWeight.w700),
+          style: AppTypography.labelMedium(
+            color: primaryTextColor,
+          ).copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );
@@ -301,7 +386,11 @@ class _ColumnStat extends StatelessWidget {
 }
 
 class _DetailRow extends StatelessWidget {
-  const _DetailRow({required this.label, required this.value, this.emphasize = false});
+  const _DetailRow({
+    required this.label,
+    required this.value,
+    this.emphasize = false,
+  });
 
   final String label;
   final String value;
@@ -309,21 +398,28 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: emphasize
-              ? AppTypography.labelMedium(color: Colors.black)
-              : AppTypography.bodySmall(color: AppColors.mutedGray),
+              ? AppTypography.labelMedium(color: primaryTextColor)
+              : AppTypography.bodySmall(color: secondaryTextColor),
         ),
         SizedBox(width: AppSpacing.sm),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.right,
-            style: AppTypography.labelMedium(color: Colors.black).copyWith(
+            style: AppTypography.labelMedium(color: primaryTextColor).copyWith(
               fontWeight: emphasize ? FontWeight.w800 : FontWeight.w600,
             ),
           ),
@@ -350,20 +446,35 @@ class _ActionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark
+        ? AppColors.surfaceDark
+        : AppColors.surfaceLight;
+    final borderColor = isDark ? AppColors.borderDark : AppColors.borderLight;
+    final accentColor = isDark ? AppColors.primaryGold : AppColors.maroonPrimary;
+    final primaryTextColor = isDark
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+        final secondaryTextColor = isDark
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
     return Opacity(
       opacity: onTap == null && !loading ? 0.5 : 1,
       child: Material(
-        color: Colors.white,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(10),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(10),
           child: Container(
             width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.sm),
+            padding: EdgeInsets.symmetric(
+              vertical: AppSpacing.md,
+              horizontal: AppSpacing.sm,
+            ),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: const Color(0xFFF0D9DE)),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               children: [
@@ -371,27 +482,29 @@ class _ActionTile extends StatelessWidget {
                   radius: 16,
                   backgroundColor: const Color(0xFFF3E7EA),
                   child: loading
-                      ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.maroonDark,
-                    ),
-                  )
-                      : Icon(icon, size: 16, color: AppColors.maroonDark),
+                      ?  SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: accentColor,
+                          ),
+                        )
+                      : Icon(icon, size: 16, color: accentColor),
                 ),
                 SizedBox(height: AppSpacing.xs),
                 Text(
                   title,
-                  style: AppTypography.labelMedium(color: Colors.black)
-                      .copyWith(fontWeight: FontWeight.w700),
+                  style: AppTypography.labelMedium(
+                    color: primaryTextColor,
+                  ).copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: AppTypography.bodyXSmall(color: AppColors.mutedGray)
-                      .copyWith(fontSize: 10),
+                  style: AppTypography.bodyXSmall(
+                    color: secondaryTextColor,
+                  ).copyWith(fontSize: 10),
                 ),
               ],
             ),

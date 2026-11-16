@@ -84,8 +84,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final currentPage = ref.watch(onboardingViewModelProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
+      backgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       body: SafeArea(
         child: Stack(
           children: [
@@ -146,42 +150,68 @@ class _OnboardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-      child: Column(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 100.h),
-          Image.asset(
-            data.image,
-            fit: BoxFit.contain,
-            width: 300.w,
-            height: 300.h,
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final imageSize = 300.w.clamp(
+          180.0,
+          constraints.maxHeight * 0.38,
+        );
+
+        return SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.xxl,
+            constraints.maxHeight * 0.06,
+            AppSpacing.xxl,
+            140.h,
           ),
-          SizedBox(height: AppSpacing.huge),
-          Text(
-            data.titleLine1,
-            textAlign: TextAlign.center,
-            style: AppTypography.headingLG(color: AppColors.textPrimaryLight),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset(
+                data.image,
+                fit: BoxFit.contain,
+                width: imageSize,
+                height: imageSize,
+              ),
+              SizedBox(height: AppSpacing.xl),
+              Text(
+                data.titleLine1,
+                textAlign: TextAlign.center,
+                style: AppTypography.headingLG(
+                  color: isDark
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimaryLight,
+                ),
+              ),
+              Text(
+                data.titleLine2,
+                textAlign: TextAlign.center,
+                style: AppTypography.headingLG(
+                  color: isDark
+                      ? AppColors.primaryGoldLight
+                      : AppColors.maroonPrimary,
+                ),
+              ),
+              SizedBox(height: AppSpacing.xl),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Text(
+                  data.description,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.bodySmall(
+                    color: isDark
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textMutedLight,
+                  ),
+                ),
+              ),
+            ],
           ),
-          Text(
-            data.titleLine2,
-            textAlign: TextAlign.center,
-            style: AppTypography.headingLG(color: AppColors.maroonPrimary),
-          ),
-          SizedBox(height: AppSpacing.xxxl),
-          // const _SectionDivider(),
-          // SizedBox(height: AppSpacing.xl),
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: Text(
-              data.description,
-              textAlign: TextAlign.center,
-              style: AppTypography.bodySmall(color: AppColors.textMutedLight),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -227,6 +257,25 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final waveColor = isDark
+        ? AppColors.goldSurfaceDark
+        : AppColors.goldSurfaceLight;
+
+    final activeColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
+    final inactiveColor = isDark
+        ? AppColors.borderStrongDark
+        : AppColors.borderStrongLight;
+
+    final buttonColor = isDark
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+
+    final buttonIconColor = isDark ? AppColors.textOnGold : Colors.white;
     return SizedBox(
       height: 120,
       child: Stack(
@@ -237,29 +286,34 @@ class _BottomBar extends StatelessWidget {
             clipper: _WaveClipper(),
             child: Container(
               height: 90,
-              color: AppColors.goldSurfaceLight.withValues(alpha: 0.8),
+              color: waveColor.withValues(alpha: 0.8),
             ),
           ),
           Positioned(
             // left: AppSpacing.xxl,
             bottom: 34,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: List.generate(pageCount, (index) {
-                final isActive = index == currentPage;
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 250),
-                  margin: EdgeInsets.only(right: AppSpacing.sm),
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isActive
-                        ? AppColors.maroonPrimary
-                        : AppColors.borderStrongLight,
-                  ),
-                );
-              }),
+            child: Semantics(
+              label: 'Page ${currentPage + 1} of $pageCount',
+              liveRegion: true,
+              child: ExcludeSemantics(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(pageCount, (index) {
+                    final isActive = index == currentPage;
+
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 250),
+                      margin: EdgeInsets.only(right: AppSpacing.sm),
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isActive ? activeColor : inactiveColor,
+                      ),
+                    );
+                  }),
+                ),
+              ),
             ),
           ),
           Positioned(
@@ -273,7 +327,7 @@ class _BottomBar extends StatelessWidget {
               enabled: true,
               child: ExcludeSemantics(
                 child: Material(
-                  color: AppColors.maroonPrimary,
+                  color: buttonColor,
                   shape: const CircleBorder(),
                   elevation: 4,
                   child: InkWell(
@@ -283,7 +337,7 @@ class _BottomBar extends StatelessWidget {
                       padding: EdgeInsets.all(AppSpacing.md),
                       child: Icon(
                         Icons.arrow_forward,
-                        color: Colors.white,
+                        color: buttonIconColor,
                         size: AppSpacing.iconLg,
                       ),
                     ),

@@ -87,6 +87,9 @@ class OtpNotifier extends Notifier<OtpState> {
       failure: (exception) => state = state.copyWith(status: OtpStatus.error, errorMessage: exception.message),
     );
   }
+  void resetOtpState() {
+  state = const OtpState();
+}
 }
 
 final otpProvider = NotifierProvider.autoDispose<OtpNotifier, OtpState>(
