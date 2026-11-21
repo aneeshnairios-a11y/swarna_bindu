@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:swarna_bindu/core/router/route_name.dart';
 import 'package:swarna_bindu/feature/screens/dashboard/presentation/screens/redeem_gold_screen.dart';
 import 'package:swarna_bindu/feature/screens/payments/presentation/screens/payment_receipt_screen.dart';
-
 import '../../feature/screens/auth/presentation/screens/login_screen.dart';
 import '../../feature/screens/auth/presentation/screens/otp_screen.dart';
 import '../../feature/screens/dashboard/presentation/screens/dashboard_screen.dart';
@@ -33,6 +32,18 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'shell');
 
 /// GoRouter instance — provided via Riverpod so it can be refreshed on
 /// auth state change in Phase 2.
+class HdfcPaymentWebViewArgs {
+  HdfcPaymentWebViewArgs({
+    required this.paymentUrl,
+    required this.transactionId,
+    required this.isReturnUrl,
+  });
+
+  final String paymentUrl;
+  final String transactionId;
+  final bool Function(Uri uri) isReturnUrl;
+}
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -136,7 +147,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         pageBuilder: (ctx, state) {
           final txnId = state.pathParameters['transactionId']!;
-          return _slideTransition(state, PaymentReceiptScreen(transactionId: txnId));
+          return _slideTransition(
+            state,
+            PaymentReceiptScreen(transactionId: txnId),
+          );
         },
       ),
       // ── Schemes ─────────────────────────────────────────────

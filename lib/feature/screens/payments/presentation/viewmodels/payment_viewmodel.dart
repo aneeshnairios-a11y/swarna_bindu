@@ -4,7 +4,8 @@ import '../../data/models/payment_dues_model.dart';
 import '../../data/models/payment_initialize_model.dart';
 import '../../data/models/payment_verify_model.dart';
 import '../../data/repository/payments_repository.dart';
-
+import '../../data/models/juspay_order_status_model.dart';
+import '../../data/repository/juspay_payment_repository.dart';
 
 
 enum PaymentMethod { upi, card, netBanking }
@@ -280,4 +281,79 @@ class PaymentNotifier extends Notifier<PaymentState> {
 
 final paymentProvider = NotifierProvider.autoDispose<PaymentNotifier, PaymentState>(
   PaymentNotifier.new,
+);
+
+
+enum JuspayStatusCheck { idle, loading, success, failure }
+
+class JuspayPaymentState {
+  const JuspayPaymentState({
+    this.status = JuspayStatusCheck.idle,
+    this.orderStatus,
+    this.errorMessage,
+  });
+
+  final JuspayStatusCheck status;
+  final JuspayOrderStatusModel? orderStatus;
+  final String? errorMessage;
+
+  bool get isLoading => status == JuspayStatusCheck.loading;
+  bool get isSuccess =>
+      status == JuspayStatusCheck.success &&
+      (orderStatus?.isCharged ?? false);
+  bool get isFailure => status == JuspayStatusCheck.failure;
+
+  JuspayPaymentState copyWith({
+    JuspayStatusCheck? status,
+    JuspayOrderStatusModel? orderStatus,
+    String? errorMessage,
+  }) {
+    return JuspayPaymentState(
+      status: status ?? this.status,
+      orderStatus: orderStatus ?? this.orderStatus,
+      errorMessage: errorMessage,
+    );
+  }
+}
+
+class JuspayPaymentNotifier extends Notifier<JuspayPaymentState> {
+  @override
+  JuspayPaymentState build() => const JuspayPaymentState();
+
+  Future<void> checkOrderStatus(String orderId) async {
+    state = const JuspayPaymentState(
+      status: JuspayStatusCheck.loading,
+    );
+
+    try {
+      final result = await ref
+          .read(juspayPaymentRepositoryProvider)
+          .getOrderStatus(orderId);
+
+      if (!ref.mounted) return;
+
+      state = JuspayPaymentState(
+        status: result.isCharged
+            ? JuspayStatusCheck.success
+            : JuspayStatusCheck.failure,
+        orderStatus: result,
+      );
+    } catch (e) {
+      if (!ref.mounted) return;
+
+      state = JuspayPaymentState(
+        status: JuspayStatusCheck.failure,
+        errorMessage: 'Unable to verify payment status. Please try again.',
+      );
+    }
+  }
+
+  void reset() {
+    state = const JuspayPaymentState();
+  }
+}
+
+final juspayPaymentProvider =
+    NotifierProvider.autoDispose<JuspayPaymentNotifier, JuspayPaymentState>(
+  JuspayPaymentNotifier.new,
 );

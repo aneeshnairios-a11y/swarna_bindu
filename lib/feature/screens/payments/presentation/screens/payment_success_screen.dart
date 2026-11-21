@@ -13,62 +13,76 @@ class PaymentSuccessScreen extends StatelessWidget {
   final PaymentReceipt receipt;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: AppColors.backgroundLight,
-    body: SafeArea(
-      child: Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Column(
-          children: [
-            const Spacer(),
-            Container(
-              width: 88,
-              height: 88,
-              decoration: const BoxDecoration(
-                color: AppColors.successGreen,
-                shape: BoxShape.circle,
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    final accentColor = darkMode
+        ? AppColors.primaryGold
+        : AppColors.maroonPrimary;
+    return Scaffold(
+      backgroundColor: backgroundColor,
+      body: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            children: [
+              const Spacer(),
+              Container(
+                width: 88,
+                height: 88,
+                decoration: const BoxDecoration(
+                  color: AppColors.successGreen,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  size: 52,
+                  color: Colors.white,
+                ),
               ),
-              child: const Icon(
-                Icons.check_rounded,
-                size: 52,
-                color: Colors.white,
+              SizedBox(height: AppSpacing.xl),
+              Text(
+                'Payment successful!',
+                style: AppTypography.headingXL(),
+                textAlign: TextAlign.center,
               ),
-            ),
-            SizedBox(height: AppSpacing.xl),
-            Text(
-              'Payment successful!',
-              style: AppTypography.headingXL(),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: AppSpacing.sm),
-            Text(
-              '${AppFormatters.currency(receipt.amount)} has been paid towards your Bindu Gold Savings Plan.',
-              style: AppTypography.bodyMedium(color: AppColors.mutedGray),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: AppSpacing.xxl),
-            _ReceiptCard(receipt: receipt),
-            const Spacer(),
-            AppButton(
-              text: 'View my passbook',
-              onPressed: () =>
-                  context.go(RouteName.passbookPath(receipt.enrollmentId)),
-              gradient: AppColors.goldGradient,
-              textColor: AppColors.textOnGold,
-            ),
-            SizedBox(height: AppSpacing.md),
-            TextButton(
-              onPressed: () => context.go(RouteName.dashboard),
-              child: Text(
-                'Back to home',
-                style: AppTypography.labelLarge(color: AppColors.darkNavy),
+              SizedBox(height: AppSpacing.sm),
+              Text(
+                '${AppFormatters.currency(receipt.amount)} has been paid towards your Bindu Gold Savings Plan.',
+                style: AppTypography.bodyMedium(color: secondaryTextColor),
+                textAlign: TextAlign.center,
               ),
-            ),
-          ],
+              SizedBox(height: AppSpacing.xxl),
+              _ReceiptCard(receipt: receipt),
+              const Spacer(),
+              AppButton(
+                text: 'Back to home',
+                onPressed: () => context.go(RouteName.dashboard),
+              ),
+              // SizedBox(height: AppSpacing.md),
+              // TextButton(
+              //   onPressed: () => context.go(
+              //     RouteName.paymentPath(receipt.enrollmentId),
+              //   ),
+              //   child: Text(
+              //     'Back to home',
+              //     style: AppTypography.labelLarge(color: accentColor),
+              //   ),
+              // ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _ReceiptCard extends StatelessWidget {
@@ -76,49 +90,65 @@ class _ReceiptCard extends StatelessWidget {
   final PaymentReceipt receipt;
 
   @override
-  Widget build(BuildContext context) => Container(
-    padding: EdgeInsets.all(AppSpacing.lg),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: AppColors.borderLight),
-    ),
-    child: Column(
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
+    Widget _row(String label, String value, {bool prominent = false}) => Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _row(
-          'Amount paid',
-          AppFormatters.currency(receipt.amount),
-          prominent: true,
+        Text(
+          label,
+          style: AppTypography.bodyXSmall(color: AppColors.mutedGray),
         ),
-        Divider(height: AppSpacing.xl),
-        _row('Payment method', _methodLabel(receipt.method)),
-        SizedBox(height: AppSpacing.md),
-        _row('Transaction ID', receipt.transactionId),
-        SizedBox(height: AppSpacing.md),
-        _row('Paid on', AppFormatters.dateTime(DateTime.now())),
+        Flexible(
+          child: Text(
+            value,
+            style: prominent
+                ? AppTypography.goldAmountSM(color: primaryTextColor)
+                : AppTypography.labelMedium(),
+            textAlign: TextAlign.end,
+          ),
+        ),
       ],
-    ),
-  );
+    );
+
+    return Container(
+      padding: EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        children: [
+          _row(
+            'Amount paid',
+            AppFormatters.currency(receipt.amount),
+            prominent: true,
+          ),
+          Divider(height: AppSpacing.xl),
+          _row('Payment method', _methodLabel(receipt.method)),
+          SizedBox(height: AppSpacing.md),
+          _row('Transaction ID', receipt.transactionId),
+          SizedBox(height: AppSpacing.md),
+          _row('Paid on', AppFormatters.dateTime(DateTime.now())),
+        ],
+      ),
+    );
+  }
 
   String _methodLabel(PaymentMethod method) => switch (method) {
     PaymentMethod.upi => 'UPI',
     PaymentMethod.card => 'Card',
     PaymentMethod.netBanking => 'Net banking',
   };
-
-  Widget _row(String label, String value, {bool prominent = false}) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    children: [
-      Text(label, style: AppTypography.bodyXSmall(color: AppColors.mutedGray)),
-      Flexible(
-        child: Text(
-          value,
-          style: prominent
-              ? AppTypography.goldAmountSM(color: AppColors.darkNavy)
-              : AppTypography.labelMedium(),
-          textAlign: TextAlign.end,
-        ),
-      ),
-    ],
-  );
 }

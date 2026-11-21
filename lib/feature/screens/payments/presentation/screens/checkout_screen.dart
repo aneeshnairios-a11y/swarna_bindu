@@ -7,6 +7,9 @@ import 'package:swarna_bindu/core/theme/app_colors.dart';
 import 'package:swarna_bindu/core/theme/app_spacing.dart';
 import 'package:swarna_bindu/core/theme/app_typography.dart';
 import 'package:swarna_bindu/feature/global_widgets/common_button.dart';
+import 'package:swarna_bindu/feature/screens/payments/presentation/screens/payment_failure_screen.dart';
+import 'package:swarna_bindu/feature/screens/payments/presentation/screens/payment_gateway_webview.dart';
+import 'package:swarna_bindu/feature/screens/payments/presentation/screens/payment_success_screen.dart';
 import '../../data/models/payment_dues_model.dart';
 import '../viewmodels/payment_viewmodel.dart';
 
@@ -31,8 +34,95 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
+  static const String _juspayOrderId = 'ordmwdxtoj877ez';
+
+  Future<void> _startJuspayPayment() async {
+    final juspayNotifier = ref.read(juspayPaymentProvider.notifier);
+    juspayNotifier.reset();
+
+    final callbackUri = await Navigator.of(context).push<Uri>(
+      MaterialPageRoute(
+        builder: (_) => const PaymentGatewayWebView(),
+      ),
+    );
+
+    if (!mounted || callbackUri == null) return;
+
+    final callbackOrderId =
+        callbackUri.queryParameters['order_id'] ??
+        callbackUri.queryParameters['orderId'];
+    final normalizedCallbackOrderId = callbackOrderId?.trim();
+    if (normalizedCallbackOrderId != null &&
+        normalizedCallbackOrderId.isNotEmpty &&
+        normalizedCallbackOrderId != _juspayOrderId) {
+      _showPaymentFailure(
+        orderId: _juspayOrderId,
+        message: 'The payment callback did not match this order.',
+      );
+      return;
+    }
+
+    final orderId = normalizedCallbackOrderId?.isNotEmpty == true
+        ? normalizedCallbackOrderId!
+        : _juspayOrderId;
+    await juspayNotifier.checkOrderStatus(orderId);
+
+    if (!mounted) return;
+
+    _showPaymentResult(ref.read(juspayPaymentProvider), orderId);
+  }
+
+  void _showPaymentResult(JuspayPaymentState juspayState, String orderId) {
+    final orderStatus = juspayState.orderStatus;
+    if (juspayState.isSuccess && orderStatus != null) {
+      final receipt = PaymentReceipt(
+        enrollmentId: widget.enrollmentId,
+        amount: orderStatus.amount.toDouble(),
+        transactionId: orderStatus.orderId,
+        method: ref.read(paymentProvider).method,
+      );
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => PaymentSuccessScreen(receipt: receipt),
+        ),
+      );
+
+      return;
+    }
+
+    _showPaymentFailure(
+      orderId: orderStatus?.orderId ?? orderId,
+      amount: orderStatus?.amount ?? ref.read(paymentProvider).selectedAmount,
+      message:
+          juspayState.errorMessage ?? 'Your payment could not be completed.',
+    );
+  }
+
+  void _showPaymentFailure({
+    required String orderId,
+    num? amount,
+    required String message,
+  }) {
+    final failureAmount = amount ?? ref.read(paymentProvider).selectedAmount;
+
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => PaymentFailureScreen(
+          orderId: orderId,
+          amount: failureAmount,
+          message: message,
+          enrollmentId: widget.enrollmentId,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Keep the auto-disposed status provider alive while this route awaits
+    // the payment WebView callback.
+    ref.watch(juspayPaymentProvider);
     final state = ref.watch(paymentProvider);
 
     if (state.isDuesLoading) {
@@ -73,8 +163,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       ),
       PaymentFlowStep.payment => _MethodStep(
         onBack: () => ref.read(paymentProvider.notifier).goBack(),
-        onPay: () => ref.read(paymentProvider.notifier).pay(),
+        onPay: _startJuspayPayment,
       ),
+
       PaymentFlowStep.processing => _ProcessingStep(
         onRetry: () => ref.read(paymentProvider.notifier).retryPayment(),
         onPayAgain: () => ref.read(paymentProvider.notifier).pay(),
@@ -377,7 +468,7 @@ class _MethodStep extends ConsumerWidget {
             iconColor: const Color(0xFF377B44),
             title: 'Pay using UPI',
             subtitle: 'Instant payment using your UPI app',
-            highlighted: true,
+            highlighted: selected == PaymentMethod.upi,
           ),
           SizedBox(height: AppSpacing.md),
           Text(
@@ -392,6 +483,7 @@ class _MethodStep extends ConsumerWidget {
             iconColor: const Color(0xFFAF7608),
             title: 'Debit/Credit Card',
             subtitle: 'Pay using your saved debit card',
+            highlighted: selected == PaymentMethod.card,
           ),
           SizedBox(height: AppSpacing.md),
           Text(
@@ -406,6 +498,7 @@ class _MethodStep extends ConsumerWidget {
             iconColor: const Color(0xFF2175B2),
             title: 'Net Banking',
             subtitle: 'Pay using net banking',
+            highlighted: selected == PaymentMethod.netBanking,
           ),
         ],
       ),
@@ -610,9 +703,13 @@ class _DueStrip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final darkMode = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = darkMode ? AppColors.primaryGoldDark : AppColors.primaryGoldLight;
+    final accentColor = darkMode
+        ? AppColors.primaryGoldDark
+        : AppColors.primaryGoldLight;
     final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
-    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
     final primaryTextColor = darkMode
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
@@ -620,64 +717,64 @@ class _DueStrip extends StatelessWidget {
         ? AppColors.textSecondaryDark
         : AppColors.textSecondaryLight;
     return Container(
-    padding: const EdgeInsets.all(12),
-    decoration: BoxDecoration(
-      color: backgroundColor,
-      border: Border.all(color: borderColor),
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Row(
-      children: [
-         CircleAvatar(
-          radius: 18,
-          backgroundColor: accentColor.withOpacity(0.1),
-          child: Icon(
-            Icons.calendar_month_outlined,
-            color: accentColor,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: accentColor.withOpacity(0.1),
+            child: Icon(
+              Icons.calendar_month_outlined,
+              color: accentColor,
+            ),
           ),
-        ),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Next Due Amount',
-                style: AppTypography.bodyXSmall(
-                  color: secondaryTextColor,
-                ).copyWith(fontSize: 10),
-              ),
-              Text(
-                AppFormatters.currencyDecimal(scheme.nextDueAmount),
-                style: AppTypography.sectionTitleSM(color: primaryTextColor),
-              ),
-            ],
+          SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Next Due Amount',
+                  style: AppTypography.bodyXSmall(
+                    color: secondaryTextColor,
+                  ).copyWith(fontSize: 10),
+                ),
+                Text(
+                  AppFormatters.currencyDecimal(scheme.nextDueAmount),
+                  style: AppTypography.sectionTitleSM(color: primaryTextColor),
+                ),
+              ],
+            ),
           ),
-        ),
-        Container(width: 1, height: 24, color: AppColors.borderStrongLight),
-        SizedBox(width: AppSpacing.lg),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Due Date',
-                style: AppTypography.bodyXSmall(
-                  color: secondaryTextColor,
-                ).copyWith(fontSize: 10),
-              ),
-              Text(
-                scheme.nextDueDateTime == null
-                    ? '—'
-                    : AppFormatters.date(scheme.nextDueDateTime!),
-                style: AppTypography.sectionTitleSM(color: primaryTextColor ),
-              ),
-            ],
+          Container(width: 1, height: 24, color: AppColors.borderStrongLight),
+          SizedBox(width: AppSpacing.lg),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Due Date',
+                  style: AppTypography.bodyXSmall(
+                    color: secondaryTextColor,
+                  ).copyWith(fontSize: 10),
+                ),
+                Text(
+                  scheme.nextDueDateTime == null
+                      ? '—'
+                      : AppFormatters.date(scheme.nextDueDateTime!),
+                  style: AppTypography.sectionTitleSM(color: primaryTextColor),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
   }
 }
 
@@ -689,55 +786,61 @@ class _DetailedSchemeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final darkMode = Theme.of(context).brightness == Brightness.dark;
-    final accentColor = darkMode ? AppColors.primaryGoldDark : AppColors.primaryGoldLight;
+    final accentColor = darkMode
+        ? AppColors.primaryGoldDark
+        : AppColors.primaryGoldLight;
     final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
-    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
 
     return Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(10),
-      border: Border.all(
-        color: selected ? const Color(0xFFC58C27) : borderColor,
-      ),
-      boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Radio<bool>(value: true, groupValue: selected, onChanged: (_) {}),
-        const _GoldThumbnail(),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      scheme.schemeName,
-                      style: AppTypography.sectionTitleSM(color: Colors.black),
-                    ),
-                  ),
-                  _StatusBadge(status: scheme.status),
-                ],
-              ),
-              Text(
-                '${scheme.paidInstallments} of ${scheme.totalInstallments} installments paid',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 10),
-              ),
-              const Divider(),
-              _SchemeMeta(scheme: scheme),
-            ],
-          ),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: selected ? const Color(0xFFC58C27) : borderColor,
         ),
-      ],
-    ),
-  );
+        boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Radio<bool>(value: true, groupValue: selected, onChanged: (_) {}),
+          const _GoldThumbnail(),
+          SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        scheme.schemeName,
+                        style: AppTypography.sectionTitleSM(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    _StatusBadge(status: scheme.status),
+                  ],
+                ),
+                Text(
+                  '${scheme.paidInstallments} of ${scheme.totalInstallments} installments paid',
+                  style: AppTypography.bodyXSmall(
+                    color: AppColors.mutedGray,
+                  ).copyWith(fontSize: 10),
+                ),
+                const Divider(),
+                _SchemeMeta(scheme: scheme),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -746,46 +849,50 @@ class _CompactSchemeCard extends StatelessWidget {
   final DueSchemeModel scheme;
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     final darkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
-final primaryTextColor = darkMode
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
     return Container(
-    padding: const EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
-    ),
-    child: Row(
-      children: [
-        const _GoldThumbnail(small: true),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      scheme.schemeName,
-                      style: AppTypography.sectionTitleSM(color: primaryTextColor),
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: const [BoxShadow(color: Color(0x15000000), blurRadius: 5)],
+      ),
+      child: Row(
+        children: [
+          const _GoldThumbnail(small: true),
+          SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        scheme.schemeName,
+                        style: AppTypography.sectionTitleSM(
+                          color: primaryTextColor,
+                        ),
+                      ),
                     ),
-                  ),
-                  _StatusBadge(status: scheme.status),
-                ],
-              ),
-              SizedBox(height: AppSpacing.xs),
-              _SchemeMeta(scheme: scheme),
-            ],
+                    _StatusBadge(status: scheme.status),
+                  ],
+                ),
+                SizedBox(height: AppSpacing.xs),
+                _SchemeMeta(scheme: scheme),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
   }
 }
 
@@ -796,8 +903,12 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final darkMode = Theme.of(context).brightness == Brightness.dark;
-    final badgeColor = darkMode ? const Color(0xFFDDF6E4) : const Color(0xFFDDF6E4);
-    final textColor = darkMode ? const Color(0xFF258B44) : const Color(0xFF258B44);
+    final badgeColor = darkMode
+        ? const Color(0xFFDDF6E4)
+        : const Color(0xFFDDF6E4);
+    final textColor = darkMode
+        ? const Color(0xFF258B44)
+        : const Color(0xFF258B44);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
@@ -805,13 +916,13 @@ class _StatusBadge extends StatelessWidget {
         color: badgeColor,
         borderRadius: BorderRadius.circular(15),
       ),
-    child: Text(
-      status,
-      style: AppTypography.bodyXSmall(
-        color: textColor,
-      ).copyWith(fontSize: 10),
-    ),
-  );
+      child: Text(
+        status,
+        style: AppTypography.bodyXSmall(
+          color: textColor,
+        ).copyWith(fontSize: 10),
+      ),
+    );
   }
 }
 
@@ -870,21 +981,21 @@ class _Meta extends StatelessWidget {
     final secondaryTextColor = darkMode
         ? AppColors.textSecondaryDark
         : AppColors.textSecondaryLight;
-        final primaryTextColor = darkMode
+    final primaryTextColor = darkMode
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
     return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: AppTypography.bodyXSmall(
-          color: secondaryTextColor,
-        ).copyWith(fontSize: 9),
-      ),
-      Text(value, style: AppTypography.labelMedium(color: primaryTextColor)),
-    ],
-  );
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTypography.bodyXSmall(
+            color: secondaryTextColor,
+          ).copyWith(fontSize: 9),
+        ),
+        Text(value, style: AppTypography.labelMedium(color: primaryTextColor)),
+      ],
+    );
   }
 }
 
@@ -909,7 +1020,9 @@ class _InstallmentTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final darkMode = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = darkMode ? AppColors.backgroundDark : AppColors.backgroundLight;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
     final primaryTextColor = darkMode
         ? AppColors.textPrimaryDark
         : AppColors.textPrimaryLight;
@@ -917,79 +1030,80 @@ class _InstallmentTile extends ConsumerWidget {
         ? AppColors.textSecondaryDark
         : AppColors.textSecondaryLight;
     return InkWell(
-    onTap: () => ref.read(paymentProvider.notifier).selectInstallment(type),
-    child: Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: selected ? const Color(0xFFD19A3D) : AppColors.borderLight,
+      onTap: () => ref.read(paymentProvider.notifier).selectInstallment(type),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? const Color(0xFFD19A3D) : AppColors.borderLight,
+          ),
+          boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 5)],
         ),
-        boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 5)],
-      ),
-      child: Row(
-        children: [
-          Radio<InstallmentType>(
-            value: type,
-            groupValue: ref.watch(
-              paymentProvider.select((v) => v.installmentType),
+        child: Row(
+          children: [
+            Radio<InstallmentType>(
+              value: type,
+              groupValue: ref.watch(
+                paymentProvider.select((v) => v.installmentType),
+              ),
+              onChanged: (v) {
+                if (v != null)
+                  ref.read(paymentProvider.notifier).selectInstallment(v);
+              },
+              activeColor: const Color(0xFFD09116),
             ),
-            onChanged: (v) {
-              if (v != null)
-                ref.read(paymentProvider.notifier).selectInstallment(v);
-            },
-            activeColor: const Color(0xFFD09116),
-          ),
-          CircleAvatar(
-            radius: 21,
-            backgroundColor: selected
-                ? const Color(0xFFFFF1D9)
-                : const Color(0xFFFFE8EC),
-            child: Icon(
-              icon,
-              color: selected
-                  ? const Color(0xFFD38A18)
-                  : const Color(0xFFFA5265),
+            CircleAvatar(
+              radius: 21,
+              backgroundColor: selected
+                  ? const Color(0xFFFFF1D9)
+                  : const Color(0xFFFFE8EC),
+              child: Icon(
+                icon,
+                color: selected
+                    ? const Color(0xFFD38A18)
+                    : const Color(0xFFFA5265),
+              ),
             ),
-          ),
-          SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.labelMedium(color: primaryTextColor),
-                ),
-                Text(
-                  subtitle,
-                  style: AppTypography.bodyXSmall(
-                    color: secondaryTextColor,
-                  ).copyWith(fontSize: 10),
-                ),
-                if (detail != null)
+            SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
-                    detail!,
+                    title,
+                    style: AppTypography.labelMedium(color: primaryTextColor),
+                  ),
+                  Text(
+                    subtitle,
                     style: AppTypography.bodyXSmall(
-                      color: type == InstallmentType.pendingDues
-                          ? Colors.red
-                          : const Color(0xFF7E3DD7),
+                      color: secondaryTextColor,
                     ).copyWith(fontSize: 10),
                   ),
-              ],
+                  if (detail != null)
+                    Text(
+                      detail!,
+                      style: AppTypography.bodyXSmall(
+                        color: type == InstallmentType.pendingDues
+                            ? Colors.red
+                            : const Color(0xFF7E3DD7),
+                      ).copyWith(fontSize: 10),
+                    ),
+                ],
+              ),
             ),
-          ),
-          Text(
-            amount,
-            style: AppTypography.labelMedium(
-              color: selected ? const Color(0xFF248A47) : Colors.black,
+            SizedBox(width: AppSpacing.sm),
+            Text(
+              amount,
+              style: AppTypography.labelMedium(
+                color: selected ? const Color(0xFF248A47) : primaryTextColor,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
   }
 }
 
@@ -1000,6 +1114,18 @@ class _PaymentSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
+
     final amount = switch (type) {
       InstallmentType.currentMonth => scheme.nextDueAmount,
       InstallmentType.pendingDues => scheme.pendingAmount,
@@ -1014,8 +1140,8 @@ class _PaymentSummary extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: const Color(0xFFF6E7D5)),
+        color: backgroundColor,
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
@@ -1026,7 +1152,7 @@ class _PaymentSummary extends StatelessWidget {
             children: [
               Text(
                 'Payment Summary',
-                style: AppTypography.sectionTitleSM(color: Colors.black),
+                style: AppTypography.sectionTitleSM(color: primaryTextColor),
               ),
               Text(
                 label,
@@ -1059,62 +1185,84 @@ class _TotalRow extends StatelessWidget {
   final String value;
   final bool prominent;
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(bottom: 5),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: AppTypography.bodyXSmall(
-            color: prominent ? Colors.black : AppColors.mutedGray,
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: AppTypography.bodyXSmall(
+              color: prominent ? primaryTextColor : secondaryTextColor,
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: AppTypography.labelMedium(
-            color: prominent ? const Color(0xFFD08112) : Colors.black,
+          Text(
+            value,
+            style: AppTypography.labelMedium(
+              color: prominent ? const Color(0xFFD08112) : primaryTextColor,
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 class _NoteCard extends StatelessWidget {
   const _NoteCard();
   @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF7EC),
-      borderRadius: BorderRadius.circular(8),
-    ),
-    child: Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Icon(Icons.info, color: Color(0xFFD69B2D)),
-        SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Note',
-                style: AppTypography.labelMedium(color: Colors.black),
-              ),
-              Text(
-                'Your payment will be adjusted to the oldest pending installment first.\nAny advance amount will be adjusted to upcoming installments.',
-                style: AppTypography.bodyXSmall(
-                  color: AppColors.mutedGray,
-                ).copyWith(fontSize: 9),
-              ),
-            ],
+  Widget build(BuildContext context) {
+    final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        border: Border.all(color: AppColors.goldBorderLight),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.info, color: Color(0xFFD69B2D)),
+          SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Note',
+                  style: AppTypography.labelMedium(color: primaryTextColor),
+                ),
+                Text(
+                  'Your payment will be adjusted to the oldest pending installment first.\nAny advance amount will be adjusted to upcoming installments.',
+                  style: AppTypography.bodyXSmall(
+                    color: AppColors.mutedGray,
+                  ).copyWith(fontSize: 9),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }
 
 class _PaymentTile extends ConsumerWidget {
@@ -1135,15 +1283,27 @@ class _PaymentTile extends ConsumerWidget {
   final String subtitle;
   final bool highlighted;
   @override
-  Widget build(BuildContext context, WidgetRef ref) => InkWell(
+  Widget build(BuildContext context, WidgetRef ref) {
+final darkMode = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = darkMode
+        ? AppColors.backgroundDark
+        : AppColors.backgroundLight;
+    final primaryTextColor = darkMode
+        ? AppColors.textPrimaryDark
+        : AppColors.textPrimaryLight;
+    final secondaryTextColor = darkMode
+        ? AppColors.textSecondaryDark
+        : AppColors.textSecondaryLight;
+        final borderColor = darkMode ? AppColors.borderDark : AppColors.borderLight;
+  return InkWell(
     onTap: () => ref.read(paymentProvider.notifier).selectMethod(method),
     child: Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: highlighted ? const Color(0xFFF7FFF7) : Colors.white,
+        color: backgroundColor,
         borderRadius: BorderRadius.circular(9),
         border: Border.all(
-          color: highlighted ? const Color(0xFF75AC79) : AppColors.borderLight,
+          color: highlighted ? const Color(0xFF75AC79) : borderColor,
         ),
         boxShadow: const [BoxShadow(color: Color(0x12000000), blurRadius: 4)],
       ),
@@ -1161,12 +1321,12 @@ class _PaymentTile extends ConsumerWidget {
               children: [
                 Text(
                   title,
-                  style: AppTypography.labelMedium(color: Colors.black),
+                  style: AppTypography.labelMedium(color: primaryTextColor),
                 ),
                 Text(
                   subtitle,
                   style: AppTypography.bodyXSmall(
-                    color: AppColors.mutedGray,
+                    color: secondaryTextColor,
                   ).copyWith(fontSize: 10),
                 ),
               ],
@@ -1184,6 +1344,7 @@ class _PaymentTile extends ConsumerWidget {
       ),
     ),
   );
+  }
 }
 
 class _PayBar extends ConsumerWidget {

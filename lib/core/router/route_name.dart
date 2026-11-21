@@ -32,6 +32,8 @@ abstract class RouteName {
   static const String paymentSuccess = '/app/pay/success';
   static const String paymentHistory = '/app/paymentHistory';
   static const String paymentReceipt = '/app/paymentReceipt/:transactionId';
+  static const String paymentWebView = '/app/pay/webview';
+  static const String paymentFailure = '/app/pay/failure';
 
   // ── Profile & KYC ────────────────────────────────────────────
 
